@@ -1,5 +1,9 @@
+"use client";
+
 import Image from "next/image";
-import { Plus } from "lucide-react";
+import { Plus, Flame, Star } from "lucide-react";
+import { useCartStore } from "@/store/cartStore";
+import { motion } from "framer-motion";
 
 type Product = {
   id: string;
@@ -13,44 +17,146 @@ type Product = {
   isHot: boolean;
 };
 
-export default function ProductCard({ product }: { product: Product }) {
-  return (
-    <div className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 flex gap-4 w-full relative overflow-hidden group">
-      {/* Badge Mới/Hot */}
-      {product.isNew && (
-        <span className="absolute top-2 left-2 bg-primary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm z-10">MỚI</span>
-      )}
-      {product.isHot && (
-        <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm z-10">HOT</span>
-      )}
+export default function ProductCard({ product, viewMode = "list" }: { product: Product, viewMode?: "grid" | "list" }) {
+  const { addItem } = useCartStore();
 
-      {/* Image */}
-      <div className="w-20 h-24 flex-shrink-0 bg-gray-50 rounded-lg overflow-hidden flex items-center justify-center relative">
-        <Image src={product.image} alt={product.name} width={80} height={80} className="object-cover group-hover:scale-110 transition-transform duration-300" />
+  const handleAddToCart = () => {
+    addItem({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1,
+      note: "",
+    });
+  };
+
+  const formatPrice = (price: number) => {
+    return price.toLocaleString("vi-VN") + " ₫";
+  };
+
+  if (viewMode === "grid") {
+    return (
+      <motion.div 
+        layout
+        className="bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex flex-col w-full relative overflow-hidden group hover:shadow-xl hover:shadow-orange-100/50 transition-all duration-300"
+      >
+        {/* Badge Section */}
+        <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+          {product.isNew && (
+            <span className="bg-green-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+              <Star size={10} fill="currentColor" /> MỚI
+            </span>
+          )}
+          {product.isHot && (
+            <span className="bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+              <Flame size={10} fill="currentColor" /> HOT
+            </span>
+          )}
+        </div>
+
+        {/* Image - Vertical */}
+        <div className="aspect-square w-full bg-gray-50 rounded-2xl overflow-hidden relative mb-4">
+          <Image 
+            src={product.image} 
+            alt={product.name} 
+            fill
+            className="object-cover group-hover:scale-110 transition-transform duration-500" 
+          />
+        </div>
+
+        {/* Content */}
+        <div className="flex flex-col flex-1">
+          <h4 className="font-bold text-lg text-gray-900 line-clamp-1 leading-tight group-hover:text-primary transition-colors">
+            {product.name}
+          </h4>
+          <p className="text-xs text-gray-400 line-clamp-2 mt-2 font-medium h-8">
+            {product.description}
+          </p>
+          
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
+            <div className="flex flex-col">
+              {product.originalPrice && (
+                <span className="text-xs text-gray-300 line-through mb-0.5">
+                  {formatPrice(product.originalPrice)}
+                </span>
+              )}
+              <span className="font-black text-primary text-xl">{formatPrice(product.price)}</span>
+            </div>
+            
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddToCart();
+              }}
+              className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center hover:bg-orange-600 transition-all shadow-lg shadow-orange-100 active:scale-90"
+            >
+              <Plus className="w-6 h-6" strokeWidth={3} />
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // List Mode
+  return (
+    <motion.div 
+      layout
+      className="bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex gap-4 w-full relative overflow-hidden group hover:shadow-lg hover:shadow-orange-50/50 transition-all duration-300"
+    >
+      {/* Badges for List mode */}
+      <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
+        {product.isNew && (
+          <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md">MỚI</span>
+        )}
+        {product.isHot && (
+          <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md">HOT</span>
+        )}
+      </div>
+
+      {/* Image - Horizontal */}
+      <div className="w-28 h-32 flex-shrink-0 bg-gray-50 rounded-2xl overflow-hidden relative">
+        <Image 
+          src={product.image} 
+          alt={product.name} 
+          fill
+          className="object-cover group-hover:scale-110 transition-transform duration-500" 
+        />
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-between py-0.5">
+      <div className="flex-1 flex flex-col justify-between py-1">
         <div>
-          <h4 className="font-semibold text-sm text-gray-900 line-clamp-1">{product.name}</h4>
-          <p className="text-xs text-gray-500 line-clamp-2 mt-1 leading-snug">{product.description}</p>
+          <h4 className="font-bold text-lg text-gray-900 line-clamp-1 leading-tight group-hover:text-primary transition-colors">
+            {product.name}
+          </h4>
+          <p className="text-[13px] text-gray-500 line-clamp-2 mt-1.5 leading-snug font-medium">
+            {product.description}
+          </p>
         </div>
         
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-primary text-sm">{product.price.toLocaleString("vi-VN")} ₫</span>
+        <div className="flex items-end justify-between mt-3">
+          <div className="flex flex-col">
             {product.originalPrice && (
-              <span className="text-xs text-gray-400 line-through hidden sm:inline-block">
-                {product.originalPrice.toLocaleString("vi-VN")} ₫
+              <span className="text-[11px] text-gray-300 line-through mb-0.5">
+                {formatPrice(product.originalPrice)}
               </span>
             )}
+            <span className="font-black text-primary text-xl leading-none">{formatPrice(product.price)}</span>
           </div>
           
-          <button className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center hover:bg-orange-600 transition-colors shadow-sm">
-            <Plus className="w-4 h-4" />
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAddToCart();
+            }}
+            className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-orange-600 transition-all shadow-lg shadow-orange-100 active:scale-90"
+          >
+            <Plus className="w-5 h-5" strokeWidth={3} />
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

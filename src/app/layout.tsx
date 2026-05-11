@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import CartDrawer from "@/components/CartDrawer";
+import OrdersDrawer from "@/components/OrdersDrawer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +21,8 @@ export default function RootLayout({
     <html lang="vi" className="bg-[#fdfbf7]">
       <body className={`${inter.className} min-h-screen text-gray-900`}>
         {children}
+        <CartDrawer />
+        <OrdersDrawer />
         <MobileBottomNav />
       </body>
     </html>
