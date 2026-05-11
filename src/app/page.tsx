@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
+import ProductDetailModal from "@/components/ProductDetailModal";
 import { useCartStore } from "@/store/cartStore";
 import { motion } from "framer-motion";
 import { Search, ClipboardList, Bell, Settings, LayoutDashboard, Soup, LayoutGrid, List as ListIcon } from "lucide-react";
@@ -13,6 +14,7 @@ export default function Home() {
   const [categories, setCategories] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<string>("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const { getTotalItems, toggleCart, toggleOrders, orders, isAdmin, logout } = useCartStore();
 
   useEffect(() => {
@@ -186,7 +188,9 @@ export default function Home() {
                 : "flex flex-col gap-4"
               }>
                 {catProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} viewMode={viewMode} />
+                  <div key={product.id} onClick={() => setSelectedProduct(product)}>
+                    <ProductCard product={product} viewMode={viewMode} />
+                  </div>
                 ))}
               </div>
             </div>
@@ -202,6 +206,12 @@ export default function Home() {
           </Link>
         )}
       </footer>
+
+      {/* Product Detail Modal */}
+      <ProductDetailModal 
+        product={selectedProduct} 
+        onClose={() => setSelectedProduct(null)} 
+      />
     </main>
   );
 }
