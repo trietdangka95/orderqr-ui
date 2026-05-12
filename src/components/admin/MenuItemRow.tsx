@@ -20,7 +20,7 @@ export default function MenuItemRow({ item, onEdit }: MenuItemRowProps) {
   };
 
   return (
-    <motion.div 
+    <motion.div
       layout
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -47,7 +47,7 @@ export default function MenuItemRow({ item, onEdit }: MenuItemRowProps) {
                 {formatPrice(item.price)}
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4 mt-2">
               <div className="flex items-center gap-1.5 px-2.5 py-1 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase tracking-wider">
                 <Tag size={12} />
@@ -89,7 +89,7 @@ export default function MenuItemRow({ item, onEdit }: MenuItemRowProps) {
           </div>
         </div>
       </div>
-      
+
       {/* Decorative background element */}
       <div className="absolute -right-4 -bottom-4 w-16 h-16 bg-gray-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity -z-10 scale-150"></div>
     </motion.div>

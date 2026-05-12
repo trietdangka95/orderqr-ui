@@ -36,7 +36,7 @@ export default function AdminMenuPage() {
       <header className="bg-white/80 backdrop-blur-md border-b sticky top-0 z-10 px-4">
         <div className="max-w-7xl mx-auto h-20 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <Link 
+            <Link
               href="/admin"
               className="w-10 h-10 flex items-center justify-center bg-gray-50 hover:bg-gray-100 rounded-full transition-all border border-gray-100"
             >
@@ -50,20 +50,20 @@ export default function AdminMenuPage() {
 
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex bg-gray-100 p-1 rounded-xl border border-gray-200">
-              <button 
+              <button
                 onClick={() => setViewMode("grid")}
                 className={`p-2 rounded-lg transition-all ${viewMode === "grid" ? "bg-white shadow-sm text-orange-500" : "text-gray-400 hover:text-gray-600"}`}
               >
                 <LayoutGrid size={20} />
               </button>
-              <button 
+              <button
                 onClick={() => setViewMode("list")}
                 className={`p-2 rounded-lg transition-all ${viewMode === "list" ? "bg-white shadow-sm text-orange-500" : "text-gray-400 hover:text-gray-600"}`}
               >
                 <ListIcon size={20} />
               </button>
             </div>
-            
+
             <button
               onClick={handleAddNew}
               className="bg-gray-900 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 hover:bg-black shadow-xl shadow-gray-200 transition-all active:scale-95"
@@ -91,8 +91,8 @@ export default function AdminMenuPage() {
         </div>
 
         {/* Content */}
-        <div className={viewMode === "grid" 
-          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" 
+        <div className={viewMode === "grid"
+          ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           : "flex flex-col gap-4"
         }>
           <AnimatePresence mode="popLayout">
@@ -101,7 +101,7 @@ export default function AdminMenuPage() {
                 <MenuItemCard key={item.id} item={item} onEdit={handleEdit} />
               ))
             ) : (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="col-span-full py-32 flex flex-col items-center justify-center text-gray-400 bg-white rounded-[2.5rem] border-2 border-dashed border-gray-100"
@@ -110,7 +110,7 @@ export default function AdminMenuPage() {
                   <Search size={32} className="opacity-20" />
                 </div>
                 <p className="text-lg font-bold italic">Không tìm thấy món ăn nào</p>
-                <button 
+                <button
                   onClick={() => setSearchTerm("")}
                   className="mt-4 text-orange-500 font-bold hover:underline"
                 >

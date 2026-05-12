@@ -13,7 +13,7 @@ export default function CartDrawer() {
     setIsOrdering(true);
     // Giả lập delay gửi API
     setTimeout(() => {
-      submitOrder(); 
+      submitOrder();
       setIsOrdering(false);
       toggleOrders(); // Mở tab Đơn đã gọi lên
     }, 600);
@@ -23,17 +23,16 @@ export default function CartDrawer() {
     <>
       {/* Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-[100] transition-opacity cursor-pointer"
           onClick={toggleCart}
         />
       )}
-      
+
       {/* Drawer */}
-      <div 
-        className={`fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-[101] shadow-2xl flex flex-col transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+      <div
+        className={`fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-[101] shadow-2xl flex flex-col transition-transform duration-300 ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white">
           <div className="flex items-center gap-2">
@@ -57,7 +56,7 @@ export default function CartDrawer() {
                 <div className="w-16 h-16 rounded-lg bg-gray-50 overflow-hidden relative flex-shrink-0">
                   <Image src={item.image} alt={item.name} fill className="object-cover" />
                 </div>
-                
+
                 <div className="flex-1 flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <h3 className="font-medium text-sm text-gray-900 line-clamp-2 pr-2">{item.name}</h3>
@@ -65,16 +64,16 @@ export default function CartDrawer() {
                       <X className="w-4 h-4" />
                     </button>
                   </div>
-                  
+
                   {item.note && (
                     <p className="text-xs text-gray-500 italic mt-0.5 border-l-2 border-gray-200 pl-2">Ghi chú: {item.note}</p>
                   )}
-                  
+
                   <div className="flex items-center justify-between mt-2">
                     <span className="font-bold text-primary text-sm">{(item.price * item.quantity).toLocaleString("vi-VN")} ₫</span>
-                    
+
                     <div className="flex items-center gap-3 bg-gray-50 rounded-full px-2 py-1 border border-gray-100">
-                      <button 
+                      <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="w-5 h-5 flex items-center justify-center rounded-full text-gray-500 hover:bg-white hover:shadow-sm transition-all disabled:opacity-50"
                         disabled={item.quantity <= 1}
@@ -82,7 +81,7 @@ export default function CartDrawer() {
                         <Minus className="w-3 h-3" />
                       </button>
                       <span className="text-sm font-medium w-4 text-center">{item.quantity}</span>
-                      <button 
+                      <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="w-5 h-5 flex items-center justify-center rounded-full text-gray-500 hover:bg-white hover:shadow-sm transition-all"
                       >
@@ -102,7 +101,7 @@ export default function CartDrawer() {
               <span className="text-gray-600 font-medium">Tổng cộng</span>
               <span className="text-xl font-bold text-primary">{getTotalPrice().toLocaleString("vi-VN")} ₫</span>
             </div>
-            <button 
+            <button
               onClick={handleCheckout}
               className="w-full bg-primary text-white font-bold text-lg py-3.5 rounded-xl shadow-lg shadow-orange-200 hover:bg-orange-600 transition-transform active:scale-[0.98]"
             >

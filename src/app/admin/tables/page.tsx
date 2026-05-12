@@ -59,7 +59,7 @@ export default function AdminTablesPage() {
       <header className="bg-white border-b sticky top-0 z-10 print:hidden">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link 
+            <Link
               href="/admin"
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
@@ -67,15 +67,15 @@ export default function AdminTablesPage() {
             </Link>
             <h1 className="text-xl font-bold text-gray-800">Quản lý Bàn</h1>
           </div>
-          
+
           <div className="flex bg-gray-100 p-1 rounded-xl border">
-            <button 
+            <button
               onClick={() => setActiveTab("status")}
               className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${activeTab === "status" ? "bg-white shadow-sm text-orange-500" : "text-gray-500"}`}
             >
               Trạng thái
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab("qr")}
               className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${activeTab === "qr" ? "bg-white shadow-sm text-orange-500" : "text-gray-500"}`}
             >
@@ -130,16 +130,15 @@ export default function AdminTablesPage() {
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Đơn #{order.id.slice(-4)}</span>
                             {!order.isConfirmed ? (
-                              <button 
+                              <button
                                 onClick={() => confirmOrder(order.id)}
                                 className="bg-red-500 text-white text-[10px] px-2 py-1 rounded-lg font-black uppercase hover:bg-red-600 transition-colors"
                               >
                                 Xác nhận ngay
                               </button>
                             ) : (
-                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                                order.status === "completed" ? "bg-green-100 text-green-600" : "bg-orange-100 text-orange-600"
-                              }`}>
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${order.status === "completed" ? "bg-green-100 text-green-600" : "bg-orange-100 text-orange-600"
+                                }`}>
                                 {order.status === "completed" ? "Đã phục vụ" : "Đang xử lý"}
                               </span>
                             )}
@@ -180,17 +179,17 @@ export default function AdminTablesPage() {
                 <h2 className="text-2xl font-black text-gray-900 tracking-tight">Danh sách mã QR Bàn</h2>
                 <p className="text-sm text-gray-500 font-medium">In mã này để dán lên từng bàn tại quán.</p>
               </div>
-              
+
               <div className="flex flex-wrap items-center gap-3">
                 <form onSubmit={handleAddTable} className="flex bg-white p-1.5 rounded-2xl border-2 border-gray-100 focus-within:border-orange-500 transition-all shadow-sm">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Số bàn (vd: 06)"
                     value={newTableNum}
                     onChange={(e) => setNewTableNum(e.target.value)}
                     className="w-32 px-4 outline-none text-sm font-bold"
                   />
-                  <button 
+                  <button
                     type="submit"
                     className="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-orange-600 transition-all active:scale-95"
                   >
@@ -198,7 +197,7 @@ export default function AdminTablesPage() {
                   </button>
                 </form>
 
-                <button 
+                <button
                   onClick={() => addMultipleTables(10)}
                   className="flex items-center gap-2 bg-blue-500 text-white px-5 py-3 rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-100 active:scale-95"
                 >
@@ -206,7 +205,7 @@ export default function AdminTablesPage() {
                   Thêm nhanh 10 bàn
                 </button>
 
-                <button 
+                <button
                   onClick={handlePrint}
                   className="flex items-center gap-2 bg-gray-900 text-white px-5 py-3 rounded-2xl font-bold hover:bg-black transition-all shadow-xl shadow-gray-200 active:scale-95"
                 >
@@ -222,7 +221,7 @@ export default function AdminTablesPage() {
                 return (
                   <div key={t} className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col items-center text-center group hover:shadow-xl hover:border-orange-200 transition-all duration-500 break-inside-avoid mb-4 relative">
                     {/* Delete button (only visible on hover and not during print) */}
-                    <button 
+                    <button
                       onClick={() => {
                         if (confirm(`Xóa bàn ${t}?`)) removeTable(t);
                       }}
@@ -235,8 +234,8 @@ export default function AdminTablesPage() {
                       {t}
                     </div>
                     <div className="p-3 bg-white border-4 border-gray-50 rounded-3xl mb-4 group-hover:border-orange-50 transition-colors">
-                      <QRCodeSVG 
-                        value={qrLink} 
+                      <QRCodeSVG
+                        value={qrLink}
                         size={120}
                         level="H"
                         includeMargin={false}
@@ -252,7 +251,7 @@ export default function AdminTablesPage() {
                     </div>
                     <p className="text-xs font-black text-gray-900 uppercase tracking-widest mb-1">BÀN SỐ {t}</p>
                     <p className="text-[10px] text-gray-400 font-medium truncate w-full px-2">{qrLink}</p>
-                    
+
                     <div className="hidden print:block mt-4 pt-4 border-t border-dashed border-gray-200 w-full">
                       <p className="text-[10px] font-bold text-gray-800">HOMI MEDIA - MENU QR</p>
                       <p className="text-[8px] text-gray-400 italic">Vui lòng quét mã để gọi món</p>

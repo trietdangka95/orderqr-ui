@@ -14,11 +14,11 @@ export default function OrdersDrawer() {
 
   return (
     <>
-      <div 
+      <div
         className="fixed inset-0 bg-black/50 z-[100] transition-opacity cursor-pointer"
         onClick={toggleOrders}
       />
-      
+
       <div className="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-gray-50 z-[101] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
         <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white shadow-sm">
           <div className="flex items-center gap-2">
@@ -50,19 +50,17 @@ export default function OrdersDrawer() {
                 <div className="px-6 py-5 border-b border-gray-50">
                   <div className="flex items-center justify-between relative">
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-100 rounded-full -z-10"></div>
-                    
-                    <div className={`absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full -z-10 transition-all duration-1000 ${
-                      !order.isConfirmed ? "w-[5%] bg-red-200" :
-                      order.status === "pending" ? "w-[10%] bg-orange-200" :
-                      order.status === "cooking" ? "w-[50%] bg-orange-400" :
-                      "w-full bg-green-500"
-                    }`}></div>
+
+                    <div className={`absolute left-0 top-1/2 -translate-y-1/2 h-1 rounded-full -z-10 transition-all duration-1000 ${!order.isConfirmed ? "w-[5%] bg-red-200" :
+                        order.status === "pending" ? "w-[10%] bg-orange-200" :
+                          order.status === "cooking" ? "w-[50%] bg-orange-400" :
+                            "w-full bg-green-500"
+                      }`}></div>
 
                     <div className="flex flex-col items-center gap-1.5">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${
-                        !order.isConfirmed ? "bg-red-500 text-white animate-pulse" :
-                        order.status === "pending" ? "bg-white border-2 border-orange-400 text-orange-500 animate-pulse" : "bg-orange-400 text-white"
-                      }`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${!order.isConfirmed ? "bg-red-500 text-white animate-pulse" :
+                          order.status === "pending" ? "bg-white border-2 border-orange-400 text-orange-500 animate-pulse" : "bg-orange-400 text-white"
+                        }`}>
                         <Clock className="w-4 h-4" />
                       </div>
                       <span className={`text-[10px] font-bold ${!order.isConfirmed ? "text-red-600" : order.status === "pending" ? "text-orange-600" : "text-gray-400"}`}>
@@ -71,20 +69,18 @@ export default function OrdersDrawer() {
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${
-                        order.status === "pending" ? "bg-white border-2 border-gray-200 text-gray-300" : 
-                        order.status === "cooking" ? "bg-white border-2 border-orange-500 text-orange-500 animate-pulse" : 
-                        "bg-orange-500 text-white"
-                      }`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${order.status === "pending" ? "bg-white border-2 border-gray-200 text-gray-300" :
+                          order.status === "cooking" ? "bg-white border-2 border-orange-500 text-orange-500 animate-pulse" :
+                            "bg-orange-500 text-white"
+                        }`}>
                         <ChefHat className="w-4 h-4" />
                       </div>
                       <span className={`text-[10px] font-bold ${order.status === "cooking" ? "text-orange-600" : "text-gray-400"}`}>Đang làm</span>
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${
-                        order.status === "serving" ? "bg-green-500 text-white animate-bounce" : "bg-white border-2 border-gray-200 text-gray-300"
-                      }`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${order.status === "serving" ? "bg-green-500 text-white animate-bounce" : "bg-white border-2 border-gray-200 text-gray-300"
+                        }`}>
                         <CheckCircle2 className="w-4 h-4" />
                       </div>
                       <span className={`text-[10px] font-bold ${order.status === "serving" ? "text-green-600" : "text-gray-400"}`}>Đang lên</span>
@@ -110,7 +106,7 @@ export default function OrdersDrawer() {
                     </div>
                   ))}
                 </div>
-                
+
                 <div className="px-4 py-3 bg-gray-50 flex flex-col gap-3 border-t border-gray-100">
                   <div className="flex justify-between items-center">
                     <span className="text-xs font-medium text-gray-500">Tổng cộng đợt này</span>

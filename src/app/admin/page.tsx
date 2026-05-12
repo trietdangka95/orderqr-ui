@@ -1,11 +1,11 @@
 "use client";
 
 import { useCartStore } from "@/store/cartStore";
-import { 
-  Soup, 
-  LayoutDashboard, 
-  Settings, 
-  LogOut, 
+import {
+  Soup,
+  LayoutDashboard,
+  Settings,
+  LogOut,
   ChevronRight,
   TrendingUp,
   Users,
@@ -52,7 +52,7 @@ export default function AdminDashboard() {
             <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Admin Dashboard</h1>
             <p className="text-gray-500 font-medium">Chào mừng trở lại, Quản trị viên</p>
           </div>
-          <button 
+          <button
             onClick={logout}
             className="flex items-center gap-2 px-6 py-3 bg-white text-red-500 font-bold rounded-2xl shadow-sm border border-red-50 hover:bg-red-50 transition-all active:scale-95 w-fit"
           >
@@ -97,7 +97,7 @@ export default function AdminDashboard() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Link 
+              <Link
                 href={item.href}
                 className="group bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all flex items-center gap-6"
               >
@@ -120,7 +120,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="mt-12 text-center">
-          <Link 
+          <Link
             href="/"
             className="text-gray-400 hover:text-gray-600 font-bold text-sm flex items-center justify-center gap-2 transition-colors"
           >

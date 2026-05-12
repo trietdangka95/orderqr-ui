@@ -22,7 +22,7 @@ export default function KitchenPage() {
     const pendingCount = orders.filter((o) => o.status === "pending").length;
     if (pendingCount > prevPendingCount && audioRef.current) {
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => {});
+      audioRef.current.play().catch(() => { });
     }
     setPrevPendingCount(pendingCount);
   }, [orders, prevPendingCount]);
@@ -69,14 +69,14 @@ export default function KitchenPage() {
         </div>
 
         <div className="flex bg-white p-1 rounded-2xl shadow-sm border">
-          <button 
+          <button
             onClick={() => setView("board")}
             className={`flex items-center gap-2 px-6 py-2 rounded-xl font-bold transition-all ${view === "board" ? "bg-orange-500 text-white shadow-lg shadow-orange-200" : "text-gray-400 hover:text-gray-600"}`}
           >
             <LayoutGrid size={18} />
             Kanban
           </button>
-          <button 
+          <button
             onClick={() => setView("summary")}
             className={`flex items-center gap-2 px-6 py-2 rounded-xl font-bold transition-all ${view === "summary" ? "bg-orange-500 text-white shadow-lg shadow-orange-200" : "text-gray-400 hover:text-gray-600"}`}
           >

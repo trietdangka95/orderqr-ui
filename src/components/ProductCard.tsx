@@ -37,7 +37,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
 
   if (viewMode === "grid") {
     return (
-      <motion.div 
+      <motion.div
         layoutId={`product-${product.id}`}
         className="bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex flex-col w-full relative overflow-hidden group hover:shadow-xl hover:shadow-orange-100/50 transition-all duration-300 h-full"
       >
@@ -57,11 +57,11 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
 
         {/* Image - Vertical */}
         <div className="aspect-square w-full bg-gray-50 rounded-2xl overflow-hidden relative mb-4">
-          <Image 
-            src={product.image} 
-            alt={product.name} 
+          <Image
+            src={product.image}
+            alt={product.name}
             fill
-            className="object-cover group-hover:scale-110 transition-transform duration-500" 
+            className="object-cover group-hover:scale-110 transition-transform duration-500"
           />
         </div>
 
@@ -73,7 +73,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
           <p className="text-xs text-gray-400 line-clamp-2 mt-2 font-medium h-8">
             {product.description}
           </p>
-          
+
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
             <div className="flex flex-col">
               {product.originalPrice && (
@@ -83,8 +83,8 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
               )}
               <span className="font-black text-primary text-xl">{formatPrice(product.price)}</span>
             </div>
-            
-            <button 
+
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 handleAddToCart();
@@ -101,7 +101,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
 
   // List Mode
   return (
-    <motion.div 
+    <motion.div
       layoutId={`product-${product.id}`}
       className="bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex gap-4 w-full relative overflow-hidden group hover:shadow-lg hover:shadow-orange-50/50 transition-all duration-300"
     >
@@ -117,11 +117,11 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
 
       {/* Image - Horizontal */}
       <div className="w-28 h-32 flex-shrink-0 bg-gray-50 rounded-2xl overflow-hidden relative">
-        <Image 
-          src={product.image} 
-          alt={product.name} 
+        <Image
+          src={product.image}
+          alt={product.name}
           fill
-          className="object-cover group-hover:scale-110 transition-transform duration-500" 
+          className="object-cover group-hover:scale-110 transition-transform duration-500"
         />
       </div>
 
@@ -135,7 +135,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
             {product.description}
           </p>
         </div>
-        
+
         <div className="flex items-end justify-between mt-3">
           <div className="flex flex-col">
             {product.originalPrice && (
@@ -145,8 +145,8 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
             )}
             <span className="font-black text-primary text-xl leading-none">{formatPrice(product.price)}</span>
           </div>
-          
-          <button 
+
+          <button
             onClick={(e) => {
               e.stopPropagation();
               handleAddToCart();

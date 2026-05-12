@@ -38,13 +38,13 @@ interface CartState {
   orders: Order[];
   isOrdersOpen: boolean;
   adminMenu: MenuItem[];
-  
+
   // Role & Table
   userRole: UserRole;
   selectedTable: string;
   setUserRole: (role: UserRole) => void;
   setSelectedTable: (table: string) => void;
-  
+
   addItem: (item: Omit<CartItem, "id">) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
@@ -59,12 +59,12 @@ interface CartState {
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   confirmOrder: (orderId: string) => void;
   clearTableOrders: (tableNumber: string) => void;
-  
+
   // Table Management
   addTable: (tableNumber: string) => void;
   addMultipleTables: (count: number) => void;
   removeTable: (tableNumber: string) => void;
-  
+
   // Admin Menu CRUD
   addMenuItem: (item: Omit<MenuItem, "id">) => void;
   updateMenuItem: (id: string, data: Partial<Omit<MenuItem, "id">>) => void;
@@ -114,179 +114,179 @@ export const useCartStore = create<CartState>()(
           description: "Cà phê pha phin truyền thống kết hợp sữa đặc."
         }
       ],
-  
-  addItem: (item) => {
-    set((state) => {
-      // Tìm xem item (cùng productId và cùng note) đã có chưa
-      const existingItemIndex = state.items.findIndex(
-        (i) => i.productId === item.productId && i.note === item.note
-      );
 
-      if (existingItemIndex > -1) {
-        const newItems = [...state.items];
-        newItems[existingItemIndex].quantity += item.quantity;
-        return { items: newItems };
+      addItem: (item) => {
+        set((state) => {
+          // Tìm xem item (cùng productId và cùng note) đã có chưa
+          const existingItemIndex = state.items.findIndex(
+            (i) => i.productId === item.productId && i.note === item.note
+          );
+
+          if (existingItemIndex > -1) {
+            const newItems = [...state.items];
+            newItems[existingItemIndex].quantity += item.quantity;
+            return { items: newItems };
+          }
+
+          // Tạo id unique cho cart item dựa trên thời gian
+          return {
+            items: [...state.items, { ...item, id: Date.now().toString() }],
+          };
+        });
+      },
+
+      removeItem: (id) => {
+        set((state) => ({
+          items: state.items.filter((item) => item.id !== id),
+        }));
+      },
+
+      updateQuantity: (id, quantity) => {
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+          ),
+        }));
+      },
+
+      updateNote: (id, note) => {
+        set((state) => ({
+          items: state.items.map((item) =>
+            item.id === id ? { ...item, note } : item
+          ),
+        }));
+      },
+
+      toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
+
+      clearCart: () => set({ items: [] }),
+
+      getTotalItems: () => {
+        return get().items.reduce((total, item) => total + item.quantity, 0);
+      },
+
+      getTotalPrice: () => {
+        return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
+      },
+
+      toggleOrders: () => set((state) => ({ isOrdersOpen: !state.isOrdersOpen })),
+
+      setUserRole: (role) => set({ userRole: role }),
+      setSelectedTable: (table) => set({ selectedTable: table }),
+
+      submitOrder: () => {
+        const { items, getTotalPrice, selectedTable } = get();
+        if (items.length === 0) return;
+        if (!selectedTable) {
+          alert("Vui lòng chọn số bàn trước khi đặt món!");
+          return;
+        }
+
+        const newOrder: Order = {
+          id: Date.now().toString(),
+          items: [...items],
+          totalPrice: getTotalPrice(),
+          status: "pending",
+          timestamp: Date.now(),
+          tableNumber: selectedTable,
+          isConfirmed: false,
+        };
+
+        set((state) => ({
+          orders: [newOrder, ...state.orders],
+          items: [], // Clear cart
+          isOpen: false, // Close cart
+        }));
+      },
+
+      updateOrderStatus: (orderId, status) => {
+        set((state) => ({
+          orders: state.orders.map(order =>
+            order.id === orderId ? { ...order, status } : order
+          )
+        }));
+      },
+
+      confirmOrder: (orderId) => {
+        set((state) => ({
+          orders: state.orders.map(order =>
+            order.id === orderId ? { ...order, isConfirmed: true } : order
+          )
+        }));
+      },
+
+      clearTableOrders: (tableNumber) => {
+        set((state) => ({
+          orders: state.orders.filter(order => order.tableNumber !== tableNumber)
+        }));
+      },
+
+      addTable: (tableNumber) => {
+        set((state) => ({
+          tables: Array.from(new Set([...state.tables, tableNumber])).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+        }));
+      },
+
+      addMultipleTables: (count) => {
+        set((state) => {
+          const lastTable = state.tables.length > 0 ? [...state.tables].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).pop() : "0";
+          const startNum = parseInt(lastTable || "0") + 1;
+          const newTables = Array.from({ length: count }, (_, i) => (startNum + i).toString().padStart(2, "0"));
+          return {
+            tables: Array.from(new Set([...state.tables, ...newTables])).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+          };
+        });
+      },
+
+      removeTable: (tableNumber) => {
+        set((state) => ({
+          tables: state.tables.filter(t => t !== tableNumber)
+        }));
+      },
+
+      addMenuItem: (item) => {
+        set((state) => ({
+          adminMenu: [...state.adminMenu, { ...item, id: Date.now().toString() }]
+        }));
+      },
+
+      updateMenuItem: (id, data) => {
+        set((state) => ({
+          adminMenu: state.adminMenu.map((item) =>
+            item.id === id ? { ...item, ...data } : item
+          )
+        }));
+      },
+
+      removeMenuItem: (id) => {
+        set((state) => ({
+          adminMenu: state.adminMenu.filter((item) => item.id !== id)
+        }));
+      },
+
+      staffLogin: (password) => {
+        if (password === "staff123") {
+          set({ userRole: "staff" });
+          return true;
+        }
+        return false;
+      },
+
+      login: (password) => {
+        if (password === "admin123") {
+          set({ isAdmin: true, userRole: "admin" });
+          return true;
+        }
+        return false;
+      },
+
+      logout: () => {
+        set({ isAdmin: false, userRole: "guest" });
       }
-
-      // Tạo id unique cho cart item dựa trên thời gian
-      return {
-        items: [...state.items, { ...item, id: Date.now().toString() }],
-      };
-    });
-  },
-
-  removeItem: (id) => {
-    set((state) => ({
-      items: state.items.filter((item) => item.id !== id),
-    }));
-  },
-
-  updateQuantity: (id, quantity) => {
-    set((state) => ({
-      items: state.items.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
-      ),
-    }));
-  },
-
-  updateNote: (id, note) => {
-    set((state) => ({
-      items: state.items.map((item) =>
-        item.id === id ? { ...item, note } : item
-      ),
-    }));
-  },
-
-  toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
-  
-  clearCart: () => set({ items: [] }),
-
-  getTotalItems: () => {
-    return get().items.reduce((total, item) => total + item.quantity, 0);
-  },
-
-  getTotalPrice: () => {
-    return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
-  },
-
-  toggleOrders: () => set((state) => ({ isOrdersOpen: !state.isOrdersOpen })),
-
-  setUserRole: (role) => set({ userRole: role }),
-  setSelectedTable: (table) => set({ selectedTable: table }),
-
-  submitOrder: () => {
-    const { items, getTotalPrice, selectedTable } = get();
-    if (items.length === 0) return;
-    if (!selectedTable) {
-      alert("Vui lòng chọn số bàn trước khi đặt món!");
-      return;
-    }
-
-    const newOrder: Order = {
-      id: Date.now().toString(),
-      items: [...items],
-      totalPrice: getTotalPrice(),
-      status: "pending",
-      timestamp: Date.now(),
-      tableNumber: selectedTable,
-      isConfirmed: false,
-    };
-
-    set((state) => ({
-      orders: [newOrder, ...state.orders],
-      items: [], // Clear cart
-      isOpen: false, // Close cart
-    }));
-  },
-
-  updateOrderStatus: (orderId, status) => {
-    set((state) => ({
-      orders: state.orders.map(order => 
-        order.id === orderId ? { ...order, status } : order
-      )
-    }));
-  },
-
-  confirmOrder: (orderId) => {
-    set((state) => ({
-      orders: state.orders.map(order => 
-        order.id === orderId ? { ...order, isConfirmed: true } : order
-      )
-    }));
-  },
-
-  clearTableOrders: (tableNumber) => {
-    set((state) => ({
-      orders: state.orders.filter(order => order.tableNumber !== tableNumber)
-    }));
-  },
-
-  addTable: (tableNumber) => {
-    set((state) => ({
-      tables: Array.from(new Set([...state.tables, tableNumber])).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-    }));
-  },
-
-  addMultipleTables: (count) => {
-    set((state) => {
-      const lastTable = state.tables.length > 0 ? [...state.tables].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).pop() : "0";
-      const startNum = parseInt(lastTable || "0") + 1;
-      const newTables = Array.from({ length: count }, (_, i) => (startNum + i).toString().padStart(2, "0"));
-      return {
-        tables: Array.from(new Set([...state.tables, ...newTables])).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-      };
-    });
-  },
-
-  removeTable: (tableNumber) => {
-    set((state) => ({
-      tables: state.tables.filter(t => t !== tableNumber)
-    }));
-  },
-
-  addMenuItem: (item) => {
-    set((state) => ({
-      adminMenu: [...state.adminMenu, { ...item, id: Date.now().toString() }]
-    }));
-  },
-
-  updateMenuItem: (id, data) => {
-    set((state) => ({
-      adminMenu: state.adminMenu.map((item) =>
-        item.id === id ? { ...item, ...data } : item
-      )
-    }));
-  },
-
-  removeMenuItem: (id) => {
-    set((state) => ({
-      adminMenu: state.adminMenu.filter((item) => item.id !== id)
-    }));
-  },
-
-  staffLogin: (password) => {
-    if (password === "staff123") {
-      set({ userRole: "staff" });
-      return true;
-    }
-    return false;
-  },
-
-  login: (password) => {
-    if (password === "admin123") {
-      set({ isAdmin: true, userRole: "admin" });
-      return true;
-    }
-    return false;
-  },
-
-  logout: () => {
-    set({ isAdmin: false, userRole: "guest" });
-  }
     }),
     {
       name: "menu-viet-storage",
-      partialize: (state) => ({ 
+      partialize: (state) => ({
         orders: state.orders,
         adminMenu: state.adminMenu,
         tables: state.tables,
