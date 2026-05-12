@@ -42,6 +42,7 @@ interface CartState {
   // Role & Table
   userRole: UserRole;
   selectedTable: string;
+  tables: string[];
   setUserRole: (role: UserRole) => void;
   setSelectedTable: (table: string) => void;
 

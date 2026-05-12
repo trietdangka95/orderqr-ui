@@ -15,15 +15,15 @@ interface Product {
 
 interface ProductDetailModalProps {
   product: Product | null;
+  isOpen: boolean;
   onClose: () => void;
 }
 
-export default function ProductDetailModal({ product, onClose }: ProductDetailModalProps) {
+export default function ProductDetailModal({ product, isOpen, onClose }: ProductDetailModalProps) {
   const { addItem } = useCartStore();
 
-  if (!product) return null;
-
   const handleAddToCart = () => {
+    if (!product) return;
     addItem({
       productId: product.id,
       name: product.name,
@@ -37,7 +37,8 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {isOpen && product && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -106,6 +107,7 @@ export default function ProductDetailModal({ product, onClose }: ProductDetailMo
           </div>
         </motion.div>
       </div>
+      )}
     </AnimatePresence>
   );
 }
