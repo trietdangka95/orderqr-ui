@@ -37,9 +37,9 @@ export default function MobileBottomNav() {
   return (
     <div className="md:hidden fixed bottom-6 left-4 right-4 z-50">
       <div className="bg-white/90 backdrop-blur-xl border border-gray-100 shadow-2xl rounded-3xl px-6 py-3 flex justify-between items-center relative overflow-visible">
-        
+
         {/* Menu Button */}
-        <button 
+        <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           className="flex flex-col items-center text-primary transition-all active:scale-90"
         >
@@ -48,8 +48,8 @@ export default function MobileBottomNav() {
         </button>
 
         {/* Cart Button with Highlight */}
-        <button 
-          onClick={toggleCart} 
+        <button
+          onClick={toggleCart}
           className="relative flex flex-col items-center group active:scale-90 transition-all"
         >
           <div className={`relative p-2 rounded-2xl transition-all duration-300 ${totalItems > 0 ? "bg-primary text-white shadow-lg shadow-orange-200 -mt-8 scale-125 border-4 border-[#fdfbf7]" : "text-gray-400"}`}>
@@ -74,14 +74,14 @@ export default function MobileBottomNav() {
         </button>
 
         {/* Orders Button */}
-        <button 
-          onClick={toggleOrders} 
+        <button
+          onClick={toggleOrders}
           className={`flex flex-col items-center transition-all active:scale-90 relative ${activeOrdersCount > 0 ? "text-blue-600" : "text-gray-400"}`}
         >
           <div className="relative">
             <ClipboardList size={24} />
             {activeOrdersCount > 0 && (
-              <motion.div 
+              <motion.div
                 animate={popOrder ? { scale: [1, 1.5, 1] } : {}}
                 className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 text-white text-[8px] font-black rounded-full flex items-center justify-center border-2 border-white shadow-sm"
               >
@@ -91,13 +91,6 @@ export default function MobileBottomNav() {
           </div>
           <span className="text-[9px] font-black uppercase tracking-tighter mt-1">Đơn hàng</span>
         </button>
-
-        {/* Call Staff Button */}
-        <button className="flex flex-col items-center text-gray-400 active:scale-90 transition-all">
-          <Bell size={24} />
-          <span className="text-[9px] font-black uppercase tracking-tighter mt-1">Gợi ý</span>
-        </button>
-
       </div>
     </div>
   );

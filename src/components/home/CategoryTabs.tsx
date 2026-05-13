@@ -12,16 +12,16 @@ export default function CategoryTabs({
   onTabChange,
 }: CategoryTabsProps) {
   return (
-    <div className="sticky top-38 z-30 bg-gray-50/80 backdrop-blur-md -mx-4 px-4 overflow-x-auto no-scrollbar">
-      <div className="flex gap-3">
+    <div className="sticky top-38 z-30 bg-gray-50/80 backdrop-blur-md py-2">
+      <div className="flex flex-wrap gap-2">
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => onTabChange(cat)}
-            className={`px-6 py-3 rounded-2xl font-bold whitespace-nowrap transition-all shadow-sm cursor-pointer ${
+            className={`px-5 py-2.5 rounded-xl font-bold whitespace-nowrap transition-all shadow-sm cursor-pointer text-sm ${
               activeTab === cat
-                ? "bg-primary text-white shadow-orange-200 scale-105"
-                : "bg-white text-gray-500 hover:bg-orange-50 hover:text-primary"
+                ? "bg-primary text-white shadow-orange-200"
+                : "bg-white text-gray-500 hover:bg-orange-50 hover:text-primary border border-gray-100"
             }`}
           >
             {cat}
