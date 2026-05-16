@@ -20,6 +20,13 @@ export interface CreateStoreData {
   currency?: string;
 }
 
+export interface PlatformStats {
+  totalStores: number;
+  activeStores: number;
+  totalProducts: number;
+  totalRevenue: number;
+}
+
 export const superAdminApi = {
   getStores: async (): Promise<Store[]> => {
     const { data } = await axiosInstance.get("/superadmin/stores");
@@ -38,5 +45,10 @@ export const superAdminApi = {
   
   deleteStore: async (id: string): Promise<void> => {
     await axiosInstance.delete(`/superadmin/stores/${id}`);
+  },
+
+  getStats: async (): Promise<PlatformStats> => {
+    const { data } = await axiosInstance.get("/superadmin/stats");
+    return data;
   },
 };

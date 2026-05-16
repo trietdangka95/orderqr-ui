@@ -3,7 +3,7 @@
 import { useCartStore } from "@/store/cartStore";
 import { ShieldAlert, LogOut, LayoutDashboard, Store } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function SuperAdminLayout({
@@ -13,6 +13,7 @@ export default function SuperAdminLayout({
 }) {
   const { userRole, logout, isLoggedIn } = useCartStore();
   const router = useRouter();
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -38,10 +39,22 @@ export default function SuperAdminLayout({
     return null;
   }
 
+  const isActive = (path: string) => {
+    if (path === "/superadmin") {
+      return pathname === "/superadmin";
+    }
+    return pathname.startsWith(path);
+  };
+
+  const navItems = [
+    { href: "/superadmin", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/superadmin/stores", label: "Manage Stores", icon: Store },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+    <div className="h-screen overflow-hidden bg-gray-50 flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-gray-900 text-white p-6 flex flex-col">
+      <aside className="w-full md:w-64 bg-gray-900 text-white p-6 flex flex-col h-auto md:h-full overflow-y-auto">
         <div className="flex items-center gap-3 mb-10 px-2">
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
             <ShieldAlert size={24} />
@@ -53,20 +66,23 @@ export default function SuperAdminLayout({
         </div>
 
         <nav className="space-y-2 flex-1">
-          <Link
-            href="/superadmin"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 text-white font-bold transition-all"
-          >
-            <LayoutDashboard size={20} />
-            <span>Dashboard</span>
-          </Link>
-          <Link
-            href="/superadmin/stores"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 text-gray-400 hover:text-white font-bold transition-all"
-          >
-            <Store size={20} />
-            <span>Manage Stores</span>
-          </Link>
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${
+                  active 
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" 
+                    : "text-gray-400 hover:bg-white/5 hover:text-white"
+                }`}
+              >
+                <item.icon size={20} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
         </nav>
 
         <button
@@ -82,9 +98,20 @@ export default function SuperAdminLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-12 overflow-y-auto">
-        {children}
+      <main className="flex-1 overflow-y-auto print:overflow-visible print:h-auto">
+        <div className="p-6 md:p-12 print:p-0">
+          {children}
+        </div>
       </main>
+
+      <style jsx global>{`
+        @media print {
+          .h-screen { height: auto !important; }
+          .overflow-hidden { overflow: visible !important; }
+          .flex { display: block !important; }
+          aside { display: none !important; }
+        }
+      `}</style>
     </div>
   );
 }

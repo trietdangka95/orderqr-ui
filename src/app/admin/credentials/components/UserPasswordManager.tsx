@@ -37,30 +37,36 @@ export default function UserPasswordManager() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {users.filter(u => u.role !== 'ADMIN').map((user) => (
-          <motion.div
-            key={user.id}
-            onClick={() => setSelectedUserId(user.id)}
-            className={`p-6 rounded-[2rem] border-2 transition-all cursor-pointer flex items-center justify-between ${
-              selectedUserId === user.id 
-              ? "border-blue-500 bg-blue-50/50 shadow-lg" 
-              : "border-gray-100 bg-white hover:border-gray-200"
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white ${
-                user.role === 'KITCHEN' ? "bg-orange-500" : "bg-blue-600"
-              }`}>
-                {user.role === 'KITCHEN' ? <Key size={20} /> : <UserCircle size={20} />}
+        {users.filter(u => u.role?.toUpperCase() !== 'ADMIN').length > 0 ? (
+          users.filter(u => u.role?.toUpperCase() !== 'ADMIN').map((user) => (
+            <motion.div
+              key={user.id}
+              onClick={() => setSelectedUserId(user.id)}
+              className={`p-6 rounded-[2.5rem] border-2 transition-all cursor-pointer flex items-center justify-between ${
+                selectedUserId === user.id 
+                ? "border-blue-500 bg-blue-50/50 shadow-lg" 
+                : "border-gray-100 bg-white hover:border-gray-200"
+              }`}
+            >
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white ${
+                  user.role?.toUpperCase() === 'KITCHEN' ? "bg-orange-500" : "bg-blue-600"
+                }`}>
+                  {user.role?.toUpperCase() === 'KITCHEN' ? <Key size={20} /> : <UserCircle size={20} />}
+                </div>
+                <div>
+                  <h3 className="font-black text-gray-900">{user.username}</h3>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{user.role}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-black text-gray-900">{user.username}</h3>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{user.role}</p>
-              </div>
-            </div>
-            {selectedUserId === user.id && <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>}
-          </motion.div>
-        ))}
+              {selectedUserId === user.id && <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>}
+            </motion.div>
+          ))
+        ) : (
+          <div className="col-span-full py-12 text-center text-gray-400 italic bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+            Không tìm thấy tài khoản nhân viên hoặc bếp nào khác.
+          </div>
+        )}
       </div>
 
       <AnimatePresence>

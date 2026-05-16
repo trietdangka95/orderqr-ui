@@ -1,8 +1,7 @@
 "use client";
 
 import { useInvoices } from "@/hooks/useInvoices";
-import { ChevronLeft, TrendingUp, Calendar, CreditCard, Search } from "lucide-react";
-import Link from "next/link";
+import { TrendingUp, Calendar, CreditCard, Search } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
@@ -40,26 +39,13 @@ export default function RevenuePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-40 px-4 shadow-sm">
-        <div className="max-w-7xl mx-auto h-20 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/admin"
-              className="w-10 h-10 flex items-center justify-center bg-gray-50 hover:bg-gray-100 rounded-full transition-all border border-gray-100"
-            >
-              <ChevronLeft size={24} className="text-gray-600" />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-black text-gray-900 tracking-tight">Quản lý Doanh thu</h1>
-              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Thống kê đơn hàng đã hoàn tất</p>
-            </div>
-          </div>
-        </div>
+    <div className="max-w-7xl mx-auto">
+      <header className="mb-12">
+        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Quản lý Doanh thu</h1>
+        <p className="text-gray-500 font-medium italic">Thống kê doanh số và lịch sử đơn hàng đã hoàn tất</p>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="py-8">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <motion.div 

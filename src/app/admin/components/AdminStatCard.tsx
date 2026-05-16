@@ -1,6 +1,7 @@
 "use client";
 
 import { LucideIcon } from "lucide-react";
+import Link from "next/link";
 
 interface AdminStatCardProps {
   icon: LucideIcon;
@@ -8,6 +9,7 @@ interface AdminStatCardProps {
   label: string;
   colorClass: string;
   bgClass: string;
+  href?: string;
 }
 
 export default function AdminStatCard({
@@ -16,9 +18,10 @@ export default function AdminStatCard({
   label,
   colorClass,
   bgClass,
+  href,
 }: AdminStatCardProps) {
-  return (
-    <div className="bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/50 relative overflow-hidden group">
+  const content = (
+    <div className={`bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/50 relative overflow-hidden group h-full ${href ? "cursor-pointer hover:border-primary/30 transition-all hover:-translate-y-1" : ""}`}>
       <div className={`w-12 h-12 ${bgClass} ${colorClass} rounded-2xl flex items-center justify-center mb-6`}>
         <Icon size={24} />
       </div>
@@ -29,4 +32,10 @@ export default function AdminStatCard({
       </div>
     </div>
   );
+
+  if (href) {
+    return <Link href={href}>{content}</Link>;
+  }
+
+  return content;
 }

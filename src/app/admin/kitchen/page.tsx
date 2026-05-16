@@ -3,8 +3,7 @@
 import { OrderStatus } from "@/store/cartStore";
 import { useEffect, useState, useRef } from "react";
 import OrderTicket from "@/components/kitchen/OrderTicket";
-import { ChevronLeft, LayoutGrid, List } from "lucide-react";
-import Link from "next/link";
+import { LayoutGrid, List } from "lucide-react";
 import { useOrders, useUpdateOrderStatus } from "@/hooks/useOrders";
 import { useIsMounted } from "@/hooks/useIsMounted";
 import { useSocket } from "@/providers/SocketProvider";
@@ -107,53 +106,42 @@ export default function KitchenPage() {
       return acc;
     }, {} as Record<string, { count: number; tables: Set<string> }>);
 
-  const columns: { status: OrderStatus; title: string; color: string }[] = [
-    { status: "pending", title: "📝 Chờ chế biến", color: "bg-red-50 text-red-700 border-red-100" },
-    { status: "cooking", title: "🍳 Đang nấu", color: "bg-orange-50 text-orange-700 border-orange-100" },
-    { status: "serving", title: "🛎️ Chờ phục vụ", color: "bg-blue-50 text-blue-700 border-blue-100" },
-    { status: "completed", title: "✅ Hoàn thành", color: "bg-green-50 text-green-700 border-green-100" },
+  const columns: { status: OrderStatus; title: string; color: string; dot: string }[] = [
+    { status: "pending", title: "Đợi xác nhận", dot: "bg-red-500", color: "bg-white border-t-red-500 shadow-red-100" },
+    { status: "cooking", title: "Đang chế biến", dot: "bg-orange-500", color: "bg-white border-t-orange-500 shadow-orange-100" },
+    { status: "serving", title: "Chờ phục vụ", dot: "bg-blue-500", color: "bg-white border-t-blue-500 shadow-blue-100" },
+    { status: "completed", title: "Hoàn thành", dot: "bg-green-500", color: "bg-white border-t-green-500 shadow-green-100" },
   ];
 
   if (!isMounted) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-40 px-4 shadow-sm">
-        <div className="max-w-[1600px] mx-auto h-20 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/admin"
-              className="w-10 h-10 flex items-center justify-center bg-gray-50 hover:bg-gray-100 rounded-full transition-all border border-gray-100"
-            >
-              <ChevronLeft size={24} className="text-gray-600" />
-            </Link>
-            <div>
-              <h1 className="text-lg md:text-2xl font-black text-gray-900 tracking-tight">Hệ thống KDS</h1>
-              <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Kitchen Display System</p>
-            </div>
-          </div>
+    <div className="max-w-[1600px] mx-auto">
+      <header className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
+        <div>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Hệ thống KDS</h1>
+          <p className="text-gray-500 font-medium italic">Kitchen Display System - Quản lý chế biến món ăn</p>
+        </div>
 
-          <div className="flex bg-gray-100 p-1 rounded-2xl border">
-            <button
-              onClick={() => setView("board")}
-              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-bold transition-all ${view === "board" ? "bg-orange-500 text-white shadow-lg shadow-orange-200" : "text-gray-400 hover:text-gray-600"}`}
-            >
-              <LayoutGrid size={18} />
-              <span className="hidden sm:inline">Kanban</span>
-            </button>
-            <button
-              onClick={() => setView("summary")}
-              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-bold transition-all ${view === "summary" ? "bg-orange-500 text-white shadow-lg shadow-orange-200" : "text-gray-400 hover:text-gray-600"}`}
-            >
-              <List size={18} />
-              <span className="hidden sm:inline">Tổng hợp</span>
-            </button>
-          </div>
+        <div className="flex bg-gray-100 p-1.5 rounded-2xl border shadow-sm h-fit">
+          <button
+            onClick={() => setView("board")}
+            className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all ${view === "board" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-gray-400 hover:text-gray-600"}`}
+          >
+            <LayoutGrid size={18} />
+            <span className="hidden sm:inline">Kanban</span>
+          </button>
+          <button
+            onClick={() => setView("summary")}
+            className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all ${view === "summary" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-gray-400 hover:text-gray-600"}`}
+          >
+            <List size={18} />
+            <span className="hidden sm:inline">Tổng hợp</span>
+          </button>
         </div>
       </header>
 
-      <main className="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8">
+      <main>
 
         {view === "board" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -161,9 +149,12 @@ export default function KitchenPage() {
               const colOrders = orders.filter((o) => o.status === col.status);
               return (
                 <section key={col.status} className="flex flex-col h-full min-h-[500px]">
-                  <div className={`p-4 rounded-2xl border-b-4 mb-4 flex items-center justify-between ${col.color}`}>
-                    <h2 className="font-black uppercase tracking-wider text-sm">{col.title}</h2>
-                    <span className="bg-white/50 px-2 py-0.5 rounded-lg text-xs font-black">{colOrders.length}</span>
+                  <div className={`p-4 rounded-2xl border-t-4 mb-6 flex items-center justify-between shadow-xl shadow-gray-200/20 ${col.color}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2.5 h-2.5 rounded-full ${col.dot} animate-pulse shadow-sm`}></div>
+                      <h2 className="font-black uppercase tracking-widest text-sm text-gray-900">{col.title}</h2>
+                    </div>
+                    <span className="bg-gray-100 text-gray-900 px-3 py-1 rounded-lg text-sm font-black shadow-sm">{colOrders.length}</span>
                   </div>
                   <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-250px)] hide-scrollbar">
                     {confirmedOrders.filter(o => o.status === col.status).map((order) => (
@@ -193,16 +184,21 @@ export default function KitchenPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {Object.entries(itemSummary).length > 0 ? (
                   Object.entries(itemSummary).map(([name, data]) => (
-                    <div key={name} className="flex flex-col p-6 bg-gray-50 rounded-2xl border border-gray-100 hover:border-orange-200 transition-colors">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-lg font-bold text-gray-700">{name}</span>
-                        <span className="w-12 h-12 bg-orange-500 text-white rounded-xl flex items-center justify-center text-xl font-black shadow-lg shadow-orange-100">
-                          {data.count}
-                        </span>
+                    <div key={name} className="flex flex-col p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/30 hover:border-primary/30 transition-all group">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-14 h-14 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-2xl font-black shadow-lg">
+                            {data.count}
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-black text-gray-900 leading-tight">{name}</h3>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Yêu cầu từ {data.tables.size} bàn</p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-2 pt-4 border-t border-dashed border-gray-100">
                         {Array.from(data.tables).sort().map(table => (
-                          <span key={table} className="px-2 py-0.5 bg-white border border-gray-100 rounded-md text-[10px] font-black text-gray-500">
+                          <span key={table} className="px-3 py-1 bg-gray-50 text-gray-600 rounded-xl text-[10px] font-black border border-gray-100 group-hover:border-gray-200 transition-colors">
                             Bàn {table}
                           </span>
                         ))}

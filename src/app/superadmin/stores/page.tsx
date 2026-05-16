@@ -13,6 +13,8 @@ import {
   Layout,
   Globe
 } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStores, useCreateStore, useUpdateStore, useDeleteStore } from "@/hooks/useSuperAdmin";
 
@@ -21,8 +23,9 @@ export default function StoreManagementPage() {
   const createStoreMutation = useCreateStore();
   const updateStoreMutation = useUpdateStore();
   const deleteStoreMutation = useDeleteStore();
+  const searchParams = useSearchParams();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(searchParams.get("new") === "true");
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -32,21 +35,74 @@ export default function StoreManagementPage() {
     currency: "VND"
   });
 
+  const [editingStoreId, setEditingStoreId] = useState<string | null>(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const filteredStores = stores.filter(store => {
+    const matchesSearch = 
+      store.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      store.slug.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = 
+      statusFilter === "all" || 
+      (statusFilter === "active" && store.isActive) || 
+      (statusFilter === "inactive" && !store.isActive);
+
+    return matchesSearch && matchesStatus;
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createStoreMutation.mutate(formData, {
-      onSuccess: () => {
-        setIsModalOpen(false);
-        setFormData({
-          name: "",
-          slug: "",
-          adminUsername: "",
-          adminPassword: "",
-          themeColor: "#f97316",
-          currency: "VND"
-        });
-      }
+    
+    if (editingStoreId) {
+      updateStoreMutation.mutate({ 
+        id: editingStoreId, 
+        data: {
+          name: formData.name,
+          themeColor: formData.themeColor,
+          currency: formData.currency
+        }
+      }, {
+        onSuccess: () => {
+          setIsModalOpen(false);
+          setEditingStoreId(null);
+          resetForm();
+        }
+      });
+    } else {
+      createStoreMutation.mutate(formData, {
+        onSuccess: () => {
+          setIsModalOpen(false);
+          resetForm();
+        }
+      });
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      slug: "",
+      adminUsername: "",
+      adminPassword: "",
+      themeColor: "#f97316",
+      currency: "VND"
     });
+  };
+
+  const handleEdit = (store: Store) => {
+    setEditingStoreId(store.id);
+    setFormData({
+      name: store.name,
+      slug: store.slug,
+      adminUsername: "********", // Placeholder
+      adminPassword: "********", // Placeholder
+      themeColor: store.themeColor,
+      currency: store.currency
+    });
+    setIsModalOpen(true);
   };
 
   const toggleStoreStatus = (id: string, currentStatus: boolean) => {
@@ -76,13 +132,19 @@ export default function StoreManagementPage() {
           <input 
             type="text" 
             placeholder="Search stores by name or domain..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20"
           />
         </div>
-        <select className="px-6 py-3 bg-gray-50 border-none rounded-2xl font-bold text-gray-600 focus:ring-2 focus:ring-blue-500/20">
-          <option>All Status</option>
-          <option>Active Only</option>
-          <option>Inactive Only</option>
+        <select 
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-6 py-3 bg-gray-50 border-none rounded-2xl font-bold text-gray-600 focus:ring-2 focus:ring-blue-500/20"
+        >
+          <option value="all">All Status</option>
+          <option value="active">Active Only</option>
+          <option value="inactive">Inactive Only</option>
         </select>
       </div>
 
@@ -92,13 +154,13 @@ export default function StoreManagementPage() {
           <div className="flex justify-center p-12">
             <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : stores.length === 0 ? (
+        ) : filteredStores.length === 0 ? (
           <div className="bg-white p-20 rounded-[3rem] text-center border-2 border-dashed border-gray-200">
             <Store size={64} className="mx-auto text-gray-200 mb-6" />
-            <p className="text-xl font-bold text-gray-400">No stores found. Let&apos;s create your first one!</p>
+            <p className="text-xl font-bold text-gray-400">No stores found matching your criteria.</p>
           </div>
         ) : (
-          stores.map((store) => (
+          filteredStores.map((store) => (
             <motion.div
               key={store.id}
               layout
@@ -145,13 +207,20 @@ export default function StoreManagementPage() {
                   {store.isActive ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                   <span className="md:hidden lg:inline">{store.isActive ? "Deactivate" : "Activate"}</span>
                 </button>
-                <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-xl font-bold transition-all">
+                <button 
+                  onClick={() => handleEdit(store)}
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-xl font-bold transition-all"
+                >
                   <Edit size={20} />
                   <span className="md:hidden lg:inline">Edit</span>
                 </button>
-                <button className="p-3 bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all">
+                <Link 
+                  href={`/?store=${store.slug}`}
+                  target="_blank"
+                  className="p-3 bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                >
                   <ExternalLink size={20} />
-                </button>
+                </Link>
                 <button 
                   onClick={() => { if(confirm('Delete this store?')) deleteStoreMutation.mutate(store.id) }}
                   className="p-3 bg-gray-50 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
@@ -172,7 +241,11 @@ export default function StoreManagementPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => {
+                setIsModalOpen(false);
+                setEditingStoreId(null);
+                resetForm();
+              }}
               className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
             ></motion.div>
             <motion.div 
@@ -186,9 +259,11 @@ export default function StoreManagementPage() {
                 <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
                   <Plus size={32} />
                 </div>
-                <h2 className="text-3xl font-black mb-4">Add Store</h2>
+                <h2 className="text-3xl font-black mb-4">{editingStoreId ? "Edit Store" : "Add Store"}</h2>
                 <p className="text-blue-100 text-sm font-medium leading-relaxed">
-                  Start by giving your new restaurant a name and a unique subdomain address.
+                  {editingStoreId 
+                    ? "Update your restaurant settings. Note: Slug and Admin credentials cannot be changed here." 
+                    : "Start by giving your new restaurant a name and a unique subdomain address."}
                 </p>
                 
                 <div className="mt-auto pt-8 border-t border-white/10 hidden md:block">
@@ -216,43 +291,48 @@ export default function StoreManagementPage() {
                       <div className="flex items-center gap-2">
                         <input 
                           required
+                          disabled={!!editingStoreId}
                           type="text" 
                           value={formData.slug}
                           onChange={(e) => setFormData({...formData, slug: e.target.value.toLowerCase().replace(/ /g, '-')})}
-                          className="flex-1 px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-mono text-sm"
+                          className="flex-1 px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 font-mono text-sm disabled:opacity-50"
                           placeholder="e.g. quan-an-viet"
                         />
                         <span className="text-gray-400 font-bold text-xs">.orderpro...</span>
                       </div>
                     </div>
 
-                    <div className="h-px bg-gray-100 my-2"></div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Store Admin Account</p>
+                    {!editingStoreId && (
+                      <>
+                        <div className="h-px bg-gray-100 my-2"></div>
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Store Admin Account</p>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Admin Username</label>
-                        <input 
-                          required
-                          type="text" 
-                          value={formData.adminUsername}
-                          onChange={(e) => setFormData({...formData, adminUsername: e.target.value})}
-                          className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20"
-                          placeholder="admin-username"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Admin Password</label>
-                        <input 
-                          required
-                          type="password" 
-                          value={formData.adminPassword}
-                          onChange={(e) => setFormData({...formData, adminPassword: e.target.value})}
-                          className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20"
-                          placeholder="••••••••"
-                        />
-                      </div>
-                    </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Admin Username</label>
+                            <input 
+                              required
+                              type="text" 
+                              value={formData.adminUsername}
+                              onChange={(e) => setFormData({...formData, adminUsername: e.target.value})}
+                              className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20"
+                              placeholder="admin-username"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Admin Password</label>
+                            <input 
+                              required
+                              type="password" 
+                              value={formData.adminPassword}
+                              onChange={(e) => setFormData({...formData, adminPassword: e.target.value})}
+                              className="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20"
+                              placeholder="••••••••"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
 
                     <div className="h-px bg-gray-100 my-2"></div>
                     
@@ -290,17 +370,21 @@ export default function StoreManagementPage() {
                   <div className="flex items-center gap-4 pt-4">
                     <button 
                       type="button"
-                      onClick={() => setIsModalOpen(false)}
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        setEditingStoreId(null);
+                        resetForm();
+                      }}
                       className="flex-1 px-6 py-4 bg-gray-100 text-gray-600 font-bold rounded-2xl hover:bg-gray-200 transition-all"
                     >
                       Cancel
                     </button>
                     <button 
                       type="submit"
-                      disabled={createStoreMutation.isPending}
+                      disabled={createStoreMutation.isPending || updateStoreMutation.isPending}
                       className="flex-[2] px-6 py-4 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-100 transition-all active:scale-95 disabled:opacity-50"
                     >
-                      {createStoreMutation.isPending ? "Creating..." : "Confirm & Create Store"}
+                      {createStoreMutation.isPending || updateStoreMutation.isPending ? "Processing..." : (editingStoreId ? "Save Changes" : "Confirm & Create Store")}
                     </button>
                   </div>
                 </form>

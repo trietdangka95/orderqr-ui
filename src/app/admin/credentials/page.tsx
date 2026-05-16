@@ -1,8 +1,7 @@
 "use client";
 
 import { useCartStore } from "@/store/cartStore";
-import { ChevronLeft, Lock, ShieldCheck, Check, AlertCircle } from "lucide-react";
-import Link from "next/link";
+import { Lock, ShieldCheck, Check, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChangePassword } from "@/hooks/useAuth";
@@ -62,26 +61,17 @@ export default function CredentialsPage() {
   const roleInfo = getRoleInfo();
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <header className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-40 px-4 shadow-sm">
-        <div className="max-w-7xl mx-auto h-20 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <Link href="/admin" className="w-10 h-10 flex items-center justify-center bg-gray-50 hover:bg-gray-100 rounded-full transition-all border border-gray-100">
-              <ChevronLeft size={24} className="text-gray-600" />
-            </Link>
-            <div>
-              <h1 className="text-2xl font-black text-gray-900 tracking-tight">Đổi mật khẩu</h1>
-              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Bảo mật tài khoản {roleInfo.text}</p>
-            </div>
-          </div>
-        </div>
+    <div className="max-w-7xl mx-auto text-center md:text-left">
+      <header className="mb-12">
+        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Đổi mật khẩu</h1>
+        <p className="text-gray-500 font-medium italic">Bảo mật tài khoản {roleInfo.text} của bạn</p>
       </header>
 
-      <main className="max-w-xl mx-auto px-4 py-12">
+      <main className="max-w-4xl mx-auto py-12">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100"
+          className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 max-w-xl mx-auto"
         >
           <div className="flex items-center gap-4 mb-8">
             <div className={`w-14 h-14 ${roleInfo.color} text-white rounded-2xl flex items-center justify-center shadow-lg`}>
@@ -178,7 +168,7 @@ export default function CredentialsPage() {
           </form>
         </motion.div>
 
-        {userRole === 'admin' && <UserPasswordManager />}
+        {userRole?.toLowerCase() === 'admin' && <UserPasswordManager />}
       </main>
 
       <AnimatePresence>

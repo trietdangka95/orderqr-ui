@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import {
-  ChevronLeft as ChevronLeftIcon,
   Receipt as ReceiptIcon,
   QrCode as QrCodeIcon,
   Printer as PrinterIcon
@@ -102,38 +100,30 @@ export default function AdminTablesPage() {
   if (!isMounted) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0 print:bg-white print:pb-0">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-40 px-4 shadow-sm print:hidden">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/admin"
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <ChevronLeftIcon size={24} />
-            </Link>
-            <h1 className="text-xl font-bold text-gray-800">Quản lý Bàn</h1>
-          </div>
+    <div className="max-w-7xl mx-auto">
+      <header className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 print:hidden">
+        <div>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Quản lý Bàn</h1>
+          <p className="text-gray-500 font-medium italic">Theo dõi trạng thái và in mã QR cho từng bàn tại quán</p>
+        </div>
 
-          <div className="flex bg-gray-100 p-1 rounded-xl border">
-            <button
-              onClick={() => setActiveTab("status")}
-              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${activeTab === "status" ? "bg-white shadow-sm text-orange-500" : "text-gray-500"}`}
-            >
-              Trạng thái
-            </button>
-            <button
-              onClick={() => setActiveTab("qr")}
-              className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${activeTab === "qr" ? "bg-white shadow-sm text-orange-500" : "text-gray-500"}`}
-            >
-              Mã QR
-            </button>
-          </div>
+        <div className="flex bg-gray-100 p-1.5 rounded-2xl border shadow-sm h-fit">
+          <button
+            onClick={() => setActiveTab("status")}
+            className={`px-6 py-2 rounded-xl text-sm font-black transition-all ${activeTab === "status" ? "bg-white shadow-md text-primary" : "text-gray-500"}`}
+          >
+            Trạng thái
+          </button>
+          <button
+            onClick={() => setActiveTab("qr")}
+            className={`px-6 py-2 rounded-xl text-sm font-black transition-all ${activeTab === "qr" ? "bg-white shadow-md text-primary" : "text-gray-500"}`}
+          >
+            Mã QR
+          </button>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="py-8">
         {activeTab === "status" ? (
           /* Table Status View */
           Object.keys(tableStatus).length === 0 ? (
@@ -171,7 +161,7 @@ export default function AdminTablesPage() {
                     placeholder="Số bàn (vd: 06)"
                     value={newTableNum}
                     onChange={(e) => setNewTableNum(e.target.value)}
-                    className="w-32 px-4 outline-none text-sm font-bold"
+                    className="w-40 px-4 outline-none text-sm font-bold"
                   />
                   <button
                     type="submit"
@@ -218,11 +208,22 @@ export default function AdminTablesPage() {
         @media print {
           body { background: white !important; }
           .print\:hidden { display: none !important; }
-          .print\:block { display: block !important; }
-          header, footer, nav { display: none !important; }
-          main { padding: 0 !important; max-width: 100% !important; }
-          .grid { display: block !important; }
-          .break-inside-avoid { break-inside: avoid; }
+          header, footer, nav, aside { display: none !important; }
+          main { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+          .grid { 
+            display: grid !important; 
+            grid-template-columns: repeat(3, 1fr) !important; 
+            gap: 20px !important;
+          }
+          .break-inside-avoid { break-inside: avoid !important; }
+          
+          /* Force only QR section to show if activeTab is QR */
+          ${activeTab === 'qr' ? `
+            section, div:has(> .grid) { display: block !important; }
+          ` : ''}
+          
+          /* Clean up cards for print */
+          .bg-white { border: 1px solid #eee !important; box-shadow: none !important; }
         }
       `}</style>
     </div>

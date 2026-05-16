@@ -42,7 +42,7 @@ export default function AdminMenuPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] pb-20">
+    <div className="max-w-7xl mx-auto">
       <MenuHeader
         itemCount={filteredMenu.length}
         viewMode={viewMode}
@@ -50,7 +50,7 @@ export default function AdminMenuPage() {
         onAddNew={handleAddNew}
       />
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="py-8">
         <CategoryManager
           categories={categoriesData}
         />

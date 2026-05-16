@@ -38,3 +38,10 @@ export const useDeleteStore = () => {
     },
   });
 };
+
+export const usePlatformStats = () => {
+  return useQuery({
+    queryKey: ["platform-stats"],
+    queryFn: () => superAdminApi.getStats(),
+  });
+};
