@@ -15,6 +15,7 @@ type Product = {
   isNew?: boolean;
   isHot?: boolean;
   discountPercent?: number;
+  isAvailable?: boolean;
 };
 
 export default function ProductCard({ product, viewMode = "list" }: { product: Product, viewMode?: "grid" | "list" }) {
@@ -32,6 +33,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
   };
 
   const handleAddToCart = () => {
+    if (product.isAvailable === false) return;
     if (!selectedTable) {
       alert("Vui lòng chọn bàn/nhập mã bàn trước khi chọn món!");
       return;
@@ -54,7 +56,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
     return (
       <motion.div
         layoutId={`product-${product.id}`}
-        className="bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex flex-col w-full relative overflow-hidden group hover:shadow-xl hover:shadow-orange-100/50 transition-all duration-300 h-full"
+        className={`bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex flex-col w-full relative overflow-hidden group hover:shadow-xl transition-all duration-300 h-full ${product.isAvailable === false ? 'opacity-60 grayscale' : 'hover:shadow-orange-100/50'}`}
       >
         {/* Badge Section */}
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
@@ -83,6 +85,13 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
             fill
             className="object-cover group-hover:scale-110 transition-transform duration-500"
           />
+          {product.isAvailable === false && (
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px] z-20">
+              <span className="bg-gray-900/90 text-white font-black px-4 py-2 rounded-xl text-sm tracking-widest shadow-xl rotate-[-10deg] border border-white/20">
+                TẠM HẾT
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -109,7 +118,8 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
                 e.stopPropagation();
                 handleAddToCart();
               }}
-              className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center hover:bg-orange-600 transition-all shadow-lg shadow-orange-100 active:scale-90"
+              disabled={product.isAvailable === false}
+              className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-lg active:scale-90 ${product.isAvailable === false ? 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed' : 'bg-primary text-white hover:bg-orange-600 shadow-orange-100'}`}
             >
               <Plus className="w-6 h-6" strokeWidth={3} />
             </button>
@@ -123,7 +133,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
   return (
     <motion.div
       layoutId={`product-${product.id}`}
-      className="bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex gap-4 w-full relative overflow-hidden group hover:shadow-lg hover:shadow-orange-50/50 transition-all duration-300"
+      className={`bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex gap-4 w-full relative overflow-hidden group hover:shadow-lg transition-all duration-300 ${product.isAvailable === false ? 'opacity-60 grayscale' : 'hover:shadow-orange-50/50'}`}
     >
       {/* Badges for List mode */}
       <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
@@ -143,6 +153,13 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
           fill
           className="object-cover group-hover:scale-110 transition-transform duration-500"
         />
+        {product.isAvailable === false && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px] z-20">
+            <span className="bg-gray-900/90 text-white font-black px-2 py-1 rounded-lg text-[10px] tracking-widest shadow-xl border border-white/20">
+              TẠM HẾT
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
@@ -180,7 +197,8 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
               e.stopPropagation();
               handleAddToCart();
             }}
-            className="w-10 h-10 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-orange-600 transition-all shadow-lg shadow-orange-100 active:scale-90"
+            disabled={product.isAvailable === false}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-lg active:scale-90 ${product.isAvailable === false ? 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed' : 'bg-primary text-white hover:bg-orange-600 shadow-orange-100'}`}
           >
             <Plus className="w-5 h-5" strokeWidth={3} />
           </button>

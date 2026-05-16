@@ -3,7 +3,7 @@
 import { MenuItem } from "@/store/cartStore";
 import { Edit2, Trash2, Tag, Info } from "lucide-react";
 import { motion } from "framer-motion";
-import { useDeleteProduct } from "@/hooks/useProducts";
+import { useDeleteProduct, useUpdateProduct } from "@/hooks/useProducts";
 
 interface MenuItemRowProps {
   item: MenuItem;
@@ -21,14 +21,33 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
     }).format(price);
   };
 
+  const updateProduct = useUpdateProduct();
+
+  const handleToggleAvailability = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    updateProduct.mutate({ id: item.id, data: { isAvailable: !item.isAvailable } });
+  };
+
   const ActionButtons = ({ isGrid }: { isGrid?: boolean }) => (
-    <div className={`flex items-center gap-2 mt-4 ${isGrid ? "justify-start" : "justify-end"}`}>
+    <div className={`flex items-center gap-2 mt-4 flex-wrap ${isGrid ? "justify-start" : "justify-end"}`}>
+      <button
+        onClick={handleToggleAvailability}
+        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${
+          item.isAvailable 
+            ? "bg-green-50 text-green-600 hover:bg-green-600 hover:text-white" 
+            : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+        }`}
+      >
+        <span className={`w-2 h-2 rounded-full ${item.isAvailable ? "bg-green-500" : "bg-gray-400"}`}></span>
+        {item.isAvailable ? "Còn món" : "Hết món"}
+      </button>
+
       <button
         onClick={(e) => {
           e.stopPropagation();
           onEdit(item);
         }}
-        className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all active:scale-95"
+        className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all active:scale-95"
       >
         <Edit2 size={14} />
         Sửa
@@ -40,7 +59,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
             deleteProduct.mutate(item.id);
           }
         }}
-        className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition-all active:scale-95"
+        className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition-all active:scale-95"
       >
         <Trash2 size={14} />
         Xóa

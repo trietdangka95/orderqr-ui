@@ -23,6 +23,7 @@ export interface Product {
   image?: string;
   category: string;
   categoryId: number;
+  isAvailable: boolean;
   discountPercent: number;
   bannerUrl?: string;
   promoTitle?: string;

@@ -43,9 +43,16 @@ export interface StoreConfig {
 }
 
 interface CartStore {
-  // Store Context
   storeConfig: StoreConfig | null;
   setStoreConfig: (config: StoreConfig | null) => void;
+  
+  // UI State
+  isOpen: boolean;
+  toggleCart: () => void;
+  isOrdersOpen: boolean;
+  toggleOrders: () => void;
+  isAdmin: boolean;
+  setIsAdmin: (isAdmin: boolean) => void;
   
   // Auth
   isLoggedIn: boolean;
@@ -83,6 +90,13 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       storeConfig: null,
       setStoreConfig: (config) => set({ storeConfig: config }),
+
+      isOpen: false,
+      toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
+      isOrdersOpen: false,
+      toggleOrders: () => set((state) => ({ isOrdersOpen: !state.isOrdersOpen })),
+      isAdmin: false,
+      setIsAdmin: (isAdmin) => set({ isAdmin }),
 
       isLoggedIn: false,
       userRole: "guest",
