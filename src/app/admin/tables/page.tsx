@@ -10,7 +10,7 @@ import { useCartStore, Order, OrderStatus } from "@/store/cartStore";
 import TableStatusCard from "./components/TableStatusCard";
 import QRCodeCard from "./components/QRCodeCard";
 import { useOrders, useClearTable, useConfirmOrder } from "@/hooks/useOrders";
-import { useIsMounted } from "@/hooks/useIsMounted";
+import useIsMounted from "@/hooks/useIsMounted";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 

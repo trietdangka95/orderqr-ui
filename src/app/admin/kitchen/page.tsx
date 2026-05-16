@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import OrderTicket from "@/components/kitchen/OrderTicket";
 import { LayoutGrid, List } from "lucide-react";
 import { useOrders, useUpdateOrderStatus } from "@/hooks/useOrders";
-import { useIsMounted } from "@/hooks/useIsMounted";
+import useIsMounted from "@/hooks/useIsMounted";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 
