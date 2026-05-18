@@ -1,16 +1,17 @@
 "use client";
 
-import { OrderStatus } from "@/store/cartStore";
+import { OrderStatus, useCartStore } from "@/store/cartStore";
 import { OrderStatus as ApiOrderStatus } from "@/types/api";
 import { useEffect, useState, useRef } from "react";
 import OrderTicket from "@/components/kitchen/OrderTicket";
-import { LayoutGrid, List } from "lucide-react";
+import { LayoutGrid, List, LogOut } from "lucide-react";
 import { useOrders, useUpdateOrderStatus } from "@/hooks/useOrders";
 import useIsMounted from "@/hooks/useIsMounted";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function KitchenPage() {
+  const { logout, userRole } = useCartStore();
   const { data: apiOrders = [] } = useOrders();
   const updateStatusMutation = useUpdateOrderStatus();
   const isMounted = useIsMounted();
@@ -124,21 +125,36 @@ export default function KitchenPage() {
           <p className="text-gray-500 font-medium italic">Kitchen Display System - Quản lý chế biến món ăn</p>
         </div>
 
-        <div className="flex bg-gray-100 p-1.5 rounded-2xl border shadow-sm h-fit">
-          <button
-            onClick={() => setView("board")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all ${view === "board" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-gray-400 hover:text-gray-600"}`}
-          >
-            <LayoutGrid size={18} />
-            <span className="hidden sm:inline">Kanban</span>
-          </button>
-          <button
-            onClick={() => setView("summary")}
-            className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all ${view === "summary" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-gray-400 hover:text-gray-600"}`}
-          >
-            <List size={18} />
-            <span className="hidden sm:inline">Tổng hợp</span>
-          </button>
+        <div className="flex items-center gap-4">
+          <div className="flex bg-gray-100 p-1.5 rounded-2xl border shadow-sm h-fit">
+            <button
+              onClick={() => setView("board")}
+              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all ${view === "board" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-gray-400 hover:text-gray-600"}`}
+            >
+              <LayoutGrid size={18} />
+              <span className="hidden sm:inline">Kanban</span>
+            </button>
+            <button
+              onClick={() => setView("summary")}
+              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all ${view === "summary" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-gray-400 hover:text-gray-600"}`}
+            >
+              <List size={18} />
+              <span className="hidden sm:inline">Tổng hợp</span>
+            </button>
+          </div>
+
+          {userRole === "kitchen" && (
+            <button
+              onClick={() => {
+                logout();
+                window.location.href = "/";
+              }}
+              className="flex items-center gap-2 px-6 py-3 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-black rounded-2xl transition-all shadow-md active:scale-95 text-sm"
+            >
+              <LogOut size={18} />
+              <span>Đăng xuất</span>
+            </button>
+          )}
         </div>
       </header>
 

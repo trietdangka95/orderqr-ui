@@ -45,6 +45,7 @@ export interface StoreConfig {
   themeColor: string;
   currency: string;
   isActive: boolean;
+  tables: string[];
 }
 
 interface CartStore {
@@ -67,6 +68,10 @@ interface CartStore {
   login: (role: UserRole, id: string, storeId?: string | null) => void;
   logout: () => void;
   
+  // Toast Feedback
+  toastMessage: string | null;
+  setToastMessage: (message: string | null) => void;
+  
   // Cart
   items: CartItem[];
   selectedTable: string;
@@ -81,9 +86,9 @@ interface CartStore {
   
   // Tables Management
   tables: string[];
-  addTable: (table: string) => void;
-  addMultipleTables: (count: number) => void;
-  removeTable: (table: string) => void;
+  addTable: (table: string) => Promise<void> | void;
+  addMultipleTables: (count: number) => Promise<void> | void;
+  removeTable: (table: string) => Promise<void> | void;
   
   // Orders & Revenue (Mocked for now, should be API-driven)
   orders: Order[];
@@ -128,6 +133,9 @@ export const useCartStore = create<CartStore>()(
         selectedTable: ""
       }),
 
+      toastMessage: null,
+      setToastMessage: (message) => set({ toastMessage: message }),
+
       items: [],
       selectedTable: "",
       isTableSelectorOpen: false,
@@ -147,6 +155,9 @@ export const useCartStore = create<CartStore>()(
         } else {
           set({ items: [...currentItems, item] });
         }
+
+        // Set toast message with emoji feedback
+        set({ toastMessage: `Đã thêm món ${item.name} vào giỏ!` });
       },
       
       removeItem: (productId) =>
@@ -165,19 +176,43 @@ export const useCartStore = create<CartStore>()(
       setIsTableSelectorOpen: (open) => set({ isTableSelectorOpen: open }),
       
       tables: ["01", "02", "03", "04", "05"], // Mặc định
-      addTable: (table) => set((state) => ({ 
-        tables: [...state.tables, table].sort((a, b) => a.localeCompare(b)) 
-      })),
-      addMultipleTables: (count) => set((state) => {
-        const lastNum = state.tables.length > 0 ? parseInt(state.tables[state.tables.length - 1] || "0") : 0;
+      addTable: async (table) => {
+        const newTables = [...get().tables, table].sort((a, b) => a.localeCompare(b));
+        set({ tables: newTables });
+        if (get().userRole === "admin") {
+          try {
+            await axiosInstance.put("/tables", { tables: newTables });
+          } catch (e) {
+            console.error("Failed to sync tables:", e);
+          }
+        }
+      },
+      addMultipleTables: async (count) => {
+        const lastNum = get().tables.length > 0 ? parseInt(get().tables[get().tables.length - 1] || "0") : 0;
         const newTables = Array.from({ length: count }, (_, i) => 
           (lastNum + i + 1).toString().padStart(2, "0")
         );
-        return { tables: [...state.tables, ...newTables] };
-      }),
-      removeTable: (table) => set((state) => ({ 
-        tables: state.tables.filter((t) => t !== table) 
-      })),
+        const updatedTables = [...get().tables, ...newTables];
+        set({ tables: updatedTables });
+        if (get().userRole === "admin") {
+          try {
+            await axiosInstance.put("/tables", { tables: updatedTables });
+          } catch (e) {
+            console.error("Failed to sync tables:", e);
+          }
+        }
+      },
+      removeTable: async (table) => {
+        const newTables = get().tables.filter((t) => t !== table);
+        set({ tables: newTables });
+        if (get().userRole === "admin") {
+          try {
+            await axiosInstance.put("/tables", { tables: newTables });
+          } catch (e) {
+            console.error("Failed to sync tables:", e);
+          }
+        }
+      },
       
       orders: [],
       addOrder: (order) => set({ orders: [order, ...get().orders] }),
@@ -192,10 +227,12 @@ export const useCartStore = create<CartStore>()(
 
       fetchStoreConfig: async (slug) => {
         try {
-          // Import axiosInstance dynamically or use it if available in scope
-          // For now, using it directly assuming it's imported or will be handled
           const response = await axiosInstance.get(`/stores/config?slug=${slug}`);
-          set({ storeConfig: response.data });
+          const config = response.data;
+          set({ storeConfig: config });
+          if (config && config.tables && config.tables.length > 0) {
+            set({ tables: config.tables });
+          }
         } catch (error) {
           console.error('Error fetching store config:', error);
         }

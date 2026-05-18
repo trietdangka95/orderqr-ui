@@ -23,8 +23,18 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout } = useCartStore();
+  const { logout, userRole } = useCartStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  if (userRole === "kitchen") {
+    return (
+      <AdminGuard>
+        <div className="h-screen overflow-y-auto bg-gray-50 p-6 md:p-12">
+          {children}
+        </div>
+      </AdminGuard>
+    );
+  }
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard },

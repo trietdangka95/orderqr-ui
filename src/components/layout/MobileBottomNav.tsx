@@ -19,14 +19,25 @@ export default function MobileBottomNav() {
   } = useCartStore();
 
   const [popOrder, setPopOrder] = useState(false);
+  const [popCart, setPopCart] = useState(false);
 
   const totalItems = getTotalItems();
   const activeOrdersCount = orders.filter(o => o.tableNumber === selectedTable && o.status.toLowerCase() !== "completed").length;
 
+  // Pop animation for Cart changes
+  useEffect(() => {
+    if (totalItems > 0) {
+      setPopCart(true);
+      const timer = setTimeout(() => setPopCart(false), 450);
+      return () => clearTimeout(timer);
+    }
+  }, [totalItems]);
+
+  // Pop animation for Orders changes
   useEffect(() => {
     if (activeOrdersCount > 0) {
       const handle = requestAnimationFrame(() => setPopOrder(true));
-      const timer = setTimeout(() => setPopOrder(false), 300);
+      const timer = setTimeout(() => setPopOrder(false), 450);
       return () => {
         cancelAnimationFrame(handle);
         clearTimeout(timer);
@@ -59,8 +70,18 @@ export default function MobileBottomNav() {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-6 left-6 right-6 z-50">
-      <div className="bg-white/85 backdrop-blur-xl border border-white/50 shadow-2xl rounded-[2.2rem] px-3 py-2 flex justify-between items-center relative gap-1">
+    <motion.div 
+      className="md:hidden fixed bottom-6 left-6 right-6 z-50"
+      animate={popCart ? { scale: [1, 1.08, 0.96, 1.02, 1] } : {}}
+      transition={{ duration: 0.45, ease: "easeInOut" }}
+    >
+      <div 
+        className={`bg-white/85 backdrop-blur-xl border flex justify-between items-center relative gap-1 transition-all duration-500 rounded-[2.2rem] px-3 py-2 ${
+          totalItems > 0 
+            ? "border-primary/30 shadow-[0_8px_32px_rgba(249,115,22,0.22)] shadow-primary/20" 
+            : "border-white/50 shadow-2xl"
+        }`}
+      >
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -84,17 +105,33 @@ export default function MobileBottomNav() {
                   ? (tab.id === "orders" ? "text-blue-600" : "text-primary") 
                   : "text-gray-400 hover:text-gray-600"
               }`}>
-                <div className="relative">
+                <motion.div 
+                  className="relative"
+                  animate={
+                    tab.id === "cart"
+                      ? (popCart
+                          ? { scale: [1, 1.6, 0.9, 1.35], rotate: [0, -10, 8, -4, 0] }
+                          : { scale: totalItems > 0 ? 1.35 : 1.0, rotate: 0 })
+                      : tab.id === "orders"
+                        ? (popOrder
+                            ? { scale: [1, 1.6, 0.9, 1.35] }
+                            : { scale: activeOrdersCount > 0 ? 1.35 : 1.0 })
+                        : {}
+                  }
+                  transition={{ duration: 0.45, ease: "easeInOut" }}
+                >
                   <Icon size={22} strokeWidth={tab.active ? 2.5 : 2} className="transition-transform duration-300" />
                   
                   {tab.badge && tab.badge > 0 ? (
-                    <span className={`absolute -top-1.5 -right-2 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[9px] font-black border-2 border-white shadow-sm ${
-                      tab.id === "orders" ? "bg-blue-500 text-white" : "bg-primary text-white"
+                    <span className={`absolute -top-1.5 -right-2 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[9px] font-black border-2 border-white shadow-sm transition-all ${
+                      tab.id === "orders" 
+                        ? "bg-blue-500 text-white" 
+                        : "bg-primary text-white shadow-[0_0_8px_rgba(249,115,22,0.6)] animate-pulse"
                     }`}>
                       {tab.badge}
                     </span>
                   ) : null}
-                </div>
+                </motion.div>
                 
                 <span className="text-[10px] font-black uppercase tracking-wider mt-1 block">
                   {tab.label}
@@ -104,6 +141,6 @@ export default function MobileBottomNav() {
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }

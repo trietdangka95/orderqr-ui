@@ -55,7 +55,7 @@ export default function UserPasswordManager() {
                   {user.role?.toUpperCase() === 'KITCHEN' ? <Key size={20} /> : <UserCircle size={20} />}
                 </div>
                 <div>
-                  <h3 className="font-black text-gray-900">{user.username}</h3>
+                  <h3 className="font-black text-gray-900">{user.username.split('_')[0]}</h3>
                   <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{user.role}</p>
                 </div>
               </div>
@@ -79,7 +79,7 @@ export default function UserPasswordManager() {
           >
             <form onSubmit={handleUpdate} className="space-y-4">
               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                Đặt mật khẩu mới cho {users.find(u => u.id === selectedUserId)?.username}
+                Đặt mật khẩu mới cho {users.find(u => u.id === selectedUserId)?.username.split('_')[0]}
               </label>
               <div className="flex gap-3">
                 <div className="relative flex-1">

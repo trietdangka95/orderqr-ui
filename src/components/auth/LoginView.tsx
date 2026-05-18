@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useLogin } from "@/hooks/useAuth";
 
 export default function LoginView({ initialRole = "staff" }: { initialRole?: UserRole }) {
-  const { login: storeLogin } = useCartStore();
+  const { login: storeLogin, storeConfig } = useCartStore();
   const [role, setRole] = useState<UserRole>(initialRole);
   const [username, setUsername] = useState(() => {
     if (initialRole === "staff") return "staff";
@@ -40,8 +40,12 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const formattedUsername = (role === "staff" || role === "kitchen") && storeConfig?.slug
+      ? `${username.trim()}_${storeConfig.slug}`
+      : username.trim();
+
     const loginData = {
-      username: username.trim(),
+      username: formattedUsername,
       password: password
     };
 
@@ -134,11 +138,12 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
                 </label>
                 <input
                   required
+                  disabled={role === "staff" || role === "kitchen" || role === "superadmin"}
                   type="text"
                   placeholder="Tên đăng nhập..."
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-50 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 rounded-2xl outline-none transition-all text-center font-bold text-gray-700 mb-4"
+                  className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-50 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 rounded-2xl outline-none transition-all text-center font-bold text-gray-700 mb-4 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
 
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-4 mb-2 block text-center">
