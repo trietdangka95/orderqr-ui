@@ -120,7 +120,7 @@ export default function SuperAdminDashboard() {
                     <h3 className="text-xl font-black text-gray-900 mb-1">{store.name}</h3>
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                      <p className="text-xs text-gray-400 font-bold tracking-widest uppercase">{store.slug}.orderpro.id.vn</p>
+                      <p className="text-xs text-gray-400 font-bold tracking-widest uppercase">{store.slug}.{process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn"}</p>
                     </div>
                   </div>
                 </div>

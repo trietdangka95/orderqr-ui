@@ -9,6 +9,7 @@ export interface Store {
   currency: string;
   isActive: boolean;
   createdAt: string;
+  users?: { username: string }[];
 }
 
 export interface CreateStoreData {
@@ -38,7 +39,7 @@ export const superAdminApi = {
     return data;
   },
   
-  updateStore: async (id: string, storeData: Partial<Store>): Promise<Store> => {
+  updateStore: async (id: string, storeData: Partial<Store> & { adminUsername?: string; adminPassword?: string }): Promise<Store> => {
     const { data } = await axiosInstance.patch(`/superadmin/stores/${id}`, storeData);
     return data;
   },

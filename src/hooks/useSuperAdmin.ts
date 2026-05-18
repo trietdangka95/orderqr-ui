@@ -21,7 +21,7 @@ export const useCreateStore = () => {
 export const useUpdateStore = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Store> }) => 
+    mutationFn: ({ id, data }: { id: string; data: Partial<Store> & { adminUsername?: string; adminPassword?: string } }) => 
       superAdminApi.updateStore(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["stores"] });

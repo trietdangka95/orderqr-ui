@@ -1,0 +1,27 @@
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- QR box (O replacement) -->
+  <rect x="60" y="148" width="80" height="80" rx="11" fill="#F97316"/>
+  <rect x="69" y="157" width="21" height="21" rx="3" fill="#fff7ed"/>
+  <rect x="110" y="157" width="21" height="21" rx="3" fill="#fff7ed"/>
+  <rect x="69" y="198" width="21" height="21" rx="3" fill="#fff7ed"/>
+  <rect x="100" y="157" width="8" height="8" rx="1.5" fill="#fff7ed"/>
+  <rect x="100" y="169" width="8" height="8" rx="1.5" fill="#fff7ed"/>
+  <rect x="112" y="181" width="8" height="8" rx="1.5" fill="#fff7ed"/>
+  <rect x="100" y="193" width="8" height="8" rx="1.5" fill="#fff7ed"/>
+  <rect x="112" y="205" width="8" height="8" rx="1.5" fill="#fff7ed"/>
+  <rect x="100" y="205" width="8" height="8" rx="1.5" fill="#fff7ed"/>
+
+  <!-- RDER -->
+  <text x="150" y="228" font-family="Arial, Helvetica, sans-serif" font-size="80" font-weight="600" letter-spacing="5" fill="#1c0a00">RDER</text>
+
+  <!-- Divider -->
+  <rect x="60" y="248" width="380" height="3" rx="1.5" fill="#F97316"/>
+
+  <!-- QR MENU -->
+  <text x="250" y="290" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="500" letter-spacing="10" fill="#F97316">QR MENU</text>
+
+  <!-- Tagline -->
+  <text x="250" y="322" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" letter-spacing="3" fill="#9a6040">Quét · Gọi món · Thưởng thức</text>
+
+</svg>

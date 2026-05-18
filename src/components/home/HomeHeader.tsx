@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Soup, ChevronDown, ShoppingBag, ClipboardList, LayoutDashboard, LogOut, LayoutGrid, List as ListIcon } from "lucide-react";
 import Link from "next/link";
-import { UserRole } from "@/store/cartStore";
+import { UserRole, useCartStore } from "@/store/cartStore";
 
 interface HomeHeaderProps {
   userRole: UserRole;
@@ -40,6 +40,8 @@ export default function HomeHeader({
   viewMode,
   setViewMode,
 }: HomeHeaderProps) {
+  const { storeConfig } = useCartStore();
+
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between gap-4">
@@ -49,10 +51,10 @@ export default function HomeHeader({
           </div>
           <div>
             <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-none">
-              HOMI
+              {storeConfig?.name || "Menu Việt"}
             </h1>
             <span className="text-[10px] md:text-xs font-bold text-primary tracking-[0.2em] uppercase">
-              Media
+              Order QR
             </span>
           </div>
         </div>

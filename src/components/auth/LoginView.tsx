@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useCartStore, UserRole } from "@/store/cartStore";
-import { ChevronLeft, LogIn, UserCheck, ShieldCheck, ShieldAlert } from "lucide-react";
+import { ChevronLeft, LogIn, UserCheck, ShieldCheck, ShieldAlert, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -11,22 +11,37 @@ import { useLogin } from "@/hooks/useAuth";
 export default function LoginView({ initialRole = "staff" }: { initialRole?: UserRole }) {
   const { login: storeLogin } = useCartStore();
   const [role, setRole] = useState<UserRole>(initialRole);
+  const [username, setUsername] = useState(() => {
+    if (initialRole === "staff") return "staff";
+    if (initialRole === "kitchen") return "kitchen";
+    if (initialRole === "superadmin") return "superadmin";
+    return "";
+  });
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(false);
   const router = useRouter();
 
   const loginMutation = useLogin();
 
+  const handleRoleChange = (newRole: UserRole) => {
+    setRole(newRole);
+    if (newRole === "staff") {
+      setUsername("staff");
+    } else if (newRole === "kitchen") {
+      setUsername("kitchen");
+    } else if (newRole === "superadmin") {
+      setUsername("superadmin");
+    } else {
+      setUsername("");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Mapping for login
-    let username = role.toString();
-    if (role === "admin") username = "admin";
-    if (role === "superadmin") username = "superadmin";
-
     const loginData = {
-      username: username,
+      username: username.trim(),
       password: password
     };
 
@@ -93,19 +108,19 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
             {/* Role Selector */}
             <div className="flex bg-gray-50 p-1.5 rounded-2xl mb-8 gap-1 overflow-x-auto">
               <button
-                onClick={() => setRole("staff")}
+                onClick={() => handleRoleChange("staff")}
                 className={`flex-1 py-3 px-4 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${role === "staff" ? "bg-white shadow-sm text-blue-600" : "text-gray-400 hover:text-gray-600"}`}
               >
                 Phục vụ
               </button>
               <button
-                onClick={() => setRole("kitchen")}
+                onClick={() => handleRoleChange("kitchen")}
                 className={`flex-1 py-3 px-4 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${role === "kitchen" ? "bg-white shadow-sm text-orange-500" : "text-gray-400 hover:text-gray-600"}`}
               >
                 Bếp
               </button>
               <button
-                onClick={() => setRole("admin")}
+                onClick={() => handleRoleChange("admin")}
                 className={`flex-1 py-3 px-4 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${role === "admin" ? "bg-white shadow-sm text-purple-600" : "text-gray-400 hover:text-gray-600"}`}
               >
                 Quản trị
@@ -115,16 +130,37 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-4 mb-2 block text-center">
-                  Mật khẩu truy cập {theme.text}
+                  Tên đăng nhập
                 </label>
                 <input
-                  autoFocus
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full px-6 py-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all text-center text-xl font-bold tracking-widest ${error ? "border-red-500 animate-shake" : `border-gray-50 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5`}`}
+                  required
+                  type="text"
+                  placeholder="Tên đăng nhập..."
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-50 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 rounded-2xl outline-none transition-all text-center font-bold text-gray-700 mb-4"
                 />
+
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-4 mb-2 block text-center">
+                  Mật khẩu truy cập
+                </label>
+                <div className="relative">
+                  <input
+                    autoFocus={role === "staff" || role === "kitchen"}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`w-full pl-6 pr-12 py-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all text-center text-xl font-bold tracking-widest ${error ? "border-red-500 animate-shake" : `border-gray-50 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5`}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
                 <AnimatePresence>
                   {error && (
                     <motion.p
@@ -133,7 +169,7 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
                       exit={{ opacity: 0, height: 0 }}
                       className="text-red-500 text-[10px] font-black text-center mt-3 uppercase tracking-wider"
                     >
-                      Mật khẩu không chính xác!
+                      Thông tin đăng nhập không chính xác!
                     </motion.p>
                   )}
                 </AnimatePresence>

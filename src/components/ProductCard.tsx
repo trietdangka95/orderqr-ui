@@ -142,6 +142,9 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
     >
       {/* Badges for List mode */}
       <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
+        {hasDiscount && (
+          <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md">-{discountPercent}%</span>
+        )}
         {product.isNew && (
           <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md">MỚI</span>
         )}
@@ -151,7 +154,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
       </div>
 
       {/* Image - Horizontal */}
-      <div className="w-28 h-32 flex-shrink-0 bg-gray-50 rounded-2xl overflow-hidden relative">
+      <div className="w-24 h-24 sm:w-28 sm:h-32 flex-shrink-0 bg-gray-50 rounded-2xl overflow-hidden relative">
         <Image
           src={getImageUrl(product.image)}
           alt={product.name}
@@ -164,15 +167,6 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
               TẠM HẾT
             </span>
           </div>
-        )}
-      </div>
-
-      <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">
-        {hasDiscount && (
-          <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md">-{discountPercent}%</span>
-        )}
-        {product.isNew && (
-          <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md">MỚI</span>
         )}
       </div>
 

@@ -48,10 +48,10 @@ export default function MenuHeader({
 
         <button
           onClick={onAddNew}
-          className="bg-primary text-white px-8 py-4 rounded-2xl font-black flex items-center gap-2 hover:bg-orange-600 shadow-2xl shadow-primary/20 transition-all active:scale-95 text-sm uppercase tracking-widest"
+          className="bg-primary text-white p-4 sm:px-8 sm:py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-orange-600 shadow-2xl shadow-primary/20 transition-all active:scale-95 text-sm uppercase tracking-widest"
         >
           <Plus size={20} />
-          <span>Thêm món mới</span>
+          <span className="hidden sm:inline">Thêm món mới</span>
         </button>
       </div>
     </header>

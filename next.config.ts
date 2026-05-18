@@ -24,6 +24,13 @@ const nextConfig: NextConfig = {
     ],
     dangerouslyAllowSVG: true,
   },
+  // Cho phép Next.js Dev Server load tài nguyên khi truy cập bằng các domain/subdomain giả lập ở local
+  allowedDevOrigins: [
+    "orderqr.id.vn",
+    "bun-bo.orderqr.id.vn",
+    "banh-xeo.orderqr.id.vn",
+    "menu-viet.orderqr.id.vn"
+  ],
 };
 
 export default nextConfig;

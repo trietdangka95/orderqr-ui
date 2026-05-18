@@ -152,7 +152,7 @@ function HomeContent() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-20 pb-20 text-center flex flex-col items-center gap-4 relative z-10">
+      <footer className="mt-20 pb-36 text-center flex flex-col items-center gap-4 relative z-10">
         {(userRole === "admin" || userRole === "staff" || userRole === "kitchen") && (
           <div className="flex flex-col items-center gap-4 mb-4 md:hidden">
             <div className="flex items-center gap-6">
