@@ -23,6 +23,16 @@ export default function StoreInitializer() {
     const storeQuery = searchParams.get("store");
     const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn";
 
+    const isMainDomain = 
+      host === mainDomain || 
+      host === "localhost" || 
+      host === "127.0.0.1";
+
+    if (isMainDomain && !storeQuery) {
+      // Base landing/superadmin domain. Skip fetching.
+      return;
+    }
+
     let slug = "default";
 
     if (storeQuery) {

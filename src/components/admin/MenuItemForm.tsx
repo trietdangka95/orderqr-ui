@@ -34,6 +34,13 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
   const [priceInput, setPriceInput] = useState(item?.price?.toString() || "0");
   const [previewError, setPreviewError] = useState(false);
 
+  const getImageUrl = (url: string | undefined) => {
+    if (!url) return 'https://placehold.co/600x400?text=No+Image';
+    if (url.startsWith('http')) return url;
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+    return `${API_URL}${url}`;
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -41,9 +48,8 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
     try {
       const result = await uploadImage.mutateAsync(file);
       // Backend returns relative path /public/uploads/...
-      // We need to prepend the API URL for full URL
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-      setFormData({ ...formData, image: `${API_URL}${result.url}` });
+      // We save only the relative path to be environment-independent
+      setFormData({ ...formData, image: result.url });
       setPreviewError(false);
     } catch {
       alert("Lỗi khi tải ảnh lên!");
@@ -212,7 +218,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 {formData.image && (
                   <div className="relative w-full h-40 rounded-2xl overflow-hidden border-2 border-gray-50 bg-gray-50">
                     <Image 
-                      src={previewError ? 'https://placehold.co/600x400?text=Lỗi+ảnh' : formData.image} 
+                      src={previewError ? 'https://placehold.co/600x400?text=Lỗi+ảnh' : getImageUrl(formData.image)} 
                       alt="Preview" 
                       fill
                       className="object-cover"

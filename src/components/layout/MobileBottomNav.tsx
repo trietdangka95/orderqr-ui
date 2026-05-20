@@ -45,7 +45,7 @@ export default function MobileBottomNav() {
     }
   }, [activeOrdersCount]);
 
-  if (pathname !== "/") return null;
+  if (pathname !== "/" || !selectedTable) return null;
 
   const handleMenuClick = () => {
     if (isOpen) toggleCart();

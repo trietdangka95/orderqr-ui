@@ -7,7 +7,7 @@ import { useCartStore } from "@/store/cartStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { LayoutDashboard, LogOut, Soup } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 
 import HomeHeader from "@/components/home/HomeHeader";
@@ -19,6 +19,28 @@ import { Product } from "@/types/api";
 function HomeContent() {
   const searchParams = useSearchParams();
   const tableParam = searchParams.get("table");
+  const router = useRouter();
+
+  const [isMainDomainRedirect, setIsMainDomainRedirect] = useState(false);
+
+  // Redirect base-domain users to superadmin
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const host = window.location.hostname;
+      const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn";
+      const storeQuery = searchParams.get("store");
+
+      const isMainDomain = 
+        host === mainDomain || 
+        host === "localhost" || 
+        host === "127.0.0.1";
+
+      if (isMainDomain && !storeQuery) {
+        setIsMainDomainRedirect(true);
+        router.push("/superadmin");
+      }
+    }
+  }, [router, searchParams]);
 
   const { data: productsData, isLoading: productsLoading } = useProducts();
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
@@ -92,6 +114,14 @@ function HomeContent() {
     const matchesCategory = activeTab ? product.category === activeTab : true;
     return matchesSearch && matchesCategory;
   }), [products, searchQuery, activeTab]);
+
+  if (isMainDomainRedirect) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center font-bold text-gray-400">
+        Đang chuyển hướng đến trang quản trị...
+      </div>
+    );
+  }
 
   const isGuest = userRole === "guest";
   const showTableSelector = isGuest && !selectedTable && !searchParams.get("table");

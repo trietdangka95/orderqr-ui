@@ -44,3 +44,23 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Interactive Cursor Polish */
+button,
+a,
+select,
+input[type="button"],
+input[type="submit"],
+input[type="file"],
+[role="button"],
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+/* Focused Placeholder Polish */
+input:focus::placeholder,
+textarea:focus::placeholder {
+  color: transparent !important;
+  opacity: 0 !important;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
