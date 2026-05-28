@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, Check, Loader2, UserCircle, Key } from "lucide-react";
+import { Lock, Check, Loader2, UserCircle, Key, Eye, EyeOff } from "lucide-react";
 import { useUsers, useUpdateUserPassword } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -11,6 +11,7 @@ export default function UserPasswordManager() {
   
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [newPassword, setNewPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleUpdate = (e: React.FormEvent) => {
@@ -87,12 +88,19 @@ export default function UserPasswordManager() {
                   <input
                     required
                     autoFocus
-                    type="text"
+                    type={showPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:border-blue-500 outline-none transition-all font-mono"
+                    className="w-full pl-12 pr-12 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:border-blue-500 outline-none transition-all font-mono"
                     placeholder="Nhập mật khẩu mới..."
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
                 <button
                   type="submit"

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
-import { ShieldAlert, ArrowRight } from "lucide-react";
+import { ShieldAlert, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useLogin } from "@/hooks/useAuth";
@@ -10,6 +10,7 @@ import { useLogin } from "@/hooks/useAuth";
 export default function SuperAdminLogin() {
   const { login: storeLogin } = useCartStore();
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(false);
   const router = useRouter();
   const loginMutation = useLogin();
@@ -33,10 +34,10 @@ export default function SuperAdminLogin() {
         setError(true);
         setTimeout(() => setError(false), 2000);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Login failed with error:", err);
-      const message = err instanceof Error ? err.message : String(err);
-      alert("Lỗi chi tiết: " + message);
+      const message = err?.message || (err instanceof Error ? err.message : String(err));
+      alert("Đăng nhập thất bại: " + message);
       setError(true);
       setTimeout(() => setError(false), 2000);
     }
@@ -61,12 +62,19 @@ export default function SuperAdminLogin() {
           <div className="relative group">
             <input
               autoFocus
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Enter master password..."
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`w-full px-6 py-4 bg-gray-900 border border-gray-800 rounded-2xl outline-none transition-all text-center text-white font-mono tracking-widest placeholder:text-gray-700 ${error ? "border-red-500/50 focus:border-red-500 animate-shake" : "focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10"}`}
+              className={`w-full pl-6 pr-14 py-4 bg-gray-900 border border-gray-800 rounded-2xl outline-none transition-all text-center text-white font-mono tracking-widest placeholder:text-gray-700 ${error ? "border-red-500/50 focus:border-red-500 animate-shake" : "focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10"}`}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
             <AnimatePresence>
               {error && (
                 <motion.div
