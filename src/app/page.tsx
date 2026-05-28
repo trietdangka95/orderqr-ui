@@ -26,13 +26,18 @@ function HomeContent() {
   // Redirect base-domain users to superadmin
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const host = window.location.hostname;
-      const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn";
+      const host = window.location.hostname.toLowerCase();
+      const mainDomain = (process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn").toLowerCase();
       const storeQuery = searchParams.get("store");
 
+      // Remove any port suffix from mainDomain just in case (e.g. localhost:3000 -> localhost)
+      const cleanMainDomain = mainDomain.split(":")[0];
+
       const isMainDomain = 
-        host === mainDomain || 
+        host === cleanMainDomain || 
+        host === `www.${cleanMainDomain}` ||
         host === "localhost" || 
+        host === "www.localhost" ||
         host === "127.0.0.1";
 
       if (isMainDomain && !storeQuery) {

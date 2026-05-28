@@ -16,6 +16,13 @@ export function StoreCard({
   onEdit,
   onDelete,
 }: StoreCardProps) {
+  const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn";
+  const cleanMainDomain = mainDomain.split(":")[0];
+  const port = mainDomain.split(":")[1] ? `:${mainDomain.split(":")[1]}` : "";
+  const isLocal = cleanMainDomain.includes("localhost") || cleanMainDomain.includes("127.0.0.1");
+  const protocol = isLocal ? "http" : "https";
+  const storeUrl = `${protocol}://${store.slug}.${cleanMainDomain}${port}`;
+
   return (
     <motion.div
       layout
@@ -75,7 +82,7 @@ export function StoreCard({
           <span className="md:hidden lg:inline">Edit</span>
         </button>
         <Link
-          href={`/?store=${store.slug}`}
+          href={storeUrl}
           target="_blank"
           className="p-3 bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
         >
