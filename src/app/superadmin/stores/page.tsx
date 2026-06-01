@@ -10,7 +10,7 @@ import { StoreCard } from "@/components/superadmin/StoreCard";
 import { StoreFormModal } from "@/components/superadmin/StoreFormModal";
 
 export default function StoreManagementPage() {
-  const { data: stores = [], isLoading } = useStores();
+  const { data: stores = [], isLoading, isError, error } = useStores();
   const createStoreMutation = useCreateStore();
   const updateStoreMutation = useUpdateStore();
   const deleteStoreMutation = useDeleteStore();
@@ -61,6 +61,9 @@ export default function StoreManagementPage() {
           setIsModalOpen(false);
           setEditingStoreId(null);
           resetForm();
+        },
+        onError: (err: any) => {
+          alert("Gặp lỗi khi cập nhật cửa hàng: " + (err.message || "Lỗi không xác định"));
         }
       });
     } else {
@@ -71,6 +74,9 @@ export default function StoreManagementPage() {
         onSuccess: () => {
           setIsModalOpen(false);
           resetForm();
+        },
+        onError: (err: any) => {
+          alert("Gặp lỗi khi tạo cửa hàng: " + (err.message || "Lỗi không xác định"));
         }
       });
     }
@@ -101,11 +107,19 @@ export default function StoreManagementPage() {
   };
 
   const toggleStoreStatus = (id: string, currentStatus: boolean) => {
-    updateStoreMutation.mutate({ id, data: { isActive: !currentStatus } });
+    updateStoreMutation.mutate({ id, data: { isActive: !currentStatus } }, {
+      onError: (err: any) => {
+        alert("Gặp lỗi khi thay đổi trạng thái hoạt động: " + (err.message || "Lỗi không xác định"));
+      }
+    });
   };
 
   const handleDelete = (id: string) => {
-    deleteStoreMutation.mutate(id);
+    deleteStoreMutation.mutate(id, {
+      onError: (err: any) => {
+        alert("Gặp lỗi khi xóa cửa hàng: " + (err.message || "Lỗi không xác định"));
+      }
+    });
   };
 
   return (
@@ -137,6 +151,11 @@ export default function StoreManagementPage() {
         {isLoading ? (
           <div className="flex justify-center p-12">
             <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : isError ? (
+          <div className="bg-red-50 p-12 rounded-[3rem] text-center border-2 border-dashed border-red-200">
+            <p className="text-xl font-bold text-red-600 mb-2">Không thể tải danh sách cửa hàng</p>
+            <p className="text-sm text-red-500">{(error as any)?.message || "Vui lòng kiểm tra lại chứng chỉ SSL hoặc kết nối với server."}</p>
           </div>
         ) : filteredStores.length === 0 ? (
           <div className="bg-white p-20 rounded-[3rem] text-center border-2 border-dashed border-gray-200">

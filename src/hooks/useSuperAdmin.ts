@@ -5,6 +5,8 @@ export const useStores = () => {
   return useQuery({
     queryKey: ["stores"],
     queryFn: () => superAdminApi.getStores(),
+    staleTime: 30000, // Cache for 30 seconds
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -43,5 +45,7 @@ export const usePlatformStats = () => {
   return useQuery({
     queryKey: ["platform-stats"],
     queryFn: () => superAdminApi.getStats(),
+    staleTime: 30000, // Cache for 30 seconds
+    refetchOnWindowFocus: false,
   });
 };
