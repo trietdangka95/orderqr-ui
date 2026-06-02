@@ -5,7 +5,7 @@ import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import { useCartStore } from "@/store/cartStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, LogOut, Soup } from "lucide-react";
+import { LayoutDashboard, LogOut, Soup, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
@@ -169,7 +169,24 @@ function HomeContent() {
             {productsLoading || categoriesLoading ? (
               <div className="text-center font-bold text-gray-400">Đang tải cấu hình quán...</div>
             ) : tables.length === 0 ? (
-              <div className="text-center text-gray-500 py-10">Không tìm thấy bàn nào. Vui lòng liên hệ nhân viên.</div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center bg-gray-900/30 border border-white/10 backdrop-blur-xl p-10 rounded-[2.5rem] max-w-sm mx-auto shadow-2xl shadow-orange-950/20 space-y-5"
+              >
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-primary animate-pulse">
+                  <Sparkles size={28} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-black text-white">Quán Đang Chuẩn Bị...</h3>
+                  <p className="text-xs text-gray-400 font-bold leading-relaxed px-2">
+                    Cửa hàng đang thiết lập thực đơn và sơ đồ bàn ăn. Vui lòng quay lại sau ít phút để bắt đầu gọi món nhé!
+                  </p>
+                </div>
+                <div className="inline-block px-4 py-1.5 bg-primary/10 text-primary text-[9px] font-black rounded-full uppercase tracking-widest font-mono">
+                  Coming Soon
+                </div>
+              </motion.div>
             ) : (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

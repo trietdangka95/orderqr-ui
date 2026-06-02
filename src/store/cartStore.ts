@@ -230,7 +230,7 @@ export const useCartStore = create<CartStore>()(
           const response = await axiosInstance.get(`/stores/config?slug=${slug}`);
           const config = response.data;
           set({ storeConfig: config });
-          if (config && config.tables && config.tables.length > 0) {
+          if (config && config.tables) {
             set({ tables: config.tables });
           }
         } catch (error) {
