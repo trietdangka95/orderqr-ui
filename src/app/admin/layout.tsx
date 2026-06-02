@@ -23,7 +23,7 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout, userRole } = useCartStore();
+  const { logout, userRole, storeConfig } = useCartStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   if (userRole === "kitchen") {
@@ -66,7 +66,7 @@ export default function AdminLayout({
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Store size={20} className="text-white" />
             </div>
-            <span className="font-black tracking-tight">Menu Việt Admin</span>
+            <span className="font-black tracking-tight">{storeConfig?.name || "Menu Việt"} Admin</span>
           </div>
           <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-white/10 rounded-lg transition-colors">
             <Menu size={24} />
@@ -83,7 +83,7 @@ export default function AdminLayout({
               <Store size={24} className="text-white" />
             </div>
             <div>
-              <h1 className="font-black text-xl tracking-tight leading-none text-white">Menu Việt</h1>
+              <h1 className="font-black text-xl tracking-tight leading-none text-white">{storeConfig?.name || "Menu Việt"}</h1>
               <p className="text-[10px] font-bold text-primary uppercase tracking-widest mt-1">Hệ thống quản lý</p>
             </div>
           </div>

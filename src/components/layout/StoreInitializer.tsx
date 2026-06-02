@@ -72,10 +72,13 @@ export default function StoreInitializer() {
   useEffect(() => {
     if (!isMounted) return;
 
-    // 3. Apply Theme Color to CSS Variables
+    // 3. Apply Theme Color & Page Title dynamically
     if (storeConfig?.themeColor) {
       document.documentElement.style.setProperty("--primary", storeConfig.themeColor);
       document.documentElement.style.setProperty("--primary-soft", `${storeConfig.themeColor}1a`); // 10% opacity
+    }
+    if (storeConfig?.name) {
+      document.title = `${storeConfig.name} - Đặt Món Online`;
     }
   }, [isMounted, storeConfig]);
 

@@ -105,7 +105,7 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
             </div>
 
             <h1 className="text-2xl font-black tracking-tight">{theme.text}</h1>
-            <p className="opacity-80 text-sm font-medium mt-1">Hệ thống Menu Việt</p>
+            <p className="opacity-80 text-sm font-medium mt-1">Hệ thống {storeConfig?.name || "Menu Việt"}</p>
           </div>
 
           <div className="p-8">
