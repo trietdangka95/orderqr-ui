@@ -4,17 +4,11 @@ import { useCartStore } from "@/store/cartStore";
 import { X, Minus, Plus, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 import { useCreateOrder } from "@/hooks/useOrders";
+import { getImageUrl } from "@/utils/image";
 
 export default function CartDrawer() {
   const { items, isOpen, toggleCart, removeItem, updateQuantity, getTotalItems, getTotalPrice, clearCart, toggleOrders, selectedTable } = useCartStore();
   const createOrder = useCreateOrder();
-
-  const getImageUrl = (url: string | undefined) => {
-    if (!url) return 'https://placehold.co/600x400?text=No+Image';
-    if (url.startsWith('http')) return url;
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    return `${API_URL}${url}`;
-  };
 
   const handleCheckout = () => {
     if (!selectedTable) {

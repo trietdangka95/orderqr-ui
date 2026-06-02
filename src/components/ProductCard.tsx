@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Plus, Flame, Star } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { motion } from "framer-motion";
+import { getImageUrl } from "@/utils/image";
 
 type Product = {
   id: string;
@@ -25,13 +26,6 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
   const discountPercent = product.discountPercent || 0;
   const hasDiscount = discountPercent > 0;
   const finalPrice = hasDiscount ? product.price * (1 - discountPercent / 100) : product.price;
-
-  const getImageUrl = (url: string | undefined) => {
-    if (!url) return 'https://placehold.co/600x400?text=No+Image';
-    if (url.startsWith('http')) return url;
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    return `${API_URL}${url}`;
-  };
 
   const handleAddToCart = () => {
     if (product.isAvailable === false) return;

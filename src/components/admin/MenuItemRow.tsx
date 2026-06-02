@@ -5,6 +5,7 @@ import { Edit2, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useDeleteProduct, useUpdateProduct } from "@/hooks/useProducts";
 import Image from "next/image";
+import { getImageUrl } from "@/utils/image";
 
 interface MenuItemRowProps {
   item: MenuItem;
@@ -94,7 +95,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
           className="rounded-2xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-50 relative w-full aspect-video mb-4"
         >
           <Image
-            src={item.image || ""}
+            src={getImageUrl(item.image)}
             alt={item.name}
             fill
             className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
@@ -136,7 +137,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
         className="rounded-2xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-50 relative w-24 h-24"
       >
         <Image
-          src={item.image || ""}
+          src={getImageUrl(item.image)}
           alt={item.name}
           fill
           className="object-cover transition-transform group-hover:scale-110 duration-500"

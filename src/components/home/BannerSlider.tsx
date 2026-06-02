@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { MenuItem } from "@/store/cartStore";
+import { getImageUrl } from "@/utils/image";
 
 interface BannerSliderProps {
   banners: MenuItem[];
@@ -52,7 +53,7 @@ export default function BannerSlider({ banners }: BannerSliderProps) {
           className="relative h-full w-full"
         >
           <Image
-            src={banners[currentBanner].bannerUrl || ""}
+            src={getImageUrl(banners[currentBanner].bannerUrl)}
             alt={banners[currentBanner].promoTitle || ""}
             fill
             className="object-cover"

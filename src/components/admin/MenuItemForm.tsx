@@ -6,6 +6,7 @@ import { MenuItem } from "@/store/cartStore";
 import Image from "next/image";
 import { X, Upload, Save, Loader2 } from "lucide-react";
 import { useCreateProduct, useUpdateProduct, useCategories, useUploadImage } from "@/hooks/useProducts";
+import { getImageUrl } from "@/utils/image";
 
 interface MenuItemFormProps {
   item?: MenuItem;
@@ -33,13 +34,6 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
 
   const [priceInput, setPriceInput] = useState(item?.price?.toString() || "0");
   const [previewError, setPreviewError] = useState(false);
-
-  const getImageUrl = (url: string | undefined) => {
-    if (!url) return 'https://placehold.co/600x400?text=No+Image';
-    if (url.startsWith('http')) return url;
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    return `${API_URL}${url}`;
-  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -169,17 +163,23 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">
                   Danh mục
                 </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-bold text-gray-700 bg-white"
-                >
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
+                {categories.length === 0 ? (
+                  <div className="text-xs font-bold text-red-500 bg-red-50 p-3.5 rounded-2xl border border-red-100 leading-relaxed">
+                    ⚠️ Chưa có danh mục nào! Vui lòng đóng hộp thoại này và thêm ít nhất 1 danh mục ở phần "Quản lý Danh mục" phía sau trước khi thêm món ăn.
+                  </div>
+                ) : (
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-bold text-gray-700 bg-white"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
 
@@ -216,21 +216,32 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 </div>
                 
                 {formData.image && (
-                  <div className="relative w-full h-40 rounded-2xl overflow-hidden border-2 border-gray-50 bg-gray-50">
-                    <Image 
-                      src={previewError ? 'https://placehold.co/600x400?text=Lỗi+ảnh' : getImageUrl(formData.image)} 
-                      alt="Preview" 
-                      fill
-                      className="object-cover"
-                      onError={() => setPreviewError(true)}
-                    />
+                  <div className="relative w-full h-40 rounded-2xl overflow-hidden border-2 border-gray-100 bg-gray-50 flex items-center justify-center">
+                    {previewError ? (
+                      <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-orange-50/60 flex flex-col items-center justify-center p-4 text-center">
+                        <span className="text-2xl mb-1">⚠️</span>
+                        <p className="text-xs font-black text-red-500 uppercase tracking-wider mb-1">Lỗi hiển thị ảnh</p>
+                        <p className="text-[10px] text-gray-400 font-bold leading-normal max-w-[80%]">
+                          Không thể hiển thị bản xem trước. Hãy đảm bảo đường dẫn ảnh hoặc kết nối đến máy chủ hoạt động tốt.
+                        </p>
+                      </div>
+                    ) : (
+                      <Image 
+                        src={getImageUrl(formData.image)} 
+                        alt="Preview" 
+                        fill
+                        unoptimized
+                        className="object-cover"
+                        onError={() => setPreviewError(true)}
+                      />
+                    )}
                     <button 
                       type="button"
                       onClick={() => {
                         setFormData({ ...formData, image: "" });
                         setPreviewError(false);
                       }}
-                      className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+                      className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
                     >
                       <X size={14} />
                     </button>
@@ -331,7 +342,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
             </button>
             <button
               type="submit"
-              disabled={createProduct.isPending || updateProduct.isPending}
+              disabled={createProduct.isPending || updateProduct.isPending || categories.length === 0}
               className="flex-1 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 shadow-lg shadow-orange-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {createProduct.isPending || updateProduct.isPending ? (

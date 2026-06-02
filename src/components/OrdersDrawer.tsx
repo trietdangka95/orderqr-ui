@@ -8,18 +8,12 @@ import { useOrders, useConfirmOrder, useUpdateOrderStatus, useTableOrders } from
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { getImageUrl } from "@/utils/image";
 
 export default function OrdersDrawer() {
   const { isOrdersOpen, toggleOrders, selectedTable, userRole } = useCartStore();
   const queryClient = useQueryClient();
   const { socket } = useSocket();
-
-  const getImageUrl = (url: string | undefined) => {
-    if (!url) return 'https://placehold.co/600x400?text=No+Image';
-    if (url.startsWith('http')) return url;
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    return `${API_URL}${url}`;
-  };
 
   // Fetch orders based on role
   const isStaff = userRole === "staff" || userRole === "admin" || userRole === "kitchen";

@@ -21,6 +21,9 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
       createCategoryMutation.mutate(newCategoryName.trim(), {
         onSuccess: () => {
           setNewCategoryName("");
+        },
+        onError: (err: any) => {
+          alert("Lỗi khi thêm danh mục: " + (err.message || "Lỗi không xác định"));
         }
       });
     }
@@ -28,7 +31,11 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
 
   const handleRemove = (id: number) => {
     if (confirm("Bạn có chắc chắn muốn xóa danh mục này? Các sản phẩm thuộc danh mục này có thể bị ảnh hưởng.")) {
-      deleteCategoryMutation.mutate(id);
+      deleteCategoryMutation.mutate(id, {
+        onError: (err: any) => {
+          alert("Lỗi khi xóa danh mục: " + (err.message || "Lỗi không xác định"));
+        }
+      });
     }
   };
 

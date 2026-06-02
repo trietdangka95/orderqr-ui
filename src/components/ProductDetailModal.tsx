@@ -4,6 +4,7 @@ import Image from "next/image";
 import { X, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
+import { getImageUrl } from "@/utils/image";
 
 interface Product {
   id: string;
@@ -43,13 +44,6 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
       note: "",
     });
     onClose();
-  };
-
-  const getImageUrl = (url: string | undefined) => {
-    if (!url) return 'https://placehold.co/600x400?text=No+Image';
-    if (url.startsWith('http')) return url;
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    return `${API_URL}${url}`;
   };
 
   return (

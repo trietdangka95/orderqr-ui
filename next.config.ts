@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "api.orderqr.id.vn",
+      },
+      {
+        protocol: "https",
         hostname: "placehold.co",
       },
       {
