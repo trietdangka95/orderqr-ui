@@ -40,7 +40,7 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formattedUsername = (role === "staff" || role === "kitchen") && storeConfig?.slug
+    const formattedUsername = (role === "staff" || role === "kitchen" || role === "admin") && storeConfig?.slug
       ? `${username.trim()}_${storeConfig.slug}`
       : username.trim();
 
