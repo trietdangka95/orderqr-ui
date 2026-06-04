@@ -51,6 +51,8 @@ export interface StoreConfig {
 interface CartStore {
   storeConfig: StoreConfig | null;
   setStoreConfig: (config: StoreConfig | null) => void;
+  storeError: { status: number; message: string } | null;
+  setStoreError: (error: { status: number; message: string } | null) => void;
   
   // UI State
   isOpen: boolean;
@@ -106,6 +108,8 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       storeConfig: null,
       setStoreConfig: (config) => set({ storeConfig: config }),
+      storeError: null,
+      setStoreError: (error) => set({ storeError: error }),
 
       isOpen: false,
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
@@ -227,14 +231,22 @@ export const useCartStore = create<CartStore>()(
 
       fetchStoreConfig: async (slug) => {
         try {
+          set({ storeError: null });
           const response = await axiosInstance.get(`/stores/config?slug=${slug}`);
           const config = response.data;
           set({ storeConfig: config });
           if (config && config.tables) {
             set({ tables: config.tables });
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error fetching store config:', error);
+          set({
+            storeError: {
+              status: error.response?.status || 500,
+              message: error.response?.data?.message || 'Có lỗi xảy ra khi tải cấu hình',
+            },
+            storeConfig: null,
+          });
         }
       },
     }),

@@ -42,7 +42,7 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message = error.response?.data?.message || 'Something went wrong';
+    const message = error.response?.data?.message || error.message || 'Something went wrong';
     
     // Handle 401 Unauthorized (e.g., redirect to login or clear token)
     if (error.response?.status === 401) {
@@ -52,10 +52,11 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    return Promise.reject({
-      ...error,
-      message,
-    });
+    if (error && typeof error === 'object') {
+      error.message = message;
+    }
+
+    return Promise.reject(error);
   }
 );
 

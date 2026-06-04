@@ -5,7 +5,7 @@ import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import { useCartStore } from "@/store/cartStore";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, LogOut, Soup, Sparkles } from "lucide-react";
+import { LayoutDashboard, LogOut, Soup, Sparkles, Store, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
@@ -15,15 +15,16 @@ import BannerSlider from "@/components/home/BannerSlider";
 import CategoryTabs from "@/components/home/CategoryTabs";
 import { useProducts, useCategories } from "@/hooks/useProducts";
 import { Product } from "@/types/api";
+import LandingPage from "@/components/home/LandingPage";
 
 function HomeContent() {
   const searchParams = useSearchParams();
   const tableParam = searchParams.get("table");
   const router = useRouter();
 
-  const [isMainDomainRedirect, setIsMainDomainRedirect] = useState(false);
+  const [isLandingPage, setIsLandingPage] = useState(false);
 
-  // Redirect base-domain users to superadmin
+  // Detect if on landing page (main domain or about subdomain, with no store query)
   useEffect(() => {
     if (typeof window !== "undefined") {
       const host = window.location.hostname.toLowerCase();
@@ -41,11 +42,12 @@ function HomeContent() {
         host === "127.0.0.1";
 
       if (isMainDomain && !storeQuery) {
-        setIsMainDomainRedirect(true);
-        router.push("/superadmin");
+        setIsLandingPage(true);
+      } else {
+        setIsLandingPage(false);
       }
     }
-  }, [router, searchParams]);
+  }, [searchParams]);
 
   const { data: productsData, isLoading: productsLoading } = useProducts();
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
@@ -59,7 +61,7 @@ function HomeContent() {
   const {
     getTotalItems, toggleCart, toggleOrders, orders, logout,
     userRole, selectedTable, setSelectedTable, tables, storeConfig,
-    toastMessage, setToastMessage
+    toastMessage, setToastMessage, storeError
   } = useCartStore();
 
   const products = useMemo(() => productsData || [], [productsData]);
@@ -120,10 +122,80 @@ function HomeContent() {
     return matchesSearch && matchesCategory;
   }), [products, searchQuery, activeTab]);
 
-  if (isMainDomainRedirect) {
+  if (isLandingPage) {
+    return <LandingPage />;
+  }
+
+  if (storeError) {
+    const is403 = storeError.status === 403;
+    const errorTitle = is403 ? "Cửa Hàng Tạm Ngưng Hoạt Động" : "Không Tìm Thấy Cửa Hàng";
+    const errorDesc = is403 
+      ? "Cửa hàng đang tạm thời đóng cửa hoặc ngừng hoạt động. Vui lòng quay lại sau hoặc liên hệ với quản trị viên quán."
+      : "Đường dẫn cửa hàng không tồn tại hoặc đã được thay đổi. Vui lòng kiểm tra lại địa chỉ URL.";
+
     return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center font-bold text-gray-400">
-        Đang chuyển hướng đến trang quản trị...
+      <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between p-6 relative overflow-hidden">
+        {/* Background Decorative Gradients */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl filter animate-pulse"></div>
+        <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl filter animate-pulse delay-700"></div>
+
+        {/* Header */}
+        <header className="flex flex-col items-center text-center mt-12 space-y-4 relative z-10">
+          <motion.div
+            initial={{ scale: 0, rotate: -15 }}
+            animate={{ scale: 1, rotate: 3 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            className={`w-16 h-16 md:w-20 md:h-20 ${is403 ? 'bg-amber-500' : 'bg-red-500'} rounded-2xl md:rounded-3xl flex items-center justify-center shadow-xl shadow-red-950/50`}
+          >
+            {is403 ? <Store className="text-white w-9 h-9 md:w-11 md:h-11" /> : <AlertTriangle className="text-white w-9 h-9 md:w-11 md:h-11" />}
+          </motion.div>
+
+          <div>
+            <span className="text-xs md:text-sm font-black text-gray-500 tracking-[0.25em] uppercase block">
+              Thông Báo Hệ Thống
+            </span>
+            <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white mt-2">
+              {errorTitle}
+            </h1>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="max-w-md mx-auto w-full py-12 relative z-10 flex-grow flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-center bg-gray-900/30 border border-white/10 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] shadow-2xl shadow-red-950/20 space-y-6"
+          >
+            <div className={`w-16 h-16 ${is403 ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500'} rounded-2xl flex items-center justify-center mx-auto`}>
+              {is403 ? <Store size={28} className="animate-pulse" /> : <AlertTriangle size={28} className="animate-pulse" />}
+            </div>
+            
+            <div className="space-y-3">
+              <h3 className="text-xl font-black text-white">
+                {is403 ? "Quán đang tạm đóng" : "Đường dẫn không hợp lệ"}
+              </h3>
+              <p className="text-xs md:text-sm text-gray-400 font-bold leading-relaxed px-2">
+                {errorDesc}
+              </p>
+            </div>
+
+            <div className="pt-2">
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center px-6 py-3 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-wider bg-white/5 hover:bg-white/10 transition-all duration-300"
+              >
+                Quay Lại
+              </Link>
+            </div>
+          </motion.div>
+        </main>
+
+        {/* Footer */}
+        <footer className="text-center py-6 text-[10px] text-gray-600 font-bold uppercase tracking-widest relative z-10">
+          © 2026 Order QR
+        </footer>
       </div>
     );
   }
