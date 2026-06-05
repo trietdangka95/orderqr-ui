@@ -5,7 +5,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useSearchParams } from "next/navigation";
 
 export default function StoreInitializer() {
-  const { fetchStoreConfig, storeConfig } = useCartStore();
+  const { fetchStoreConfig, storeConfig, storeError } = useCartStore();
   const searchParams = useSearchParams();
 
   const [isMounted, setIsMounted] = useState(false);
@@ -35,6 +35,16 @@ export default function StoreInitializer() {
 
     if (isMainDomain && !storeQuery) {
       // Base landing/superadmin domain. Skip fetching.
+      // Enforce domain routing: main domain only allows /, /super-login, and /superadmin
+      const pathname = window.location.pathname;
+      const isAllowedPathOnMainDomain = 
+        pathname === "/" || 
+        pathname === "/super-login" || 
+        pathname.startsWith("/superadmin");
+
+      if (!isAllowedPathOnMainDomain) {
+        window.location.href = "/";
+      }
       return;
     }
 
@@ -81,6 +91,15 @@ export default function StoreInitializer() {
       document.title = `${storeConfig.name} - Đặt Món Online`;
     }
   }, [isMounted, storeConfig]);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
+    // 4. Redirect to home if there is an error loading the store on a subpath (e.g. store inactive/not found)
+    if (storeError && window.location.pathname !== "/") {
+      window.location.href = "/";
+    }
+  }, [isMounted, storeError]);
 
   return null;
 }

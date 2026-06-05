@@ -23,7 +23,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000', {
-      transports: ['websocket'],
+      transports: ['polling', 'websocket'],
     });
 
     socketInstance.on('connect', () => {

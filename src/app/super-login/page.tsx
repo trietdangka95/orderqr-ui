@@ -75,13 +75,17 @@ export default function SuperAdminLogin() {
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
+          </div>
+
+          {/* Reserved height error message space to prevent layout shifting and overlapping */}
+          <div className="h-6 flex items-center justify-center">
             <AnimatePresence>
               {error && (
                 <motion.div
-                  initial={{ opacity: 0, y: -10 }}
+                  initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute -bottom-8 left-0 right-0 text-center"
+                  exit={{ opacity: 0, y: -5 }}
+                  className="text-center"
                 >
                   <span className="text-red-500 text-[10px] font-black uppercase tracking-wider">Access Denied</span>
                 </motion.div>
@@ -92,7 +96,7 @@ export default function SuperAdminLogin() {
           <button
             type="submit"
             disabled={loginMutation.isPending || password.length === 0}
-            className="w-full py-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all active:scale-95 bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] disabled:opacity-50 disabled:shadow-none mt-6"
+            className="w-full py-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all active:scale-95 bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] disabled:opacity-50 disabled:shadow-none mt-2"
           >
             {loginMutation.isPending ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
