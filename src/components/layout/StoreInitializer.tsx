@@ -19,7 +19,10 @@ export default function StoreInitializer() {
     if (!isMounted) return;
 
     // 1. Detect Slug from Subdomain or Query Param
-    const host = window.location.hostname.toLowerCase();
+    let host = window.location.hostname.toLowerCase();
+    if (host.startsWith("www.")) {
+      host = host.substring(4);
+    }
     const storeQuery = searchParams.get("store");
     const mainDomain = (process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn").toLowerCase();
 
