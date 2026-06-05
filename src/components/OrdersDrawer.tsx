@@ -10,6 +10,16 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { getImageUrl } from "@/utils/image";
 
+interface MappedOrderItem {
+  id: string;
+  productId: string;
+  name: string;
+  image: string;
+  price: number;
+  quantity: number;
+  note?: string | null;
+}
+
 export default function OrdersDrawer() {
   const { isOrdersOpen, toggleOrders, selectedTable, userRole } = useCartStore();
   const queryClient = useQueryClient();
@@ -56,7 +66,7 @@ export default function OrdersDrawer() {
     timestamp: new Date(o.createdAt).getTime(),
     isConfirmed: o.isConfirmed,
     // Backend (Prisma) trả về 'orderItems', frontend type gọi là 'items' → hỗ trợ cả hai
-    items: ((o as any).orderItems || (o as any).items || []).map((i: any) => ({
+    items: ((o as any).orderItems || (o as any).items || []).map((i: any): MappedOrderItem => ({
       ...i,
       name: i.product?.name || 'Món ăn',
       image: i.product?.image || '',
@@ -81,7 +91,7 @@ export default function OrdersDrawer() {
   // Summary for current table
   const tableSummary = tableOrders.reduce((acc, order) => {
     if (order.status !== "completed") {
-      order.items.forEach(item => {
+      order.items.forEach((item: { name: string; quantity: number }) => {
         if (!acc[item.name]) acc[item.name] = { quantity: 0, status: order.status };
         acc[item.name].quantity += item.quantity;
       });
@@ -237,7 +247,7 @@ export default function OrdersDrawer() {
                 </div>
 
                 <div className="p-4 space-y-3">
-                  {order.items.map(item => (
+                  {order.items.map((item: MappedOrderItem) => (
                     <div key={item.id} className="flex gap-3">
                       <div className="w-12 h-12 rounded-lg bg-gray-50 overflow-hidden relative flex-shrink-0">
                         <Image src={getImageUrl(item.image)} alt={item.name} fill className="object-cover" />
