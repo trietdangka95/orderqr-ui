@@ -17,7 +17,7 @@ export default function OrdersDrawer() {
 
   // Fetch orders based on role
   const isStaff = userRole === "staff" || userRole === "admin" || userRole === "kitchen";
-  const allOrdersQuery = useOrders();
+  const allOrdersQuery = useOrders(isStaff);   // chỉ fetch khi là staff/admin/kitchen
   const tableOrdersQuery = useTableOrders(selectedTable);
 
   const apiOrders = isStaff ? (allOrdersQuery.data || []) : (tableOrdersQuery.data || []);
@@ -32,6 +32,10 @@ export default function OrdersDrawer() {
 
     const refreshOrders = () => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      // Cập nhật guest view theo bàn (public route)
+      if (selectedTable) {
+        queryClient.invalidateQueries({ queryKey: ["orders", "table", selectedTable] });
+      }
     };
 
     socket.on('newOrder', refreshOrders);
@@ -43,7 +47,7 @@ export default function OrdersDrawer() {
       socket.off('orderUpdate', refreshOrders);
       socket.off('checkout', refreshOrders);
     };
-  }, [socket, queryClient]);
+  }, [socket, queryClient, selectedTable]);
 
   // Map API data to UI format if necessary (handle casing or field names)
   const orders = apiOrders.map(o => ({

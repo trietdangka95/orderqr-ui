@@ -43,7 +43,10 @@ export default function StoreInitializer() {
       const isAllowedPathOnMainDomain = 
         pathname === "/" || 
         pathname === "/super-login" || 
-        pathname.startsWith("/superadmin");
+        pathname.startsWith("/superadmin") ||
+        pathname === "/staff" ||
+        pathname === "/admin/kitchen" ||
+        pathname.startsWith("/admin");
 
       if (!isAllowedPathOnMainDomain) {
         window.location.href = "/";

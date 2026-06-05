@@ -3,10 +3,11 @@ import { ordersApi } from "@/api/orders";
 import { tablesApi } from "@/api/tables";
 import { OrderStatus } from "@/types/api";
 
-export const useOrders = () => {
+export const useOrders = (enabled = true) => {
   return useQuery({
     queryKey: ["orders"],
     queryFn: ordersApi.getOrders,
+    enabled,
   });
 };
 
@@ -24,8 +25,10 @@ export const useConfirmOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ordersApi.confirmOrder,
-    onSuccess: () => {
+    onSuccess: (updatedOrder) => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      // Cập nhật guest view theo bàn
+      queryClient.invalidateQueries({ queryKey: ["orders", "table", updatedOrder.tableNumber] });
     },
   });
 };
@@ -34,8 +37,10 @@ export const useUpdateOrderStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: OrderStatus }) => ordersApi.updateStatus(id, status),
-    onSuccess: () => {
+    onSuccess: (updatedOrder) => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      // Cập nhật guest view theo bàn
+      queryClient.invalidateQueries({ queryKey: ["orders", "table", updatedOrder.tableNumber] });
     },
   });
 };
