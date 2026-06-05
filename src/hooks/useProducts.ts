@@ -1,18 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { menuApi } from "@/api/menu";
-import { MenuItem } from "@/store/cartStore";
+import { MenuItem, useCartStore } from "@/store/cartStore";
 
 export const useProducts = () => {
+  const storeConfig = useCartStore((state) => state.storeConfig);
   return useQuery({
-    queryKey: ["products"],
+    queryKey: ["products", storeConfig?.id],
     queryFn: menuApi.getProducts,
+    enabled: !!storeConfig?.id,
   });
 };
 
 export const useCategories = () => {
+  const storeConfig = useCartStore((state) => state.storeConfig);
   return useQuery({
-    queryKey: ["categories"],
+    queryKey: ["categories", storeConfig?.id],
     queryFn: menuApi.getCategories,
+    enabled: !!storeConfig?.id,
   });
 };
 
