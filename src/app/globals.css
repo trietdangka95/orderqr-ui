@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
+  --background: #fdfbf7;
   --foreground: #171717;
   --primary: #FF7B00;
   --primary-foreground: #ffffff;
@@ -18,13 +18,6 @@
   --color-primary-foreground: var(--primary-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
