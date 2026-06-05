@@ -3,7 +3,7 @@ import { Invoice } from '@/types/api';
 
 export const tablesApi = {
   clearTable: async (tableNumber: string): Promise<Invoice> => {
-    const response = await axiosInstance.post<Invoice>('/tables/clear', { tableNumber });
+    const response = await axiosInstance.post<Invoice>('/orders/checkout', { tableNumber });
     return response.data;
   },
 

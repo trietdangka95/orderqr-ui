@@ -44,6 +44,7 @@ export interface Order {
   id: string;
   tableNumber: string;
   status: OrderStatus;
+  isConfirmed: boolean;
   items: OrderItem[];
   createdAt: string;
   updatedAt: string;

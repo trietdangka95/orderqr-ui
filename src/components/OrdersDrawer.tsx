@@ -34,14 +34,14 @@ export default function OrdersDrawer() {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     };
 
-    socket.on('NEW_ORDER_ALERT', refreshOrders);
-    socket.on('ORDER_STATUS_CHANGED', refreshOrders);
-    socket.on('ORDER_READY_TO_COOK', refreshOrders);
+    socket.on('newOrder', refreshOrders);
+    socket.on('orderUpdate', refreshOrders);
+    socket.on('checkout', refreshOrders);
 
     return () => {
-      socket.off('NEW_ORDER_ALERT', refreshOrders);
-      socket.off('ORDER_STATUS_CHANGED', refreshOrders);
-      socket.off('ORDER_READY_TO_COOK', refreshOrders);
+      socket.off('newOrder', refreshOrders);
+      socket.off('orderUpdate', refreshOrders);
+      socket.off('checkout', refreshOrders);
     };
   }, [socket, queryClient]);
 
@@ -50,7 +50,7 @@ export default function OrdersDrawer() {
     ...o,
     status: o.status.toLowerCase() as "pending" | "cooking" | "serving" | "completed", // UI expects lowercase
     timestamp: new Date(o.createdAt).getTime(),
-    isConfirmed: o.status !== 'PENDING', // In API, PENDING means unconfirmed
+    isConfirmed: o.isConfirmed,
     items: o.items.map(i => ({
       ...i,
       name: i.product?.name || 'Món ăn',

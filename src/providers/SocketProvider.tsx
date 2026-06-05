@@ -19,9 +19,11 @@ export const useSocket = () => useContext(SocketContext);
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const { userRole, selectedTable } = useCartStore();
+  const { userRole, selectedTable, storeConfig } = useCartStore();
 
   useEffect(() => {
+    if (!storeConfig?.id) return;
+
     const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000', {
       transports: ['polling', 'websocket'],
     });
@@ -30,15 +32,10 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Connected to socket server');
       setIsConnected(true);
 
-      // Join rooms based on role/table
-      if (userRole === 'admin' || userRole === 'staff') {
-        socketInstance.emit('join', 'admin_staff');
-      }
-      if (userRole === 'kitchen' || userRole === 'admin') {
-        socketInstance.emit('join', 'kitchen');
-      }
+      // Join rooms based on store context
+      socketInstance.emit('join', `store_${storeConfig.id}`);
       if (selectedTable) {
-        socketInstance.emit('join', `table_${selectedTable}`);
+        socketInstance.emit('join', `store_${storeConfig.id}_table_${selectedTable}`);
       }
     });
 
@@ -53,7 +50,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       cancelAnimationFrame(handle);
       socketInstance.disconnect();
     };
-  }, [userRole, selectedTable]);
+  }, [userRole, selectedTable, storeConfig?.id]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected }}>

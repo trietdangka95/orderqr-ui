@@ -31,12 +31,14 @@ export default function AdminTablesPage() {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     };
 
-    socket.on('NEW_ORDER_ALERT', refreshOrders);
-    socket.on('ORDER_STATUS_CHANGED', refreshOrders);
+    socket.on('newOrder', refreshOrders);
+    socket.on('orderUpdate', refreshOrders);
+    socket.on('checkout', refreshOrders);
 
     return () => {
-      socket.off('NEW_ORDER_ALERT', refreshOrders);
-      socket.off('ORDER_STATUS_CHANGED', refreshOrders);
+      socket.off('newOrder', refreshOrders);
+      socket.off('orderUpdate', refreshOrders);
+      socket.off('checkout', refreshOrders);
     };
   }, [socket, queryClient]);
 
@@ -44,7 +46,7 @@ export default function AdminTablesPage() {
     ...o,
     status: o.status.toLowerCase() as OrderStatus,
     timestamp: new Date(o.createdAt).getTime(),
-    isConfirmed: o.status !== 'PENDING',
+    isConfirmed: o.isConfirmed,
     items: o.items.map(i => ({
       ...i,
       id: i.productId,
