@@ -52,17 +52,18 @@ export default function OrdersDrawer() {
   // Map API data to UI format if necessary (handle casing or field names)
   const orders = apiOrders.map(o => ({
     ...o,
-    status: o.status.toLowerCase() as "pending" | "cooking" | "serving" | "completed", // UI expects lowercase
+    status: o.status.toLowerCase() as "pending" | "cooking" | "serving" | "completed",
     timestamp: new Date(o.createdAt).getTime(),
     isConfirmed: o.isConfirmed,
-    items: o.items.map(i => ({
+    // Backend (Prisma) trả về 'orderItems', frontend type gọi là 'items' → hỗ trợ cả hai
+    items: ((o as any).orderItems || (o as any).items || []).map((i: any) => ({
       ...i,
       name: i.product?.name || 'Món ăn',
       image: i.product?.image || '',
       price: i.product?.price || 0,
       id: i.productId
     })),
-    totalPrice: o.totalAmount || o.items.reduce((sum, i) => sum + (i.product?.price || 0) * i.quantity, 0)
+    totalPrice: o.totalAmount || ((o as any).orderItems || (o as any).items || []).reduce((sum: number, i: any) => sum + (i.product?.price || 0) * i.quantity, 0)
   }));
 
   // Only consider non-completed orders as "active"

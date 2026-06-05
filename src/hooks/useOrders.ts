@@ -15,8 +15,12 @@ export const useCreateOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ordersApi.createOrder,
-    onSuccess: () => {
+    onSuccess: (createdOrder) => {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      // Cập nhật guest view theo bàn ngay lập tức
+      if (createdOrder?.tableNumber) {
+        queryClient.invalidateQueries({ queryKey: ["orders", "table", createdOrder.tableNumber] });
+      }
     },
   });
 };
