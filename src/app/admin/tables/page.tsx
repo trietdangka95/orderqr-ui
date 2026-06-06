@@ -191,7 +191,7 @@ export default function AdminTablesPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="print-qr-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
               {tables.map((t) => (
                 <QRCodeCard
                   key={t}
@@ -204,28 +204,59 @@ export default function AdminTablesPage() {
           </div>
         )}
       </main>
-
+ 
       {/* Print Styles */}
       <style jsx global>{`
         @media print {
-          body { background: white !important; }
-          .print\:hidden { display: none !important; }
-          header, footer, nav, aside { display: none !important; }
-          main { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
-          .grid { 
-            display: grid !important; 
-            grid-template-columns: repeat(3, 1fr) !important; 
-            gap: 20px !important;
+          @page {
+            size: A4 portrait;
+            margin: 0.5cm;
           }
-          .break-inside-avoid { break-inside: avoid !important; }
           
-          /* Force only QR section to show if activeTab is QR */
-          ${activeTab === 'qr' ? `
-            section, div:has(> .grid) { display: block !important; }
-          ` : ''}
+          body { 
+            background: white !important; 
+            color: black !important;
+          }
           
-          /* Clean up cards for print */
-          .bg-white { border: 1px solid #eee !important; box-shadow: none !important; }
+          .print\:hidden { 
+            display: none !important; 
+          }
+          
+          header, footer, nav, aside { 
+            display: none !important; 
+          }
+          
+          main { 
+            padding: 0 !important; 
+            margin: 0 !important; 
+            max-width: 100% !important; 
+          }
+          
+          .print-qr-grid { 
+            display: grid !important; 
+            grid-template-columns: repeat(3, 6.0cm) !important; 
+            gap: 0.5cm !important;
+            justify-content: center !important;
+            padding-top: 0.5cm !important;
+            background: white !important;
+          }
+          
+          .print-qr-card {
+            width: 6.0cm !important;
+            height: 9.0cm !important;
+            padding: 0.4cm !important;
+            border-radius: 0.4cm !important;
+            border: 1px dashed #9ca3af !important;
+            box-shadow: none !important;
+            background: white !important;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+          
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
         }
       `}</style>
     </div>
