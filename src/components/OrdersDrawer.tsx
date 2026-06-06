@@ -236,11 +236,22 @@ export default function OrdersDrawer() {
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${(order.status === "serving" || order.status === "completed") ? "bg-green-500 text-white animate-bounce" : "bg-white border-2 border-gray-200 text-gray-300"
-                        }`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-all ${
+                        order.status === "completed" ? "bg-green-500 text-white" :
+                        order.status === "serving" ? "bg-white border-2 border-green-500 text-green-500 animate-pulse" :
+                        "bg-white border-2 border-gray-200 text-gray-300"
+                      }`}>
                         <CheckCircle2 className="w-4 h-4" />
                       </div>
-                      <span className={`text-[10px] font-bold ${(order.status === "serving" || order.status === "completed") ? "text-green-600" : "text-gray-400"}`}>Lên món</span>
+                      <span className={`text-[10px] font-bold ${
+                        (order.status === "serving" || order.status === "completed") ? "text-green-600" : "text-gray-400"
+                      }`}>
+                        {order.status === "completed" 
+                          ? (userRole === "staff" ? "Đã phục vụ" : "Đã lên món")
+                          : order.status === "serving"
+                            ? (userRole === "staff" ? "Chờ phục vụ" : "Đang lên món")
+                            : "Lên món"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -277,7 +288,7 @@ export default function OrdersDrawer() {
                       onClick={() => confirmOrderMutation.mutate(order.id)}
                       className="w-full bg-green-500 text-white font-bold py-2 rounded-xl shadow-lg shadow-green-100 hover:bg-green-600 transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-sm disabled:opacity-50"
                     >
-                      {confirmOrderMutation.isPending ? (
+                      {confirmOrderMutation.isPending && confirmOrderMutation.variables === order.id ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
                         <>
@@ -295,7 +306,7 @@ export default function OrdersDrawer() {
                       onClick={() => updateStatusMutation.mutate({ id: order.id, status: 'COMPLETED' })}
                       className="w-full bg-blue-600 text-white font-bold py-2 rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-sm disabled:opacity-50"
                     >
-                      {updateStatusMutation.isPending ? (
+                      {updateStatusMutation.isPending && updateStatusMutation.variables?.id === order.id ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
                         <>
