@@ -29,6 +29,7 @@ import { getImageUrl } from "@/utils/image";
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const [showcaseTab, setShowcaseTab] = useState<"menu" | "kitchen" | "admin">("menu");
 
   const features = [
     {
@@ -230,139 +231,337 @@ export default function LandingPage() {
           </a>
         </motion.div>
 
+        {/* Showcase Switcher Tabs */}
+        <div className="flex bg-gray-900/60 border border-white/5 p-1.5 rounded-2xl mb-8 gap-1 w-full max-w-xl mx-auto overflow-x-auto relative z-10">
+          <button
+            onClick={() => setShowcaseTab("menu")}
+            className={`flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "menu" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
+          >
+            📱 Khách Gọi Món (Menu)
+          </button>
+          <button
+            onClick={() => setShowcaseTab("kitchen")}
+            className={`flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "kitchen" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
+          >
+            🍳 Nhà Bếp (Đơn Hàng)
+          </button>
+          <button
+            onClick={() => setShowcaseTab("admin")}
+            className={`flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "admin" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
+          >
+            📊 Admin (Doanh Thu)
+          </button>
+        </div>
+
         {/* Interactive Mockup Grid */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
-          className="relative max-w-4xl w-full mt-20 border border-white/10 bg-gray-900/40 rounded-[2rem] p-4 md:p-6 backdrop-blur-2xl shadow-3xl shadow-black/80"
+          className="relative max-w-5xl w-full border border-white/10 bg-gray-900/40 rounded-[2rem] p-4 md:p-6 backdrop-blur-2xl shadow-3xl shadow-black/80"
         >
-          <div className="absolute top-[-10px] left-1/2 transform -translate-x-1/2 px-4 py-1.5 bg-gray-950 border border-white/10 text-gray-400 rounded-full text-[10px] font-black uppercase tracking-widest">
-            Giao Diện Trực Quan
+          <div className="absolute top-[-10px] left-1/2 transform -translate-x-1/2 px-4 py-1.5 bg-gray-950 border border-white/10 text-gray-400 rounded-full text-[10px] font-black uppercase tracking-widest z-20">
+            {showcaseTab === "menu" && "Giao Diện Khách Gọi Món"}
+            {showcaseTab === "kitchen" && "Màn Hình Phân Đơn Nhà Bếp"}
+            {showcaseTab === "admin" && "Hệ Thống Admin & Doanh Thu"}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-            {/* Phone Mockup Representation */}
-            <div className="md:col-span-5 bg-gray-50 border-[8px] border-gray-900 rounded-[2.75rem] shadow-2xl relative flex flex-col justify-between overflow-hidden text-gray-900 h-[520px] max-w-[280px] mx-auto w-full shrink-0">
-              {/* Notch */}
-              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-28 h-4 bg-gray-900 rounded-full z-30"></div>
-              
-              {/* Shop App Header */}
-              <div className="bg-white pt-6 pb-3 px-3 border-b border-gray-100 flex flex-col gap-2 shrink-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-black text-white overflow-hidden shrink-0">
-                      🥣
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            
+            {/* Left Column: Device Mockup */}
+            <div className="md:col-span-5 flex items-center justify-center min-h-[420px] md:min-h-[520px]">
+              <AnimatePresence mode="wait">
+                {showcaseTab === "menu" && (
+                  <motion.div 
+                    key="menu"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="bg-gray-50 border-[8px] border-gray-900 rounded-[2.75rem] shadow-2xl relative flex flex-col justify-between overflow-hidden text-gray-900 h-[500px] max-w-[270px] w-full shrink-0"
+                  >
+                    {/* Notch */}
+                    <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-28 h-4 bg-gray-900 rounded-full z-30"></div>
+                    
+                    {/* Shop App Header */}
+                    <div className="bg-white pt-6 pb-3 px-3 border-b border-gray-100 flex flex-col gap-2 shrink-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-black text-white overflow-hidden shrink-0">
+                            🥣
+                          </div>
+                          <div className="text-left">
+                            <h5 className="text-[10px] font-black leading-none text-gray-900">Bun Bo 97</h5>
+                            <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider block mt-0.5">Bàn 01</span>
+                          </div>
+                        </div>
+                        <ShoppingBag size={14} className="text-orange-500" />
+                      </div>
+                      
+                      {/* Category tabs */}
+                      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[8px] font-black uppercase tracking-wider">
+                        <span className="px-2 py-1 bg-orange-500 text-white rounded-full">Món chính</span>
+                        <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Nước uống</span>
+                        <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Tráng miệng</span>
+                      </div>
                     </div>
-                    <div className="text-left">
-                      <h5 className="text-[10px] font-black leading-none text-gray-900">Menu Việt</h5>
-                      <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider block mt-0.5">Bàn 01</span>
-                    </div>
-                  </div>
-                  <ShoppingBag size={14} className="text-orange-500" />
-                </div>
-                
-                {/* Category tabs */}
-                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[8px] font-black uppercase tracking-wider">
-                  <span className="px-2 py-1 bg-orange-500 text-white rounded-full">Món chính</span>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Món phụ</span>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Nước</span>
-                </div>
-              </div>
 
-              {/* Menu list */}
-              <div className="flex-grow py-3 px-3 space-y-3 overflow-y-auto bg-gray-50">
-                <div className="bg-white rounded-2xl p-2.5 border border-gray-100 flex gap-2.5 shadow-sm relative overflow-hidden">
-                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-50 flex items-center justify-center relative">
-                    <img 
-                      src={getImageUrl("/public/uploads/1780410334813-images.jpeg")} 
-                      alt="Bún Bò Tót" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = "none";
-                      }}
-                    />
-                    <span className="absolute text-sm">🥣</span>
-                  </div>
-                  <div className="text-left flex-1 flex flex-col justify-between py-0.5">
-                    <div>
-                      <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">Bún Bò Tót</p>
-                      <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">Thơm ngon, đậm đà, chuẩn vị Huế</p>
-                    </div>
-                    <div className="flex items-end justify-between mt-1">
-                      <span className="text-[10px] font-black text-orange-500">65.000 đ</span>
-                      <button className="w-5 h-5 rounded-lg bg-orange-500 text-white flex items-center justify-center active:scale-90">
-                        <Plus className="w-3 h-3" strokeWidth={3} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                    {/* Menu list */}
+                    <div className="flex-grow py-3 px-3 space-y-3 overflow-y-auto bg-gray-50">
+                      <div className="bg-white rounded-2xl p-2.5 border border-gray-100 flex gap-2.5 shadow-sm relative overflow-hidden">
+                        <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-50 flex items-center justify-center relative">
+                          <img 
+                            src={getImageUrl("/public/uploads/1778770335484-images.jpeg")} 
+                            alt="Bún Bò" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLElement).style.display = "none";
+                            }}
+                          />
+                          <span className="absolute text-sm">🥣</span>
+                        </div>
+                        <div className="text-left flex-1 flex flex-col justify-between py-0.5">
+                          <div>
+                            <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">Bún Bò Đặc Biệt</p>
+                            <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">Bún bò nạm, chả bò, nước dùng ngọt đậm đà</p>
+                          </div>
+                          <div className="flex items-end justify-between mt-1">
+                            <span className="text-[10px] font-black text-orange-500">65.000 đ</span>
+                            <button className="w-5 h-5 rounded-lg bg-orange-500 text-white flex items-center justify-center active:scale-90">
+                              <Plus className="w-3 h-3" strokeWidth={3} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
 
-                <div className="bg-white rounded-2xl p-2.5 border border-gray-100 flex gap-2.5 shadow-sm relative overflow-hidden">
-                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-50 flex items-center justify-center relative">
-                    <img 
-                      src="https://i-giadinh.vnecdn.net/2025/11/17/Pho-bo-Ha-Noi-7-vnexpress-1763-7388-9585-1763372391.jpg" 
-                      alt="Bò kho" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = "none";
-                      }}
-                    />
-                    <span className="absolute text-sm">🥩</span>
-                  </div>
-                  <div className="text-left flex-1 flex flex-col justify-between py-0.5">
-                    <div>
-                      <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">Bò kho</p>
-                      <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">Bò kho Quá ngon thơm lừng</p>
+                      <div className="bg-white rounded-2xl p-2.5 border border-gray-100 flex gap-2.5 shadow-sm relative overflow-hidden">
+                        <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-50 flex items-center justify-center relative">
+                          <span className="absolute text-sm">🍹</span>
+                        </div>
+                        <div className="text-left flex-1 flex flex-col justify-between py-0.5">
+                          <div>
+                            <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">Trà Đào Cam Sả</p>
+                            <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">Hương vị sả thơm mát hòa quyện cùng đào miếng giòn ngọt</p>
+                          </div>
+                          <div className="flex items-end justify-between mt-1">
+                            <span className="text-[10px] font-black text-orange-500">30.000 đ</span>
+                            <button className="w-5 h-5 rounded-lg bg-orange-500 text-white flex items-center justify-center active:scale-90">
+                              <Plus className="w-3 h-3" strokeWidth={3} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-end justify-between mt-1">
-                      <span className="text-[10px] font-black text-orange-500">100.000 đ</span>
-                      <button className="w-5 h-5 rounded-lg bg-orange-500 text-white flex items-center justify-center active:scale-90">
-                        <Plus className="w-3 h-3" strokeWidth={3} />
-                      </button>
+                    
+                    {/* Order button */}
+                    <div className="pt-2 border-t border-gray-100 bg-white p-3 shrink-0">
+                      <div className="w-full py-2 bg-orange-500 rounded-xl text-[10px] font-black text-white flex items-center justify-center gap-1 shadow-lg shadow-orange-100 active:scale-98">
+                        Gửi Đơn Vào Bếp (2 Món)
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Order button */}
-              <div className="pt-2 border-t border-gray-100 bg-white p-3 shrink-0">
-                <div className="w-full py-2 bg-orange-500 rounded-xl text-[10px] font-black text-white flex items-center justify-center gap-1 shadow-lg shadow-orange-100 active:scale-98">
-                  Gửi Đơn Vào Bếp (2 Món)
-                </div>
-              </div>
+                  </motion.div>
+                )}
+
+                {showcaseTab === "kitchen" && (
+                  <motion.div
+                    key="kitchen"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="w-full bg-gray-900 border-[8px] border-gray-800 rounded-[2rem] shadow-2xl overflow-hidden text-gray-100 h-[380px] max-w-[450px] flex flex-col text-xs"
+                  >
+                    <div className="bg-gray-800 px-4 py-2.5 border-b border-gray-700 flex justify-between items-center text-[10px] shrink-0">
+                      <span className="font-black tracking-wider text-orange-500">KITCHEN BOARD • MÀN BẾP</span>
+                      <span className="bg-green-500/20 text-green-400 font-bold px-2 py-0.5 rounded-full">Connected ✔</span>
+                    </div>
+                    <div className="flex-grow p-3 grid grid-cols-2 gap-3 bg-gray-950 overflow-y-auto">
+                      <div className="bg-gray-900 rounded-xl p-3 border border-orange-500/30 flex flex-col justify-between h-fit min-h-[140px]">
+                        <div>
+                          <div className="flex justify-between items-center mb-1.5">
+                            <span className="font-black text-xs text-orange-400">BÀN SỐ: 01</span>
+                            <span className="text-[8px] text-gray-500">Vừa xong</span>
+                          </div>
+                          <div className="space-y-1.5 text-[10px] text-left">
+                            <div className="flex justify-between font-bold text-gray-300">
+                              <span>1x Bún Bò Đặc Biệt</span>
+                              <span className="text-orange-500 font-black animate-pulse">Chờ nấu</span>
+                            </div>
+                            <div className="flex justify-between font-bold text-gray-300">
+                              <span>1x Trà Đào Cam Sả</span>
+                              <span className="text-green-500">Xong ✔</span>
+                            </div>
+                          </div>
+                        </div>
+                        <button className="w-full mt-3 py-1.5 bg-orange-500 text-white rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-orange-600 transition-all">
+                          Xong Hết Món
+                        </button>
+                      </div>
+
+                      <div className="bg-gray-900 rounded-xl p-3 border border-white/5 flex flex-col justify-between h-fit min-h-[140px]">
+                        <div>
+                          <div className="flex justify-between items-center mb-1.5">
+                            <span className="font-black text-xs text-gray-400">BÀN SỐ: 03</span>
+                            <span className="text-[8px] text-gray-500">5 phút trước</span>
+                          </div>
+                          <div className="space-y-1.5 text-[10px] text-left">
+                            <div className="flex justify-between font-bold text-gray-300">
+                              <span>2x Phở Bò Tái</span>
+                              <span className="text-orange-500 font-black animate-pulse">Chờ nấu</span>
+                            </div>
+                          </div>
+                        </div>
+                        <button className="w-full mt-3 py-1.5 bg-orange-500 text-white rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-orange-600 transition-all">
+                          Xong Hết Món
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {showcaseTab === "admin" && (
+                  <motion.div
+                    key="admin"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="w-full bg-gray-950 border-[10px] border-gray-800 rounded-[1.5rem] shadow-2xl overflow-hidden text-gray-300 h-[380px] max-w-[480px] flex flex-col text-[10px]"
+                  >
+                    <div className="bg-gray-900 px-3 py-1.5 border-b border-gray-800 flex items-center justify-between shrink-0">
+                      <div className="flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                        <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
+                        <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                      </div>
+                      <span className="text-gray-500 text-[8px]">bun-bo.orderqr.id.vn/admin</span>
+                      <div className="w-6"></div>
+                    </div>
+                    <div className="flex-grow flex bg-gray-950 text-left">
+                      <div className="w-24 bg-gray-900/60 border-r border-white/5 p-2 space-y-1 font-bold shrink-0">
+                        <div className="px-2 py-1 bg-orange-500/10 text-orange-500 rounded flex items-center gap-1">
+                          📊 Dashboard
+                        </div>
+                        <div className="px-2 py-1 text-gray-500 hover:text-gray-300 rounded flex items-center gap-1">
+                          🍲 Thực đơn
+                        </div>
+                        <div className="px-2 py-1 text-gray-500 hover:text-gray-300 rounded flex items-center gap-1">
+                          🪑 Bản đồ bàn
+                        </div>
+                        <div className="px-2 py-1 text-gray-500 hover:text-gray-300 rounded flex items-center gap-1">
+                          📈 Doanh thu
+                        </div>
+                      </div>
+                      <div className="flex-grow p-3 space-y-3 overflow-y-auto">
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="bg-gray-900 p-2 rounded-lg border border-white/5">
+                            <span className="text-[7px] text-gray-500 uppercase block font-black">Hôm nay</span>
+                            <span className="text-[10px] font-black text-white mt-0.5 block">2.350.000 đ</span>
+                          </div>
+                          <div className="bg-gray-900 p-2 rounded-lg border border-white/5">
+                            <span className="text-[7px] text-gray-500 uppercase block font-black">Số đơn</span>
+                            <span className="text-[10px] font-black text-white mt-0.5 block">36 đơn</span>
+                          </div>
+                          <div className="bg-gray-900 p-2 rounded-lg border border-white/5">
+                            <span className="text-[7px] text-gray-500 uppercase block font-black">Chạy nhất</span>
+                            <span className="text-[8px] font-black text-orange-500 mt-0.5 block truncate">Bún Bò ĐB</span>
+                          </div>
+                        </div>
+                        <div className="bg-gray-900/40 border border-white/5 rounded-lg p-2">
+                          <p className="text-[7px] text-gray-500 uppercase font-black mb-1.5">Doanh số tuần này</p>
+                          <div className="h-24 flex items-end justify-between px-1 gap-1 pt-2">
+                            {[30, 50, 45, 65, 80, 55, 95].map((val, idx) => (
+                              <div key={idx} className="flex-grow flex flex-col items-center gap-1">
+                                <div 
+                                  className="w-full bg-gradient-to-t from-orange-600 to-orange-400 rounded-t"
+                                  style={{ height: `${val * 0.5}px` }}
+                                ></div>
+                                <span className="text-[6px] text-gray-600">Th {idx+2}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Desktop Stats Mockup */}
+            {/* Right Column: High-Impact Texts */}
             <div className="md:col-span-7 space-y-6 text-left p-2 md:p-6">
               <div className="inline-flex items-center gap-2 text-xs font-black text-orange-500 uppercase tracking-widest">
                 <Zap size={14} className="fill-orange-500/20" />
-                Vận Hành Siêu Tốc
+                Vận Hành Tiện Lợi
               </div>
-              <h3 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
-                Không Còn Cảnh Khách Đợi Gọi Món, Bếp Nhầm Đơn
-              </h3>
-              <p className="text-gray-400 text-sm font-medium leading-relaxed">
-                Tất cả dữ liệu được đồng bộ hóa tức thời qua Socket.io. Khi khách hàng bấm đặt món trên điện thoại, máy tính bảng tại quầy bếp sẽ phát âm thanh cảnh báo và hiển thị tức thì số bàn cùng các món cần chế biến.
-              </p>
+              
+              <AnimatePresence mode="wait">
+                {showcaseTab === "menu" && (
+                  <motion.div
+                    key="menu-text"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-4"
+                  >
+                    <h3 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
+                      Khách hàng chủ động chọn món và gửi bếp tức thì
+                    </h3>
+                    <p className="text-gray-400 text-sm font-medium leading-relaxed">
+                      Thực khách chỉ cần quét mã QR đặt tại bàn bằng camera điện thoại để truy cập ngay menu điện tử sinh động, chi tiết mà không cần tải ứng dụng. Việc đặt món trở nên dễ dàng, tự động điền số bàn và chuyển đơn thẳng vào bếp chỉ với vài cú chạm.
+                    </p>
+                  </motion.div>
+                )}
+
+                {showcaseTab === "kitchen" && (
+                  <motion.div
+                    key="kitchen-text"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-4"
+                  >
+                    <h3 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
+                      Nhà bếp xử lý đơn chuyên nghiệp, không sợ nhầm món
+                    </h3>
+                    <p className="text-gray-400 text-sm font-medium leading-relaxed">
+                      Khi khách đặt món, màn hình bếp sẽ lập tức phát cảnh báo và hiển thị đầy đủ thông tin: số lượng món, số bàn và các ghi chú đặc biệt (ví dụ: ít cay, nhiều rau). Trạng thái nấu được đồng bộ hóa tức thì giúp tối ưu hóa tiến độ chuẩn bị món ăn.
+                    </p>
+                  </motion.div>
+                )}
+
+                {showcaseTab === "admin" && (
+                  <motion.div
+                    key="admin-text"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-4"
+                  >
+                    <h3 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
+                      Kiểm soát doanh thu chặt chẽ, thay đổi thực đơn linh hoạt
+                    </h3>
+                    <p className="text-gray-400 text-sm font-medium leading-relaxed">
+                      Trang quản lý admin cung cấp hệ thống báo cáo doanh thu trực quan theo ngày/tuần/tháng, số lượng hóa đơn phát sinh. Đồng thời, chủ quán dễ dàng thêm bớt món ăn, thay đổi giá, tạo bàn ăn mới hay cấu hình logo và màu sắc quán chỉ trong tích tắc.
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               
               <div className="space-y-3 pt-2">
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
                     <CheckCircle2 size={12} />
                   </div>
-                  <span className="text-sm font-bold text-gray-300">Tăng 30% tốc độ xoay vòng bàn ăn</span>
+                  <span className="text-sm font-bold text-gray-300">Không lo trễ đơn, nhầm bàn ăn trong giờ cao điểm</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
                     <CheckCircle2 size={12} />
                   </div>
-                  <span className="text-sm font-bold text-gray-300">Tiết kiệm 50% chi phí in ấn thực đơn giấy</span>
+                  <span className="text-sm font-bold text-gray-300">Tiết kiệm chi phí in ấn thiết kế thực đơn giấy</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
                     <CheckCircle2 size={12} />
                   </div>
-                  <span className="text-sm font-bold text-gray-300">Kiểm soát dòng tiền và thất thoát 100%</span>
+                  <span className="text-sm font-bold text-gray-300">Quản lý hiệu quả, tối ưu hóa năng suất nhân sự phục vụ</span>
                 </div>
               </div>
             </div>
@@ -431,7 +630,7 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <div className="lg:col-span-7 aspect-[16/10] bg-gray-900/30 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-2xl flex items-center justify-center">
+          <div className="lg:col-span-7 aspect-[16/10] bg-gray-900/30 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-2xl flex items-center justify-center min-h-[360px]">
             {/* Background glowing sphere inside box */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
             
@@ -441,51 +640,133 @@ export default function LandingPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="text-center max-w-md space-y-6"
+                className="flex flex-col items-center justify-center text-center max-w-lg w-full space-y-6 z-10"
               >
                 {activeStep === 0 && (
-                  <>
-                    <div className="w-32 h-32 bg-orange-500/10 border border-orange-500/20 rounded-3xl flex items-center justify-center mx-auto text-orange-500 animate-bounce">
-                      <QrCode size={64} />
+                  <div className="flex flex-col items-center gap-6">
+                    <motion.div 
+                      initial={{ rotate: -5 }}
+                      animate={{ rotate: 0 }}
+                      className="bg-white p-5 rounded-2xl shadow-2xl border border-gray-100 flex flex-col items-center justify-center w-[160px] h-[220px] text-gray-900 relative shrink-0"
+                    >
+                      <div className="w-full py-1 bg-orange-500 text-white text-[7px] font-black rounded uppercase mb-2">QUÉT MÃ GỌI MÓN</div>
+                      <div className="p-1.5 border border-gray-100 rounded-xl bg-gray-50 flex items-center justify-center mb-2">
+                        <QrCode size={70} className="text-gray-900" />
+                      </div>
+                      <span className="text-[9px] font-black text-gray-800 bg-gray-100 px-2 py-0.5 rounded-full">BÀN SỐ 01</span>
+                      <span className="absolute -bottom-3 -right-3 text-2xl animate-bounce">📱</span>
+                    </motion.div>
+                    <div className="text-center space-y-2">
+                      <h4 className="text-lg font-black text-white">Bước 1: Thực Khách Quét Mã QR</h4>
+                      <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
+                        Khi ngồi vào bàn, khách dùng camera điện thoại quét mã QR. Mỗi bàn sẽ tương ứng một mã duy nhất để tự động ghi nhận số bàn chính xác.
+                      </p>
                     </div>
-                    <h3 className="text-2xl font-black">Khách Hàng Quét Mã QR</h3>
-                    <p className="text-gray-400 text-xs md:text-sm font-medium leading-relaxed">
-                      Mỗi bàn ăn tương ứng với một mã QR duy nhất được mã hóa. Khi khách quét, hệ thống tự động ghi nhận số bàn vào URL mà không cần nhập liệu thủ công.
-                    </p>
-                  </>
+                  </div>
                 )}
+
                 {activeStep === 1 && (
-                  <>
-                    <div className="w-32 h-32 bg-orange-500/10 border border-orange-500/20 rounded-3xl flex items-center justify-center mx-auto text-orange-500">
-                      <ShoppingBag size={64} className="animate-pulse" />
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="bg-gray-50 border-4 border-gray-900 rounded-[1.75rem] w-[180px] h-[240px] overflow-hidden text-gray-900 flex flex-col justify-between shadow-2xl shrink-0 text-left">
+                      <div className="bg-white p-2 border-b border-gray-100 flex justify-between items-center text-[7px] font-black text-gray-700">
+                        <span>BÀN 01</span>
+                        <span className="text-orange-500">🛒 2 món</span>
+                      </div>
+                      <div className="p-2 space-y-1.5 flex-grow overflow-y-auto">
+                        <div className="bg-white p-1.5 rounded-xl border border-gray-100 flex gap-2 items-center">
+                          <span className="text-xs">🥣</span>
+                          <div className="text-[7px]">
+                            <p className="font-bold text-gray-900">Bún Bò Đặc Biệt</p>
+                            <p className="font-bold text-orange-500">65.000đ</p>
+                          </div>
+                        </div>
+                        <div className="bg-white p-1.5 rounded-xl border border-gray-100 flex gap-2 items-center">
+                          <span className="text-xs">🍹</span>
+                          <div className="text-[7px]">
+                            <p className="font-bold text-gray-900">Trà Đào Cam Sả</p>
+                            <p className="font-bold text-orange-500">30.000đ</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-2 bg-white border-t border-gray-100">
+                        <div className="w-full py-1.5 bg-orange-500 text-white rounded-lg text-[7px] font-black uppercase tracking-wider text-center animate-pulse">
+                          Xác Nhận Đặt Món
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="text-2xl font-black">Tự Do Lựa Chọn Thực Đơn</h3>
-                    <p className="text-gray-400 text-xs md:text-sm font-medium leading-relaxed">
-                      Menu phân loại theo danh mục hấp dẫn, hỗ trợ giảm giá phần trăm trực tiếp trên từng món ăn để kích thích nhu cầu gọi thêm của thực khách.
-                    </p>
-                  </>
+                    <div className="text-center space-y-2">
+                      <h4 className="text-lg font-black text-white">Bước 2: Xem Thực Đơn & Đặt Món</h4>
+                      <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
+                        Thực khách duyệt danh mục, thêm ghi chú và tự xác nhận gửi đơn. Trải nghiệm gọi món mượt mà, trực quan mà không cần gọi phục vụ.
+                      </p>
+                    </div>
+                  </div>
                 )}
+
                 {activeStep === 2 && (
-                  <>
-                    <div className="w-32 h-32 bg-orange-500/10 border border-orange-500/20 rounded-3xl flex items-center justify-center mx-auto text-orange-500">
-                      <ChefHat size={64} />
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="bg-gray-900 rounded-2xl border border-white/10 w-[240px] p-3 text-left shadow-2xl shrink-0">
+                      <div className="flex justify-between items-center border-b border-white/5 pb-1.5 mb-2">
+                        <span className="text-[8px] font-black text-orange-500">BẾP CHẾ BIẾN</span>
+                        <span className="text-[7px] text-gray-500">Bàn 01</span>
+                      </div>
+                      <div className="space-y-1 text-[9px] font-bold text-gray-300">
+                        <div className="flex justify-between">
+                          <span>1x Bún Bò Đặc Biệt</span>
+                          <span className="text-orange-500 font-black animate-pulse">Chờ nấu...</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>1x Trà Đào Cam Sả</span>
+                          <span className="text-green-500">Xong ✔</span>
+                        </div>
+                      </div>
+                      <div className="mt-3 pt-2 border-t border-white/5">
+                        <div className="w-full py-1 bg-green-600 text-white text-center rounded text-[7px] font-black uppercase tracking-wider">
+                          Hoàn Tất
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="text-2xl font-black">Đơn Bếp Chế Biến Tự Động</h3>
-                    <p className="text-gray-400 text-xs md:text-sm font-medium leading-relaxed">
-                      Danh sách món ăn cần nấu hiển thị rõ ràng trên thiết bị của đầu bếp kèm thời gian đặt và các ghi chú đặc biệt (ví dụ: ít cay, không hành).
-                    </p>
-                  </>
+                    <div className="text-center space-y-2">
+                      <h4 className="text-lg font-black text-white">Bước 3: Nhà Bếp Tự Động Nhận Đơn</h4>
+                      <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
+                        Đầu bếp lập tức nhìn thấy danh sách gọi món trên màn hình bếp. Phân chia chuẩn xác, chế biến nhanh và không lo thất lạc thông tin.
+                      </p>
+                    </div>
+                  </div>
                 )}
+
                 {activeStep === 3 && (
-                  <>
-                    <div className="w-32 h-32 bg-orange-500/10 border border-orange-500/20 rounded-3xl flex items-center justify-center mx-auto text-orange-500">
-                      <Clock size={64} />
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="bg-white p-4 rounded-xl shadow-2xl border border-gray-100 text-gray-800 w-[180px] text-left relative overflow-hidden shrink-0">
+                      <div className="text-center border-b border-dashed border-gray-200 pb-2 mb-2">
+                        <h5 className="font-black text-[10px] text-gray-900">HÓA ĐƠN TẠM TÍNH</h5>
+                        <span className="text-[7px] text-gray-400">Bàn 01 • Order QR</span>
+                      </div>
+                      <div className="space-y-1 text-[8px] font-bold text-gray-600 border-b border-dashed border-gray-200 pb-2 mb-2">
+                        <div className="flex justify-between">
+                          <span>1x Bún Bò Đặc Biệt</span>
+                          <span>65k</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>1x Trà Đào Cam Sả</span>
+                          <span>30k</span>
+                        </div>
+                      </div>
+                      <div className="flex justify-between text-[9px] font-black text-gray-900 mb-2">
+                        <span>TỔNG CỘNG:</span>
+                        <span className="text-orange-500">95.000đ</span>
+                      </div>
+                      <div className="bg-green-500 text-white text-center py-1 rounded text-[7px] font-black uppercase tracking-wider">
+                        ĐÃ THANH TOÁN
+                      </div>
                     </div>
-                    <h3 className="text-2xl font-black">Nhanh Chóng & Chuyên Nghiệp</h3>
-                    <p className="text-gray-400 text-xs md:text-sm font-medium leading-relaxed">
-                      Nhân viên chỉ cần mang đồ đến đúng bàn, tăng hiệu quả công việc. Việc thanh toán được xử lý gọn gàng bằng cách in hóa đơn trực tiếp tại quầy thu ngân.
-                    </p>
-                  </>
+                    <div className="text-center space-y-2">
+                      <h4 className="text-lg font-black text-white">Bước 4: Phục Vụ & Thu Ngân</h4>
+                      <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
+                        Nhân viên bưng bê món ăn đến bàn tương ứng. Thu ngân in hóa đơn và hoàn tất giao dịch tự động nhanh chóng và chính xác.
+                      </p>
+                    </div>
+                  </div>
                 )}
               </motion.div>
             </AnimatePresence>
