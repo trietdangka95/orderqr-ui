@@ -2,19 +2,19 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  ChefHat, 
-  QrCode, 
-  ShoppingBag, 
-  TrendingUp, 
-  Layers, 
-  ArrowRight, 
-  CheckCircle2, 
-  Smartphone, 
-  Sparkles, 
-  Play, 
-  Clock, 
-  Coins, 
+import {
+  ChefHat,
+  QrCode,
+  ShoppingBag,
+  TrendingUp,
+  Layers,
+  ArrowRight,
+  CheckCircle2,
+  Smartphone,
+  Sparkles,
+  Play,
+  Clock,
+  Coins,
   Menu,
   X,
   Store,
@@ -113,8 +113,8 @@ export default function LandingPage() {
 
           {/* CTAs */}
           <div className="hidden md:flex items-center gap-4">
-            <a 
-              href="#pricing" 
+            <a
+              href="#pricing"
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl text-sm font-black shadow-lg shadow-orange-950/30 hover:scale-102 transition-all flex items-center gap-1"
             >
               Liên Hệ Ngay
@@ -123,7 +123,7 @@ export default function LandingPage() {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <button 
+          <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 text-gray-400 hover:text-white transition-colors"
           >
@@ -135,29 +135,29 @@ export default function LandingPage() {
       {/* Mobile Menu Panel */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden fixed top-[73px] left-0 right-0 bg-gray-950 border-b border-white/10 z-40 px-6 py-8 space-y-6 shadow-2xl"
           >
             <div className="flex flex-col gap-4 text-base font-semibold text-gray-400">
-              <a 
-                href="#features" 
+              <a
+                href="#features"
                 onClick={() => setMobileMenuOpen(false)}
                 className="hover:text-white py-2 border-b border-white/5"
               >
                 Tính năng
               </a>
-              <a 
-                href="#workflow" 
+              <a
+                href="#workflow"
                 onClick={() => setMobileMenuOpen(false)}
                 className="hover:text-white py-2 border-b border-white/5"
               >
                 Quy trình
               </a>
-              <a 
-                href="#pricing" 
+              <a
+                href="#pricing"
                 onClick={() => setMobileMenuOpen(false)}
                 className="hover:text-white py-2 border-b border-white/5"
               >
@@ -165,8 +165,8 @@ export default function LandingPage() {
               </a>
             </div>
             <div className="flex flex-col gap-3 pt-2">
-              <a 
-                href="#pricing" 
+              <a
+                href="#pricing"
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full text-center py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-sm font-black shadow-lg"
               >
@@ -180,7 +180,7 @@ export default function LandingPage() {
       {/* Hero Section */}
       <section className="relative max-w-7xl mx-auto px-4 md:px-8 pt-16 md:pt-24 pb-20 flex flex-col items-center text-center">
         {/* Badge */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-500 text-xs font-black tracking-widest uppercase mb-8"
@@ -190,7 +190,7 @@ export default function LandingPage() {
         </motion.div>
 
         {/* Headlines */}
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -199,7 +199,7 @@ export default function LandingPage() {
           Menu QR Điện Tử & Gọi Món Tại Bàn
         </motion.h1>
 
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -209,21 +209,21 @@ export default function LandingPage() {
         </motion.p>
 
         {/* Buttons */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center gap-4 mt-10 w-full sm:w-auto"
         >
-          <a 
-            href="#pricing" 
+          <a
+            href="#pricing"
             className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-2xl text-base font-black shadow-xl shadow-orange-950/40 hover:scale-105 transition-all flex items-center justify-center gap-2"
           >
             Xem Bảng Giá Dịch Vụ
             <ArrowRight size={18} />
           </a>
-          <a 
-            href="#features" 
+          <a
+            href="#features"
             className="w-full sm:w-auto px-8 py-4 border border-white/10 hover:border-white/20 rounded-2xl text-base font-bold bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center gap-2"
           >
             Tìm Hiểu Tính Năng
@@ -232,29 +232,29 @@ export default function LandingPage() {
         </motion.div>
 
         {/* Showcase Switcher Tabs */}
-        <div className="flex bg-gray-900/60 border border-white/5 p-1.5 rounded-2xl mb-8 gap-1 w-full max-w-xl mx-auto overflow-x-auto relative z-10">
+        <div className="flex bg-gray-900/60 border border-white/5 p-1.5 rounded-2xl mb-8 gap-1 w-full max-w-xl mx-auto relative z-10">
           <button
             onClick={() => setShowcaseTab("menu")}
-            className={`flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "menu" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
+            className={`flex-1 py-2.5 px-3 sm:py-3 sm:px-4 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "menu" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
           >
-            📱 Khách Gọi Món (Menu)
+            Khách Gọi Món
           </button>
           <button
             onClick={() => setShowcaseTab("kitchen")}
-            className={`flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "kitchen" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
+            className={`flex-1 py-2.5 px-3 sm:py-3 sm:px-4 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "kitchen" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
           >
-            🍳 Nhà Bếp (Đơn Hàng)
+            Nhà Bếp
           </button>
           <button
             onClick={() => setShowcaseTab("admin")}
-            className={`flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "admin" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
+            className={`flex-1 py-2.5 px-3 sm:py-3 sm:px-4 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "admin" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
           >
-            📊 Admin (Doanh Thu)
+            Quản Lý Admin
           </button>
         </div>
 
         {/* Interactive Mockup Grid */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
@@ -266,12 +266,12 @@ export default function LandingPage() {
             {showcaseTab === "admin" && "Hệ Thống Admin & Doanh Thu"}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-            
+
             {/* Left Column: Device Mockup */}
             <div className="md:col-span-5 flex items-center justify-center min-h-[420px] md:min-h-[520px]">
               <AnimatePresence mode="wait">
                 {showcaseTab === "menu" && (
-                  <motion.div 
+                  <motion.div
                     key="menu"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -280,7 +280,7 @@ export default function LandingPage() {
                   >
                     {/* Notch */}
                     <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-28 h-4 bg-gray-900 rounded-full z-30"></div>
-                    
+
                     {/* Shop App Header */}
                     <div className="bg-white pt-6 pb-3 px-3 border-b border-gray-100 flex flex-col gap-2 shrink-0">
                       <div className="flex items-center justify-between">
@@ -295,7 +295,7 @@ export default function LandingPage() {
                         </div>
                         <ShoppingBag size={14} className="text-orange-500" />
                       </div>
-                      
+
                       {/* Category tabs */}
                       <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[8px] font-black uppercase tracking-wider">
                         <span className="px-2 py-1 bg-orange-500 text-white rounded-full">Món chính</span>
@@ -308,9 +308,9 @@ export default function LandingPage() {
                     <div className="flex-grow py-3 px-3 space-y-3 overflow-y-auto bg-gray-50">
                       <div className="bg-white rounded-2xl p-2.5 border border-gray-100 flex gap-2.5 shadow-sm relative overflow-hidden">
                         <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-50 flex items-center justify-center relative">
-                          <img 
-                            src={getImageUrl("/public/uploads/1778770335484-images.jpeg")} 
-                            alt="Bún Bò" 
+                          <img
+                            src={getImageUrl("/public/uploads/1778770335484-images.jpeg")}
+                            alt="Bún Bò"
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               (e.target as HTMLElement).style.display = "none";
@@ -350,7 +350,7 @@ export default function LandingPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Order button */}
                     <div className="pt-2 border-t border-gray-100 bg-white p-3 shrink-0">
                       <div className="w-full py-2 bg-orange-500 rounded-xl text-[10px] font-black text-white flex items-center justify-center gap-1 shadow-lg shadow-orange-100 active:scale-98">
@@ -468,11 +468,11 @@ export default function LandingPage() {
                           <div className="h-24 flex items-end justify-between px-1 gap-1 pt-2">
                             {[30, 50, 45, 65, 80, 55, 95].map((val, idx) => (
                               <div key={idx} className="flex-grow flex flex-col items-center gap-1">
-                                <div 
+                                <div
                                   className="w-full bg-gradient-to-t from-orange-600 to-orange-400 rounded-t"
                                   style={{ height: `${val * 0.5}px` }}
                                 ></div>
-                                <span className="text-[6px] text-gray-600">Th {idx+2}</span>
+                                <span className="text-[6px] text-gray-600">Th {idx + 2}</span>
                               </div>
                             ))}
                           </div>
@@ -490,7 +490,7 @@ export default function LandingPage() {
                 <Zap size={14} className="fill-orange-500/20" />
                 Vận Hành Tiện Lợi
               </div>
-              
+
               <AnimatePresence mode="wait">
                 {showcaseTab === "menu" && (
                   <motion.div
@@ -543,7 +543,7 @@ export default function LandingPage() {
                   </motion.div>
                 )}
               </AnimatePresence>
-              
+
               <div className="space-y-3 pt-2">
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
@@ -583,7 +583,7 @@ export default function LandingPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, idx) => (
-            <motion.div 
+            <motion.div
               key={idx}
               whileHover={{ y: -6, borderColor: "rgba(249, 115, 22, 0.3)" }}
               className="bg-gray-900/20 border border-white/5 rounded-3xl p-8 backdrop-blur-xl transition-all duration-300 group"
@@ -614,7 +614,7 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-5 space-y-4">
             {steps.map((step, idx) => (
-              <div 
+              <div
                 key={idx}
                 onClick={() => setActiveStep(idx)}
                 className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 flex gap-4 ${activeStep === idx ? 'bg-orange-500/10 border-orange-500' : 'bg-gray-900/10 border-white/5 hover:border-white/10'}`}
@@ -633,7 +633,7 @@ export default function LandingPage() {
           <div className="lg:col-span-7 aspect-[16/10] bg-gray-900/30 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-2xl flex items-center justify-center min-h-[360px]">
             {/* Background glowing sphere inside box */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStep}
@@ -644,7 +644,7 @@ export default function LandingPage() {
               >
                 {activeStep === 0 && (
                   <div className="flex flex-col items-center gap-6">
-                    <motion.div 
+                    <motion.div
                       initial={{ rotate: -5 }}
                       animate={{ rotate: 0 }}
                       className="bg-white p-5 rounded-2xl shadow-2xl border border-gray-100 flex flex-col items-center justify-center w-[160px] h-[220px] text-gray-900 relative shrink-0"
@@ -793,7 +793,7 @@ export default function LandingPage() {
               <span className="text-xs font-black text-gray-500 uppercase tracking-widest">GÓI TRẢI NGHIỆM</span>
               <h3 className="text-2xl font-black text-white mt-2">Dùng Thử Miễn Phí</h3>
               <p className="text-gray-400 text-xs font-bold mt-2">Không giới hạn thời gian chạy thử</p>
-              
+
               <div className="flex items-baseline gap-1 mt-6 border-b border-white/5 pb-6">
                 <span className="text-4xl font-black text-white">0đ</span>
                 <span className="text-gray-500 text-sm font-bold">/ tháng</span>
@@ -816,8 +816,8 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-8">
-              <a 
-                href="#pricing" 
+              <a
+                href="#pricing"
                 className="w-full py-3.5 border border-white/10 hover:border-white/20 rounded-xl text-xs font-black uppercase tracking-wider bg-white/5 hover:bg-white/10 transition-all block text-center"
               >
                 Liên Hệ Đăng Ký
@@ -831,12 +831,12 @@ export default function LandingPage() {
             <div className="absolute top-0 right-0 px-4 py-1.5 bg-orange-500 text-white text-[9px] font-black uppercase tracking-widest rounded-bl-xl shadow-lg">
               Phổ Biến Nhất
             </div>
-            
+
             <div>
               <span className="text-xs font-black text-orange-500 uppercase tracking-widest">GÓI CHUYÊN NGHIỆP</span>
               <h3 className="text-2xl font-black text-white mt-2">Premium Partner</h3>
               <p className="text-gray-400 text-xs font-bold mt-2">Dành cho nhà hàng lớn, hoạt động tần suất cao</p>
-              
+
               <div className="flex items-baseline gap-1 mt-6 border-b border-orange-500/20 pb-6">
                 <span className="text-4xl font-black text-white">199.000đ</span>
                 <span className="text-gray-500 text-sm font-bold">/ tháng</span>
@@ -863,8 +863,8 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-8">
-              <a 
-                href="#pricing" 
+              <a
+                href="#pricing"
                 className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-950/30 hover:scale-102 transition-all block text-center"
               >
                 Liên Hệ Tư Vấn
@@ -889,8 +889,8 @@ export default function LandingPage() {
           </p>
 
           <div className="mt-8 relative z-10 w-full sm:w-auto">
-            <a 
-              href="#pricing" 
+            <a
+              href="#pricing"
               className="w-full sm:w-auto px-8 py-4 bg-white text-orange-600 hover:bg-gray-100 rounded-2xl text-base font-black shadow-xl hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
             >
               Xem Bảng Giá & Đăng Ký
@@ -946,7 +946,7 @@ export default function LandingPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-4 md:px-8 border-t border-white/5 mt-10 pt-6 text-center text-xs text-gray-600 font-bold uppercase tracking-wider">
-          © 2026 Triet Dang. All Rights Reserved. Built with Antigravity.
+          © 2026 Triet Dang. All Rights Reserved.
         </div>
       </footer>
     </div>
