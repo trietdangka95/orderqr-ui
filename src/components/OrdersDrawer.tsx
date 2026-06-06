@@ -65,15 +65,14 @@ export default function OrdersDrawer() {
     status: o.status.toLowerCase() as "pending" | "cooking" | "serving" | "completed" | "cancelled",
     timestamp: new Date(o.createdAt).getTime(),
     isConfirmed: o.isConfirmed,
-    // Backend (Prisma) trả về 'orderItems', frontend type gọi là 'items' → hỗ trợ cả hai
-    items: ((o as any).orderItems || (o as any).items || []).map((i: any): MappedOrderItem => ({
+    items: o.orderItems.map((i): MappedOrderItem => ({
       ...i,
       name: i.product?.name || 'Món ăn',
       image: i.product?.image || '',
       price: i.product?.price || 0,
       id: i.productId
     })),
-    totalPrice: o.totalAmount || ((o as any).orderItems || (o as any).items || []).reduce((sum: number, i: any) => sum + (i.product?.price || 0) * i.quantity, 0)
+    totalPrice: o.totalAmount || o.orderItems.reduce((sum: number, i) => sum + (i.product?.price || 0) * i.quantity, 0)
   }));
 
   // Only consider orders that are not checked out/paid as "active"

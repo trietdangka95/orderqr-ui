@@ -47,7 +47,7 @@ export default function AdminTablesPage() {
     status: o.status.toLowerCase() as OrderStatus,
     timestamp: new Date(o.createdAt).getTime(),
     isConfirmed: o.isConfirmed,
-    items: o.items.map(i => ({
+    items: o.orderItems.map((i) => ({
       ...i,
       id: i.productId,
       name: i.product?.name || 'Món ăn',
@@ -58,7 +58,7 @@ export default function AdminTablesPage() {
       categoryId: i.product?.categoryId || 0,
       note: i.note || '',
     })),
-    totalPrice: o.totalAmount || o.items.reduce((sum, i) => sum + (i.product?.price || 0) * i.quantity, 0)
+    totalPrice: o.totalAmount || o.orderItems.reduce((sum: number, i) => sum + (i.product?.price || 0) * i.quantity, 0)
   }));
   const [activeTab, setActiveTab] = useState<"status" | "qr">("status");
   const [newTableNum, setNewTableNum] = useState("");

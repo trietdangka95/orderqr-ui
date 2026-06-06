@@ -37,14 +37,13 @@ export default function KitchenPage() {
     };
   }, [socket, queryClient]);
 
-  // Map API data to UI format
   const orders = apiOrders.map(o => ({
     ...o,
     status: o.status.toLowerCase() as OrderStatus, // UI expects lowercase
     timestamp: new Date(o.createdAt).getTime(),
     isConfirmed: o.isConfirmed,
     totalPrice: o.totalAmount || 0,
-    items: o.items.map(i => ({
+    items: o.orderItems.map((i) => ({
       ...i,
       id: i.productId, // Use productId as id for CartItem compatibility
       name: i.product?.name || 'Món ăn',
@@ -98,7 +97,7 @@ export default function KitchenPage() {
   const itemSummary = confirmedOrders
     .filter(o => o.status === "pending" || o.status === "cooking")
     .reduce((acc, order) => {
-      order.items.forEach(item => {
+      order.items.forEach((item: any) => {
         if (!acc[item.name]) {
           acc[item.name] = { count: 0, tables: new Set<string>() };
         }

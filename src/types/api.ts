@@ -45,7 +45,7 @@ export interface Order {
   tableNumber: string;
   status: OrderStatus;
   isConfirmed: boolean;
-  items: OrderItem[];
+  orderItems: OrderItem[];
   createdAt: string;
   updatedAt: string;
   totalAmount?: number;
