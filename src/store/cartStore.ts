@@ -83,6 +83,7 @@ interface CartStore {
   addItem: (item: CartItem) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
+  updateNote: (productId: string, note: string) => void;
   clearCart: () => void;
   setSelectedTable: (table: string) => void;
   setIsTableSelectorOpen: (open: boolean) => void;
@@ -156,7 +157,13 @@ export const useCartStore = create<CartStore>()(
           set({
             items: currentItems.map((i) =>
               i.productId === item.productId
-                ? { ...i, quantity: i.quantity + item.quantity }
+                ? { 
+                    ...i, 
+                    quantity: i.quantity + item.quantity,
+                    note: item.note 
+                      ? (i.note ? `${i.note}, ${item.note}` : item.note) 
+                      : i.note
+                  }
                 : i
             ),
           });
@@ -175,6 +182,13 @@ export const useCartStore = create<CartStore>()(
         set({
           items: get().items.map((i) =>
             i.productId === productId ? { ...i, quantity } : i
+          ),
+        }),
+      
+      updateNote: (productId, note) =>
+        set({
+          items: get().items.map((i) =>
+            i.productId === productId ? { ...i, note } : i
           ),
         }),
       

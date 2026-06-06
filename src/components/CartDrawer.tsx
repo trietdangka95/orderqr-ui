@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
-import { X, Minus, Plus, ShoppingBag } from "lucide-react";
+import { X, Minus, Plus, ShoppingBag, FileText } from "lucide-react";
 import Image from "next/image";
 import { useCreateOrder } from "@/hooks/useOrders";
 import { getImageUrl } from "@/utils/image";
 
 export default function CartDrawer() {
-  const { items, isOpen, toggleCart, removeItem, updateQuantity, getTotalItems, getTotalPrice, clearCart, toggleOrders, selectedTable } = useCartStore();
+  const { items, isOpen, toggleCart, removeItem, updateQuantity, updateNote, getTotalItems, getTotalPrice, clearCart, toggleOrders, selectedTable } = useCartStore();
   const createOrder = useCreateOrder();
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
 
   const handleCheckout = () => {
     if (!selectedTable) {
@@ -83,9 +85,45 @@ export default function CartDrawer() {
                     </button>
                   </div>
 
-                  {item.note && (
-                    <p className="text-xs text-gray-500 italic mt-0.5 border-l-2 border-gray-200 pl-2">Ghi chú: {item.note}</p>
-                  )}
+                  {/* Note Section */}
+                  <div className="mt-1">
+                    {editingNoteId === item.id || item.note ? (
+                      <div className="flex gap-2 items-center bg-gray-50/50 rounded-lg p-1 border border-gray-100/50">
+                        <FileText className="w-3.5 h-3.5 text-gray-400 shrink-0 ml-1" />
+                        <input
+                          type="text"
+                          value={item.note}
+                          onChange={(e) => updateNote(item.id, e.target.value)}
+                          placeholder="Ghi chú (không hành, ít cay...)"
+                          className="flex-1 bg-transparent text-xs py-0.5 focus:outline-none placeholder-gray-400 text-gray-700 min-w-0"
+                          autoFocus={editingNoteId === item.id}
+                          onBlur={() => {
+                            if (!item.note) {
+                              setEditingNoteId(null);
+                            }
+                          }}
+                        />
+                        <button
+                          onClick={() => {
+                            updateNote(item.id, "");
+                            setEditingNoteId(null);
+                          }}
+                          className="p-1 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-red-500 shrink-0"
+                          title="Xóa ghi chú"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setEditingNoteId(item.id)}
+                        className="text-[11px] text-gray-400 hover:text-primary transition-colors flex items-center gap-1 font-medium hover:underline py-0.5"
+                      >
+                        <FileText className="w-3 h-3" />
+                        Thêm ghi chú...
+                      </button>
+                    )}
+                  </div>
 
                   <div className="flex items-center justify-between mt-2">
                     <span className="font-bold text-primary text-sm">{(item.price * item.quantity).toLocaleString("vi-VN")} ₫</span>

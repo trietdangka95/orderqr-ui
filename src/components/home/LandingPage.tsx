@@ -178,58 +178,169 @@ export default function LandingPage() {
       </AnimatePresence>
 
       {/* Hero Section */}
-      <section className="relative max-w-7xl mx-auto px-4 md:px-8 pt-16 md:pt-24 pb-20 flex flex-col items-center text-center">
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-500 text-xs font-black tracking-widest uppercase mb-8"
-        >
-          <Sparkles size={14} className="animate-spin-slow" />
-          Giải Pháp Số Hóa Nhà Hàng 2026
-        </motion.div>
+      <section className="relative max-w-7xl mx-auto px-4 md:px-8 pt-16 md:pt-24 pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          {/* Left Column: Headlines & CTA */}
+          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-500 text-xs font-black tracking-widest uppercase mb-6"
+            >
+              <Sparkles size={14} className="animate-spin-slow" />
+              Giải Pháp Số Hóa Nhà Hàng 2026
+            </motion.div>
 
-        {/* Headlines */}
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight max-w-4xl leading-[1.1] text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-orange-500"
-        >
-          Menu QR Điện Tử & Gọi Món Tại Bàn
-        </motion.h1>
+            {/* Headlines */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-orange-500"
+            >
+              Menu QR Điện Tử & Gọi Món Tại Bàn
+            </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-gray-400 text-base md:text-xl font-medium max-w-2xl mt-6 leading-relaxed"
-        >
-          Cách mạng hóa trải nghiệm ăn uống tại nhà hàng của bạn. Khách hàng quét mã gọi món trực tiếp, đơn chuyển tức thì đến Bếp. Tiết kiệm nhân lực, tăng tốc phục vụ.
-        </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-gray-400 text-base md:text-xl font-medium mt-6 leading-relaxed max-w-2xl"
+            >
+              Cách mạng hóa trải nghiệm ăn uống tại nhà hàng của bạn. Khách hàng quét mã gọi món trực tiếp, đơn chuyển tức thì đến Bếp. Tiết kiệm nhân lực, tăng tốc phục vụ.
+            </motion.p>
 
-        {/* Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center gap-4 mt-10 w-full sm:w-auto"
-        >
-          <a
-            href="#pricing"
-            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-2xl text-base font-black shadow-xl shadow-orange-950/40 hover:scale-105 transition-all flex items-center justify-center gap-2"
-          >
-            Xem Bảng Giá Dịch Vụ
-            <ArrowRight size={18} />
-          </a>
-          <a
-            href="#features"
-            className="w-full sm:w-auto px-8 py-4 border border-white/10 hover:border-white/20 rounded-2xl text-base font-bold bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center gap-2"
-          >
-            Tìm Hiểu Tính Năng
-            <Play size={14} className="fill-white" />
-          </a>
-        </motion.div>
+            {/* Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="flex flex-col sm:flex-row items-center gap-4 mt-10 w-full sm:w-auto"
+            >
+              <a
+                href="#pricing"
+                className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-2xl text-base font-black shadow-xl shadow-orange-950/40 hover:scale-105 transition-all flex items-center justify-center gap-2"
+              >
+                Xem Bảng Giá Dịch Vụ
+                <ArrowRight size={18} />
+              </a>
+              <a
+                href="#features"
+                className="w-full sm:w-auto px-8 py-4 border border-white/10 hover:border-white/20 rounded-2xl text-base font-bold bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+              >
+                Tìm Hiểu Tính Năng
+                <Play size={14} className="fill-white" />
+              </a>
+            </motion.div>
+          </div>
+
+          {/* Right Column: Beautiful Customer Menu Phone Mockup */}
+          <div className="lg:col-span-5 flex items-center justify-center relative min-h-[450px]">
+            {/* Glowing background blob behind mockup */}
+            <div className="absolute w-[320px] h-[320px] bg-orange-600/10 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, rotate: 2 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ delay: 0.4, type: "spring", stiffness: 80 }}
+              className="bg-gray-50 border-[8px] border-gray-900 rounded-[2.75rem] shadow-2xl relative flex flex-col justify-between overflow-hidden text-gray-900 h-[480px] max-w-[260px] w-full shrink-0 hover:scale-[1.02] transition-transform duration-300"
+            >
+              {/* Notch */}
+              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-24 h-3.5 bg-gray-900 rounded-full z-30"></div>
+
+              {/* Shop App Header */}
+              <div className="bg-white pt-6 pb-3 px-3 border-b border-gray-100 flex flex-col gap-2 shrink-0">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-black text-white overflow-hidden shrink-0">
+                      🥣
+                    </div>
+                    <div className="text-left">
+                      <h5 className="text-[10px] font-black leading-none text-gray-900">Bun Bo 97</h5>
+                      <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider block mt-0.5">Bàn 01</span>
+                    </div>
+                  </div>
+                  <ShoppingBag size={14} className="text-orange-500" />
+                </div>
+
+                {/* Category tabs */}
+                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[8px] font-black uppercase tracking-wider">
+                  <span className="px-2 py-1 bg-orange-500 text-white rounded-full">Món chính</span>
+                  <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Nước uống</span>
+                  <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Tráng miệng</span>
+                </div>
+              </div>
+
+              {/* Menu list */}
+              <div className="flex-grow py-3 px-3 space-y-3 overflow-y-auto bg-gray-50">
+                <div className="bg-white rounded-2xl p-2.5 border border-gray-100 flex gap-2.5 shadow-sm relative overflow-hidden">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-50 flex items-center justify-center relative">
+                    <img
+                      src={getImageUrl("/public/uploads/1778770335484-images.jpeg")}
+                      alt="Bún Bò"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = "none";
+                      }}
+                    />
+                    <span className="absolute text-sm">🥣</span>
+                  </div>
+                  <div className="text-left flex-1 flex flex-col justify-between py-0.5">
+                    <div>
+                      <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">Bún Bò Đặc Biệt</p>
+                      <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">Bún bò nạm, chả bò, nước dùng ngọt đậm đà</p>
+                    </div>
+                    <div className="flex items-end justify-between mt-1">
+                      <span className="text-[10px] font-black text-orange-500">65.000 đ</span>
+                      <button className="w-5 h-5 rounded-lg bg-orange-500 text-white flex items-center justify-center active:scale-90">
+                        <Plus className="w-3 h-3" strokeWidth={3} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl p-2.5 border border-gray-100 flex gap-2.5 shadow-sm relative overflow-hidden">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-50 flex items-center justify-center relative">
+                    <span className="absolute text-sm">🍹</span>
+                  </div>
+                  <div className="text-left flex-1 flex flex-col justify-between py-0.5">
+                    <div>
+                      <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">Trà Đào Cam Sả</p>
+                      <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">Hương vị sả thơm mát hòa quyện cùng đào miếng giòn ngọt</p>
+                    </div>
+                    <div className="flex items-end justify-between mt-1">
+                      <span className="text-[10px] font-black text-orange-500">30.000 đ</span>
+                      <button className="w-5 h-5 rounded-lg bg-orange-500 text-white flex items-center justify-center active:scale-90">
+                        <Plus className="w-3 h-3" strokeWidth={3} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Order button */}
+              <div className="pt-2 border-t border-gray-100 bg-white p-3 shrink-0">
+                <div className="w-full py-2 bg-orange-500 rounded-xl text-[10px] font-black text-white flex items-center justify-center gap-1 shadow-lg shadow-orange-100 active:scale-98">
+                  Gửi Đơn Vào Bếp (2 Món)
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* System Experience Showcase Section */}
+      <section className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">Trải Nghiệm Thực Tế</span>
+          <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3">
+            Hệ Thống Vận Hành Toàn Diện
+          </h2>
+          <p className="text-gray-400 text-sm md:text-base font-medium mt-4">
+            Khám phá quy trình tương tác và quản lý khép kín được thiết kế tối ưu, giúp vận hành quán ăn chuyên nghiệp và tinh gọn.
+          </p>
+        </div>
 
         {/* Showcase Switcher Tabs */}
         <div className="flex bg-gray-900/60 border border-white/5 p-1.5 rounded-2xl mb-8 gap-1 w-full max-w-xl mx-auto relative z-10">
@@ -256,9 +367,10 @@ export default function LandingPage() {
         {/* Interactive Mockup Grid */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
-          className="relative max-w-5xl w-full border border-white/10 bg-gray-900/40 rounded-[2rem] p-4 md:p-6 backdrop-blur-2xl shadow-3xl shadow-black/80"
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ type: "spring", stiffness: 100 }}
+          className="relative max-w-5xl w-full border border-white/10 bg-gray-900/40 rounded-[2rem] p-4 md:p-6 backdrop-blur-2xl shadow-3xl shadow-black/80 mx-auto"
         >
           <div className="absolute top-[-10px] left-1/2 transform -translate-x-1/2 px-4 py-1.5 bg-gray-950 border border-white/10 text-gray-400 rounded-full text-[10px] font-black uppercase tracking-widest z-20">
             {showcaseTab === "menu" && "Giao Diện Khách Gọi Món"}
@@ -545,24 +657,72 @@ export default function LandingPage() {
               </AnimatePresence>
 
               <div className="space-y-3 pt-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
-                    <CheckCircle2 size={12} />
-                  </div>
-                  <span className="text-sm font-bold text-gray-300">Không lo trễ đơn, nhầm bàn ăn trong giờ cao điểm</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
-                    <CheckCircle2 size={12} />
-                  </div>
-                  <span className="text-sm font-bold text-gray-300">Tiết kiệm chi phí in ấn thiết kế thực đơn giấy</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
-                    <CheckCircle2 size={12} />
-                  </div>
-                  <span className="text-sm font-bold text-gray-300">Quản lý hiệu quả, tối ưu hóa năng suất nhân sự phục vụ</span>
-                </div>
+                {showcaseTab === "menu" && (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                        <CheckCircle2 size={12} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-300">Không lo trễ đơn, nhầm bàn ăn trong giờ cao điểm</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                        <CheckCircle2 size={12} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-300">Tiết kiệm chi phí in ấn và thiết kế thực đơn giấy</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                        <CheckCircle2 size={12} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-300">Hình ảnh món ăn sinh động giúp kích thích gọi món nhiều hơn</span>
+                    </div>
+                  </>
+                )}
+                {showcaseTab === "kitchen" && (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                        <CheckCircle2 size={12} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-300">Đồng bộ tức thời theo thời gian thực từ bàn đến bếp</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                        <CheckCircle2 size={12} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-300">Hiển thị rõ ràng các ghi chú đặc biệt (ít cay, không hành...)</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                        <CheckCircle2 size={12} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-300">Quản lý và cập nhật trạng thái chế biến món ăn dễ dàng</span>
+                    </div>
+                  </>
+                )}
+                {showcaseTab === "admin" && (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                        <CheckCircle2 size={12} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-300">Báo cáo doanh số trực quan bằng biểu đồ chi tiết theo ngày/tuần</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                        <CheckCircle2 size={12} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-300">Chỉnh sửa thực đơn, món ăn và giá bán linh hoạt chỉ trong 3 giây</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                        <CheckCircle2 size={12} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-300">Quản lý sơ đồ bàn ăn thực tế tương thích với hoạt động của quán</span>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
