@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { X, ClipboardList, CheckCircle2, Clock, ChefHat } from "lucide-react";
 import Image from "next/image";
-import { useOrders, useConfirmOrder, useUpdateOrderStatus, useTableOrders } from "@/hooks/useOrders";
+import { useOrders, useConfirmOrder, useUpdateOrderStatus, useTableOrders, useUpdateOrderItemQuantity } from "@/hooks/useOrders";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -34,6 +34,7 @@ export default function OrdersDrawer() {
 
   const confirmOrderMutation = useConfirmOrder();
   const updateStatusMutation = useUpdateOrderStatus();
+  const updateOrderItemMutation = useUpdateOrderItemQuantity();
   const [activeTab, setActiveTab] = useState<"current" | "all" | "serving">("current");
 
   // Real-time updates
@@ -78,6 +79,7 @@ export default function OrdersDrawer() {
   // Only consider orders that are not checked out/paid as "active"
   const activeOrders = orders.filter(o => !o.invoiceId && o.status !== "cancelled");
   const tableOrders = activeOrders.filter(o => o.tableNumber === selectedTable);
+  const tableTotal = tableOrders.reduce((sum, order) => sum + order.totalPrice, 0);
 
   const displayOrders = userRole === "staff"
     ? activeTab === "all"
@@ -156,6 +158,19 @@ export default function OrdersDrawer() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
+          {/* Cumulative Subtotal Banner */}
+          {selectedTable && tableOrders.length > 0 && (
+            <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 flex justify-between items-center mb-2 shadow-sm">
+              <div>
+                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Tổng tạm tính (Chưa thanh toán)</p>
+                <p className="text-[10px] text-gray-400 font-bold mt-0.5">Bao gồm {tableOrders.length} đợt gọi món</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xl font-black text-orange-600">{tableTotal.toLocaleString("vi-VN")} ₫</p>
+              </div>
+            </div>
+          )}
+
           {/* Table Summary for Staff */}
           {userRole === "staff" && activeTab === "current" && Object.keys(tableSummary).length > 0 && (
             <div className="bg-blue-50/50 rounded-2xl p-4 border border-blue-100 mb-2">
@@ -263,9 +278,48 @@ export default function OrdersDrawer() {
                         <Image src={getImageUrl(item.image)} alt={item.name} fill className="object-cover" />
                       </div>
                       <div className="flex-1">
-                        <div className="flex justify-between">
+                        <div className="flex justify-between items-center">
                           <h4 className="font-semibold text-sm text-gray-900 leading-tight pr-4">{item.name}</h4>
-                          <span className="font-bold text-sm">x{item.quantity}</span>
+                          
+                          {(userRole === "staff" || userRole === "admin") && order.status !== "completed" && order.status !== "cancelled" ? (
+                            <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-xl px-1.5 py-0.5">
+                              <button
+                                disabled={updateOrderItemMutation.isPending}
+                                onClick={() => {
+                                  if (item.quantity === 1) {
+                                    if (confirm(`Bạn có chắc chắn muốn xóa món "${item.name}" khỏi đơn hàng?`)) {
+                                      updateOrderItemMutation.mutate({ orderId: order.id, productId: item.productId, quantity: 0 });
+                                    }
+                                  } else {
+                                    updateOrderItemMutation.mutate({ orderId: order.id, productId: item.productId, quantity: item.quantity - 1 });
+                                  }
+                                }}
+                                className="w-5 h-5 rounded-lg flex items-center justify-center bg-white border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors text-xs font-black disabled:opacity-50"
+                              >
+                                -
+                              </button>
+                              
+                              {updateOrderItemMutation.isPending && 
+                               updateOrderItemMutation.variables?.orderId === order.id && 
+                               updateOrderItemMutation.variables?.productId === item.productId ? (
+                                <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                              ) : (
+                                <span className="font-bold text-xs w-4 text-center">{item.quantity}</span>
+                              )}
+                              
+                              <button
+                                disabled={updateOrderItemMutation.isPending}
+                                onClick={() => {
+                                  updateOrderItemMutation.mutate({ orderId: order.id, productId: item.productId, quantity: item.quantity + 1 });
+                                }}
+                                className="w-5 h-5 rounded-lg flex items-center justify-center bg-white border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors text-xs font-black disabled:opacity-50"
+                              >
+                                +
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="font-bold text-sm">x{item.quantity}</span>
+                          )}
                         </div>
                         {item.note && (
                           <p className="text-xs text-gray-500 italic mt-0.5">Note: {item.note}</p>

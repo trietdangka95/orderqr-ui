@@ -72,3 +72,16 @@ export interface Invoice {
 export interface ErrorResponse {
   message: string;
 }
+
+export interface AuditLog {
+  id: string;
+  storeId: string;
+  userId?: string | null;
+  user?: {
+    username: string;
+    role: string;
+  } | null;
+  action: string;
+  details: string;
+  createdAt: string;
+}

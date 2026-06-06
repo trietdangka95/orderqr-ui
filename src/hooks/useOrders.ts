@@ -66,3 +66,22 @@ export const useTableOrders = (tableNumber: string) => {
     enabled: !!tableNumber,
   });
 };
+
+export const useUpdateOrderItemQuantity = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ orderId, productId, quantity }: { orderId: string; productId: string; quantity: number }) =>
+      ordersApi.updateItemQuantity(orderId, productId, quantity),
+    onSuccess: (updatedOrder) => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders", "table", updatedOrder.tableNumber] });
+    },
+  });
+};
+
+export const useAuditLogs = () => {
+  return useQuery({
+    queryKey: ["audit-logs"],
+    queryFn: ordersApi.getAuditLogs,
+  });
+};
