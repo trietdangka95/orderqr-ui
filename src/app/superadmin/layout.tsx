@@ -25,7 +25,7 @@ export default function SuperAdminLayout({
     if (!mounted) return;
 
     const role = userRole?.toLowerCase();
-    if (!isLoggedIn || role !== "superadmin") {
+    if (!isLoggedIn || (role !== "superadmin" && role !== "super_admin")) {
       console.log("Access denied for role:", userRole);
       router.push("/super-login");
     }
@@ -35,7 +35,7 @@ export default function SuperAdminLayout({
   if (!mounted) return null;
 
   const role = userRole?.toLowerCase();
-  if (role !== "superadmin") {
+  if (role !== "superadmin" && role !== "super_admin") {
     return null;
   }
 

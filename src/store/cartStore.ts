@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import axiosInstance from "@/api/axiosInstance";
 import { authApi } from "@/api/auth";
 
-export type UserRole = "admin" | "staff" | "kitchen" | "guest" | "superadmin";
+export type UserRole = "admin" | "staff" | "kitchen" | "guest" | "superadmin" | "super_admin";
 
 export interface MenuItem {
   id: string;

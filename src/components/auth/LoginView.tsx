@@ -57,7 +57,7 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
       storeLogin(normalizedRole as UserRole, res.id, res.storeId);
       
       // Redirect based on role
-      if (normalizedRole === "superadmin") {
+      if (normalizedRole === "superadmin" || normalizedRole === "super_admin") {
         router.push("/superadmin");
       } else if (normalizedRole === "admin") {
         router.push("/admin");

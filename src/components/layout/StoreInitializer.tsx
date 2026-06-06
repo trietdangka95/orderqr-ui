@@ -37,6 +37,11 @@ export default function StoreInitializer() {
       host === "127.0.0.1";
 
     if (isMainDomain && !storeQuery) {
+      // Clear store context since we are on the main domain
+      if (storeConfig !== null || storeError !== null) {
+        useCartStore.setState({ storeConfig: null, storeError: null });
+      }
+
       // Base landing/superadmin domain. Skip fetching.
       // Enforce domain routing: main domain only allows /, /super-login, and /superadmin
       const pathname = window.location.pathname;
