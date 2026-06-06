@@ -109,5 +109,10 @@ export default function StoreInitializer() {
     }
   }, [isMounted, storeError]);
 
-  return null;
+  return (
+    <>
+      <title>{storeConfig?.name ? `${storeConfig.name} - Đặt Món Online` : "Order QR - Đặt Món Online"}</title>
+      <link rel="icon" href="/orderqr-logo.svg" type="image/svg+xml" />
+    </>
+  );
 }

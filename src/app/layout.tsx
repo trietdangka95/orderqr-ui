@@ -5,8 +5,11 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Menu Việt - Đặt Món Online",
+  title: "Order QR - Đặt Món Online",
   description: "Giải pháp menu điện tử cho nhà hàng",
+  icons: {
+    icon: "/orderqr-logo.svg",
+  }
 };
 
 import Providers from "@/components/Providers";
