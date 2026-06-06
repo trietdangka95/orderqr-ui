@@ -5,6 +5,7 @@ import { Utensils, ClipboardList, ShoppingBag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useOrders, useTableOrders } from "@/hooks/useOrders";
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
@@ -12,17 +13,22 @@ export default function MobileBottomNav() {
     getTotalItems, 
     toggleCart, 
     toggleOrders, 
-    orders, 
     selectedTable, 
     isOpen, 
-    isOrdersOpen 
+    isOrdersOpen,
+    userRole
   } = useCartStore();
 
   const [popOrder, setPopOrder] = useState(false);
   const [popCart, setPopCart] = useState(false);
 
+  const isStaff = userRole === "staff" || userRole === "admin" || userRole === "kitchen";
+  const { data: allOrders = [] } = useOrders(isStaff);
+  const { data: tableOrders = [] } = useTableOrders(selectedTable);
+  const apiOrders = isStaff ? allOrders : tableOrders;
+  const activeOrdersCount = apiOrders.filter(o => !o.invoiceId && o.status.toUpperCase() !== "CANCELLED").length;
+
   const totalItems = getTotalItems();
-  const activeOrdersCount = orders.filter(o => o.tableNumber === selectedTable && o.status.toLowerCase() !== "completed").length;
 
   // Pop animation for Cart changes
   useEffect(() => {
@@ -45,7 +51,7 @@ export default function MobileBottomNav() {
     }
   }, [activeOrdersCount]);
 
-  if (pathname !== "/" || !selectedTable) return null;
+  if (pathname !== "/" || (!selectedTable && !isStaff)) return null;
 
   const handleMenuClick = () => {
     if (isOpen) toggleCart();

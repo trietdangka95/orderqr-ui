@@ -14,6 +14,7 @@ import HomeHeader from "@/components/home/HomeHeader";
 import BannerSlider from "@/components/home/BannerSlider";
 import CategoryTabs from "@/components/home/CategoryTabs";
 import { useProducts, useCategories } from "@/hooks/useProducts";
+import { useOrders, useTableOrders } from "@/hooks/useOrders";
 import { Product } from "@/types/api";
 import LandingPage from "@/components/home/LandingPage";
 
@@ -59,10 +60,16 @@ function HomeContent() {
   const [isTableSelectorOpen, setIsTableSelectorOpen] = useState(false);
 
   const {
-    getTotalItems, toggleCart, toggleOrders, orders, logout,
+    getTotalItems, toggleCart, toggleOrders, logout,
     userRole, selectedTable, setSelectedTable, tables, storeConfig,
     toastMessage, setToastMessage, storeError
   } = useCartStore();
+
+  const isStaff = userRole === "staff" || userRole === "admin" || userRole === "kitchen";
+  const { data: allOrders = [] } = useOrders(isStaff);
+  const { data: tableOrders = [] } = useTableOrders(selectedTable);
+  const apiOrders = isStaff ? allOrders : tableOrders;
+  const activeOrdersCount = apiOrders.filter(o => !o.invoiceId && o.status.toUpperCase() !== "CANCELLED").length;
 
   const products = useMemo(() => productsData || [], [productsData]);
   const storeCategories = useMemo(() => categoriesData?.map(c => c.name) || [], [categoriesData]);
@@ -308,7 +315,7 @@ function HomeContent() {
         toggleOrders={toggleOrders}
         logout={logout}
         getTotalItems={getTotalItems}
-        orderCount={orders.filter(o => o.tableNumber === selectedTable && o.status.toLowerCase() !== "completed").length}
+        orderCount={activeOrdersCount}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         viewMode={viewMode}

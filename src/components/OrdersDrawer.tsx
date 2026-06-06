@@ -62,7 +62,7 @@ export default function OrdersDrawer() {
   // Map API data to UI format if necessary (handle casing or field names)
   const orders = apiOrders.map(o => ({
     ...o,
-    status: o.status.toLowerCase() as "pending" | "cooking" | "serving" | "completed",
+    status: o.status.toLowerCase() as "pending" | "cooking" | "serving" | "completed" | "cancelled",
     timestamp: new Date(o.createdAt).getTime(),
     isConfirmed: o.isConfirmed,
     // Backend (Prisma) trả về 'orderItems', frontend type gọi là 'items' → hỗ trợ cả hai
@@ -76,8 +76,8 @@ export default function OrdersDrawer() {
     totalPrice: o.totalAmount || ((o as any).orderItems || (o as any).items || []).reduce((sum: number, i: any) => sum + (i.product?.price || 0) * i.quantity, 0)
   }));
 
-  // Only consider non-completed orders as "active"
-  const activeOrders = orders.filter(o => o.status !== "completed");
+  // Only consider orders that are not checked out/paid as "active"
+  const activeOrders = orders.filter(o => !o.invoiceId && o.status !== "cancelled");
   const tableOrders = activeOrders.filter(o => o.tableNumber === selectedTable);
 
   const displayOrders = userRole === "staff"
@@ -237,11 +237,11 @@ export default function OrdersDrawer() {
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${order.status === "serving" ? "bg-green-500 text-white animate-bounce" : "bg-white border-2 border-gray-200 text-gray-300"
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${(order.status === "serving" || order.status === "completed") ? "bg-green-500 text-white animate-bounce" : "bg-white border-2 border-gray-200 text-gray-300"
                         }`}>
                         <CheckCircle2 className="w-4 h-4" />
                       </div>
-                      <span className={`text-[10px] font-bold ${order.status === "serving" ? "text-green-600" : "text-gray-400"}`}>Lên món</span>
+                      <span className={`text-[10px] font-bold ${(order.status === "serving" || order.status === "completed") ? "text-green-600" : "text-gray-400"}`}>Lên món</span>
                     </div>
                   </div>
                 </div>

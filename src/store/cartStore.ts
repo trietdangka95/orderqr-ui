@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import axiosInstance from "@/api/axiosInstance";
+import { authApi } from "@/api/auth";
 
 export type UserRole = "admin" | "staff" | "kitchen" | "guest" | "superadmin";
 
@@ -128,14 +129,17 @@ export const useCartStore = create<CartStore>()(
         userId: id,
         userStoreId: storeId || null
       }),
-      logout: () => set({ 
-        isLoggedIn: false, 
-        userRole: "guest", 
-        userId: null,
-        userStoreId: null,
-        items: [],
-        selectedTable: ""
-      }),
+      logout: () => {
+        authApi.logout();
+        set({ 
+          isLoggedIn: false, 
+          userRole: "guest", 
+          userId: null,
+          userStoreId: null,
+          items: [],
+          selectedTable: ""
+        });
+      },
 
       toastMessage: null,
       setToastMessage: (message) => set({ toastMessage: message }),

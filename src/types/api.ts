@@ -49,6 +49,7 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   totalAmount?: number;
+  invoiceId?: string | null;
 }
 
 export interface CreateOrderDto {
