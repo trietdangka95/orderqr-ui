@@ -1,7 +1,7 @@
 "use client";
  
 import { useState } from "react";
-import { useRenewalRequests, useApproveRenewalRequest, useRejectRenewalRequest } from "@/hooks/useRenewals";
+import { useRenewalRequests, useApproveRenewalRequest, useRejectRenewalRequest, useBankConfig, useSaveBankConfig } from "@/hooks/useRenewals";
 import { 
   Check, 
   X, 
@@ -20,10 +20,17 @@ export default function SuperAdminRenewalsPage() {
   const { data: requests = [], isLoading } = useRenewalRequests();
   const approveMutation = useApproveRenewalRequest();
   const rejectMutation = useRejectRenewalRequest();
+  const { data: bankConfig } = useBankConfig();
+  const saveBankConfigMutation = useSaveBankConfig();
  
   const [activeTab, setActiveTab] = useState<"ALL" | "PENDING" | "APPROVED" | "REJECTED">("PENDING");
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [isBankModalOpen, setIsBankModalOpen] = useState(false);
+  const [bankId, setBankId] = useState("");
+  const [bankAccountNo, setBankAccountNo] = useState("");
+  const [bankAccountName, setBankAccountName] = useState("");
+  const [premiumPrice, setPremiumPrice] = useState<number>(599000);
  
   if (!isMounted) return null;
  
@@ -72,11 +79,28 @@ export default function SuperAdminRenewalsPage() {
     });
   };
  
+  const handleOpenBankModal = () => {
+    setBankId(bankConfig?.bankId || "MB");
+    setBankAccountNo(bankConfig?.bankAccountNo || "123456789");
+    setBankAccountName(bankConfig?.bankAccountName || "PLATFORM OWNER");
+    setPremiumPrice(bankConfig?.premiumPrice || 599000);
+    setIsBankModalOpen(true);
+  };
+ 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Yêu cầu gia hạn</h1>
-        <p className="text-gray-500 font-medium italic">Đối soát tiền về tài khoản hệ thống và duyệt gói dịch vụ cho các store</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Yêu cầu gia hạn</h1>
+          <p className="text-gray-500 font-medium italic">Đối soát tiền về tài khoản hệ thống và duyệt gói dịch vụ cho các store</p>
+        </div>
+        <button
+          onClick={handleOpenBankModal}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-2xl text-sm transition-all active:scale-95 shadow-lg shadow-blue-100 flex items-center gap-2"
+        >
+          <CreditCard size={18} />
+          Cấu hình TK Nhận Tiền
+        </button>
       </div>
  
       {/* Tab Filter */}
@@ -266,6 +290,114 @@ export default function SuperAdminRenewalsPage() {
                   <>
                     <X size={16} />
                     Xác nhận Từ chối
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+ 
+      {/* Bank Settings Modal */}
+      {isBankModalOpen && (
+        <div className="fixed inset-0 bg-black/60 z-[100] backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-[2rem] w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <CreditCard className="text-blue-500" />
+                <h3 className="font-bold text-lg text-gray-900">Cấu hình Tài khoản Nhận tiền</h3>
+              </div>
+              <button 
+                onClick={() => setIsBankModalOpen(false)} 
+                className="p-1.5 hover:bg-gray-200 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+ 
+            <div className="p-6 space-y-4 text-left">
+              <div className="space-y-1">
+                <label className="text-xs font-black text-gray-500 uppercase block">Mã Ngân Hàng (VietQR ID)</label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: MB, VCB, BIDV..."
+                  value={bankId}
+                  onChange={(e) => setBankId(e.target.value.toUpperCase())}
+                  className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
+                />
+              </div>
+ 
+              <div className="space-y-1">
+                <label className="text-xs font-black text-gray-500 uppercase block">Số Tài Khoản</label>
+                <input
+                  type="text"
+                  placeholder="Nhập số tài khoản ngân hàng..."
+                  value={bankAccountNo}
+                  onChange={(e) => setBankAccountNo(e.target.value)}
+                  className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
+                />
+              </div>
+ 
+              <div className="space-y-1">
+                <label className="text-xs font-black text-gray-500 uppercase block">Tên Chủ Tài Khoản</label>
+                <input
+                  type="text"
+                  placeholder="Nhập tên không dấu..."
+                  value={bankAccountName}
+                  onChange={(e) => setBankAccountName(e.target.value)}
+                  className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-black text-gray-500 uppercase block">Đơn giá gói Premium / Tháng (₫)</label>
+                <input
+                  type="number"
+                  placeholder="Nhập đơn giá (ví dụ: 599000)..."
+                  value={premiumPrice}
+                  onChange={(e) => setPremiumPrice(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
+                />
+              </div>
+            </div>
+ 
+            <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
+              <button
+                onClick={() => setIsBankModalOpen(false)}
+                className="flex-1 py-3 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-100 transition-all active:scale-[0.98]"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                disabled={saveBankConfigMutation.isPending}
+                onClick={() => {
+                  if (!bankId.trim() || !bankAccountNo.trim() || !bankAccountName.trim()) {
+                    alert("Vui lòng điền đầy đủ thông tin tài khoản!");
+                    return;
+                  }
+                  saveBankConfigMutation.mutate({
+                    bankId: bankId.trim(),
+                    bankAccountNo: bankAccountNo.trim(),
+                    bankAccountName: bankAccountName.trim(),
+                    premiumPrice: premiumPrice,
+                  }, {
+                    onSuccess: () => {
+                      setIsBankModalOpen(false);
+                      alert("Đã cập nhật cấu hình hệ thống thành công!");
+                    },
+                    onError: (err: any) => {
+                      alert(err.message || "Cập nhật thất bại!");
+                    }
+                  });
+                }}
+                className="flex-1 py-3 bg-blue-500 text-white rounded-xl font-bold text-sm hover:bg-blue-600 shadow-lg shadow-blue-100 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              >
+                {saveBankConfigMutation.isPending ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <Check size={16} />
+                    Lưu Cấu Hình
                   </>
                 )}
               </button>

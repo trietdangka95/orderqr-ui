@@ -25,11 +25,26 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { getImageUrl } from "@/utils/image";
+import { useEffect } from "react";
+import axiosInstance from "@/api/axiosInstance";
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [showcaseTab, setShowcaseTab] = useState<"menu" | "kitchen" | "admin">("menu");
+  const [monthlyPrice, setMonthlyPrice] = useState<number>(599000);
+
+  useEffect(() => {
+    axiosInstance.get("/stores/premium-price")
+      .then((res) => {
+        if (res.data?.monthlyPrice) {
+          setMonthlyPrice(res.data.monthlyPrice);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load premium price", err);
+      });
+  }, []);
 
   const features = [
     {
@@ -905,7 +920,7 @@ export default function LandingPage() {
               <p className="text-gray-400 text-xs font-bold mt-2">Dành cho nhà hàng lớn, hoạt động tần suất cao</p>
 
               <div className="flex items-baseline gap-1 mt-6 border-b border-orange-500/20 pb-6">
-                <span className="text-4xl font-black text-white">199.000đ</span>
+                <span className="text-4xl font-black text-white">{monthlyPrice.toLocaleString("vi-VN")}đ</span>
                 <span className="text-gray-500 text-sm font-bold">/ tháng</span>
               </div>
 

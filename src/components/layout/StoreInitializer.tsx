@@ -1,8 +1,9 @@
 "use client";
-
+ 
 import { useEffect, useState, useRef } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useSearchParams } from "next/navigation";
+import { useSocket } from "@/providers/SocketProvider";
 
 // Helper function to extract store slug from host or search params
 function getSlug(searchParams: URLSearchParams): string | null {
@@ -56,7 +57,8 @@ function getSlug(searchParams: URLSearchParams): string | null {
 export default function StoreInitializer() {
   const { fetchStoreConfig, storeConfig, storeError } = useCartStore();
   const searchParams = useSearchParams();
-
+  const { socket } = useSocket();
+ 
   const [isMounted, setIsMounted] = useState(false);
   const fetchedSlugRef = useRef<string | null>(null);
 
@@ -111,6 +113,23 @@ export default function StoreInitializer() {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [isMounted, fetchStoreConfig, searchParams]);
+ 
+  // Listen for real-time store config updates (e.g. renewal approved by superadmin)
+  useEffect(() => {
+    if (!socket || !isMounted) return;
+ 
+    const slug = getSlug(searchParams);
+    if (!slug) return;
+ 
+    const handleConfigUpdate = () => {
+      fetchStoreConfig(slug);
+    };
+ 
+    socket.on('store_config_update', handleConfigUpdate);
+    return () => {
+      socket.off('store_config_update', handleConfigUpdate);
+    };
+  }, [isMounted, socket, fetchStoreConfig, searchParams]);
 
   useEffect(() => {
     if (!isMounted) return;

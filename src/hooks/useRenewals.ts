@@ -38,3 +38,20 @@ export const useRejectRenewalRequest = () => {
     },
   });
 };
+ 
+export const useBankConfig = () => {
+  return useQuery({
+    queryKey: ["superadmin-bank-config"],
+    queryFn: renewalsApi.getBankConfig,
+  });
+};
+ 
+export const useSaveBankConfig = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: renewalsApi.saveBankConfig,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["superadmin-bank-config"] });
+    },
+  });
+};

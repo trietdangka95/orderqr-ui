@@ -36,4 +36,14 @@ export const renewalsApi = {
     const response = await axiosInstance.patch<RenewalRequest>(`/renewals/${id}/reject`, { notes });
     return response.data;
   },
+ 
+  getBankConfig: async (): Promise<{ bankId: string; bankAccountNo: string; bankAccountName: string; premiumPrice?: number }> => {
+    const response = await axiosInstance.get<{ bankId: string; bankAccountNo: string; bankAccountName: string; premiumPrice?: number }>('/renewals/bank-config');
+    return response.data;
+  },
+ 
+  saveBankConfig: async (payload: { bankId: string; bankAccountNo: string; bankAccountName: string; premiumPrice?: number }): Promise<{ bankId: string; bankAccountNo: string; bankAccountName: string; premiumPrice?: number }> => {
+    const response = await axiosInstance.post<{ bankId: string; bankAccountNo: string; bankAccountName: string; premiumPrice?: number }>('/renewals/bank-config', payload);
+    return response.data;
+  },
 };

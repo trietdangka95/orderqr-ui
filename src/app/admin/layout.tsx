@@ -27,6 +27,17 @@ export default function AdminLayout({
   const router = useRouter();
   const { logout, userRole, storeConfig } = useCartStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+ 
+  const getRemainingDays = () => {
+    if (!storeConfig?.subscriptionEnd) return 999;
+    const end = new Date(storeConfig.subscriptionEnd).getTime();
+    const now = new Date().getTime();
+    const diff = end - now;
+    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  };
+ 
+  const daysLeft = getRemainingDays();
+  const showWarning = storeConfig?.subscriptionEnd && (daysLeft <= 3);
 
   if (userRole === "kitchen") {
     return (
@@ -148,6 +159,22 @@ export default function AdminLayout({
           aside, .md\:hidden { display: none !important; }
         }
       `}</style>
+ 
+      {/* Expiring Watermark (like Windows not activated) */}
+      {showWarning && (
+        <div className="fixed bottom-6 right-6 z-[9999] select-none text-right font-sans opacity-45 hover:opacity-100 transition-opacity duration-300 pointer-events-auto bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-gray-200/20 shadow-sm max-w-[240px]">
+          <Link href="/admin/billing" className="block text-right group">
+            <p className="text-xs font-black text-gray-400 uppercase tracking-wider group-hover:text-primary transition-colors">
+              {daysLeft <= 0 ? "Dịch vụ đã hết hạn" : "Gói cước sắp hết hạn"}
+            </p>
+            <p className="text-[10px] text-gray-500 font-bold mt-1 leading-normal group-hover:text-gray-700 transition-colors">
+              {daysLeft <= 0 
+                ? "Vui lòng gia hạn để khách tiếp tục gọi món."
+                : `Còn lại ${daysLeft} ngày sử dụng. Nhấp để gia hạn.`}
+            </p>
+          </Link>
+        </div>
+      )}
     </AdminGuard>
   );
 }
