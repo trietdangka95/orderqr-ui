@@ -1,7 +1,7 @@
 "use client";
 
 import { useCartStore } from "@/store/cartStore";
-import { ShieldAlert, LogOut, LayoutDashboard, Store } from "lucide-react";
+import { ShieldAlert, LogOut, LayoutDashboard, Store, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -49,6 +49,7 @@ export default function SuperAdminLayout({
   const navItems = [
     { href: "/superadmin", label: "Dashboard", icon: LayoutDashboard },
     { href: "/superadmin/stores", label: "Manage Stores", icon: Store },
+    { href: "/superadmin/renewals", label: "Yêu cầu gia hạn", icon: CreditCard },
   ];
 
   return (

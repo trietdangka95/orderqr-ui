@@ -10,7 +10,8 @@ import {
   Users, 
   LogOut,
   Menu,
-  ClipboardList
+  ClipboardList,
+  CreditCard
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -43,7 +44,10 @@ export default function AdminLayout({
     { href: "/admin/kitchen", label: "Quản lý Bếp", icon: Soup },
     { href: "/admin/revenue", label: "Doanh thu", icon: TrendingUp },
     { href: "/admin/menu", label: "Thực đơn", icon: Settings },
-    ...(userRole === "admin" ? [{ href: "/admin/logs", label: "Nhật ký", icon: ClipboardList }] : []),
+    ...(userRole === "admin" ? [
+      { href: "/admin/billing", label: "Gói cước", icon: CreditCard },
+      { href: "/admin/logs", label: "Nhật ký", icon: ClipboardList }
+    ] : []),
     { href: "/admin/credentials", label: "Tài khoản", icon: Users },
   ];
 

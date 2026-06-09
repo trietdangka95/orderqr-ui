@@ -85,3 +85,27 @@ export const useAuditLogs = () => {
     queryFn: ordersApi.getAuditLogs,
   });
 };
+
+export const useRequestCheckout = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ordersApi.requestCheckout,
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders", "table", variables.tableNumber] });
+    },
+  });
+};
+
+export const useConfirmInvoicePayment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ordersApi.confirmInvoicePayment,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      if (data?.tableNumber) {
+        queryClient.invalidateQueries({ queryKey: ["orders", "table", data.tableNumber] });
+      }
+    },
+  });
+};

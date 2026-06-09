@@ -36,4 +36,14 @@ export const ordersApi = {
     const response = await axiosInstance.get<AuditLog[]>('/orders/logs');
     return response.data;
   },
+
+  requestCheckout: async (payload: { tableNumber: string; paymentMethod: 'CASH' | 'QR_TRANSFER'; paymentStatus: 'PENDING' | 'PAID' }): Promise<any> => {
+    const response = await axiosInstance.post('/orders/checkout', payload);
+    return response.data;
+  },
+
+  confirmInvoicePayment: async (invoiceId: string): Promise<any> => {
+    const response = await axiosInstance.patch(`/orders/checkout/${invoiceId}/confirm`);
+    return response.data;
+  },
 };

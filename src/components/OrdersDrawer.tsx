@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
-import { X, ClipboardList, CheckCircle2, Clock, ChefHat } from "lucide-react";
+import { X, ClipboardList, CheckCircle2, Clock, ChefHat, Copy, Check, CreditCard, Coins, QrCode, Sparkles, AlertCircle } from "lucide-react";
 import Image from "next/image";
-import { useOrders, useConfirmOrder, useUpdateOrderStatus, useTableOrders, useUpdateOrderItemQuantity } from "@/hooks/useOrders";
+import { useOrders, useConfirmOrder, useUpdateOrderStatus, useTableOrders, useUpdateOrderItemQuantity, useRequestCheckout } from "@/hooks/useOrders";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -21,7 +21,7 @@ interface MappedOrderItem {
 }
 
 export default function OrdersDrawer() {
-  const { isOrdersOpen, toggleOrders, selectedTable, userRole } = useCartStore();
+  const { isOrdersOpen, toggleOrders, selectedTable, userRole, storeConfig } = useCartStore();
   const queryClient = useQueryClient();
   const { socket } = useSocket();
 
@@ -35,7 +35,11 @@ export default function OrdersDrawer() {
   const confirmOrderMutation = useConfirmOrder();
   const updateStatusMutation = useUpdateOrderStatus();
   const updateOrderItemMutation = useUpdateOrderItemQuantity();
+  const requestCheckoutMutation = useRequestCheckout();
+
   const [activeTab, setActiveTab] = useState<"current" | "all" | "serving">("current");
+  const [isCheckoutMode, setIsCheckoutMode] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<'CASH' | 'QR_TRANSFER' | null>(null);
 
   // Real-time updates
   useEffect(() => {
@@ -52,11 +56,13 @@ export default function OrdersDrawer() {
     socket.on('newOrder', refreshOrders);
     socket.on('orderUpdate', refreshOrders);
     socket.on('checkout', refreshOrders);
+    socket.on('payment_request', refreshOrders);
 
     return () => {
       socket.off('newOrder', refreshOrders);
       socket.off('orderUpdate', refreshOrders);
       socket.off('checkout', refreshOrders);
+      socket.off('payment_request', refreshOrders);
     };
   }, [socket, queryClient, selectedTable]);
 
@@ -76,10 +82,15 @@ export default function OrdersDrawer() {
     totalPrice: o.totalAmount || o.orderItems.reduce((sum: number, i) => sum + (i.product?.price || 0) * i.quantity, 0)
   }));
 
-  // Only consider orders that are not checked out/paid as "active"
-  const activeOrders = orders.filter(o => !o.invoiceId && o.status !== "cancelled");
+  // Active orders: either not checked out, or waiting for payment approval
+  const activeOrders = orders.filter(o => (!o.invoiceId || o.invoice?.paymentStatus === "PENDING") && o.status !== "cancelled");
   const tableOrders = activeOrders.filter(o => o.tableNumber === selectedTable);
-  const tableTotal = tableOrders.reduce((sum, order) => sum + order.totalPrice, 0);
+  
+  // Find if there is an active pending invoice for this table
+  const pendingInvoice = orders.find(o => o.invoiceId && o.invoice?.paymentStatus === "PENDING")?.invoice;
+  const tableTotal = pendingInvoice 
+    ? Number(pendingInvoice.totalAmount) 
+    : tableOrders.reduce((sum, order) => sum + order.totalPrice, 0);
 
   const displayOrders = userRole === "staff"
     ? activeTab === "all"
@@ -375,6 +386,202 @@ export default function OrdersDrawer() {
             ))
           )}
         </div>
+
+        {/* Guest checkout section */}
+        {userRole !== "staff" && tableOrders.length > 0 && (
+          <div className="bg-white border-t border-gray-100 p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] pb-safe relative z-20">
+            {pendingInvoice ? (
+              // Status screen for pending payment
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 bg-amber-50 border border-amber-100 p-3.5 rounded-2xl">
+                  <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white shrink-0 animate-pulse">
+                    <Clock size={16} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-amber-800">Yêu cầu thanh toán chờ duyệt</h4>
+                    <p className="text-xs text-amber-600 mt-0.5 font-medium">Nhân viên đang kiểm tra hóa đơn của bạn</p>
+                  </div>
+                </div>
+
+                {pendingInvoice.paymentMethod === "QR_TRANSFER" ? (
+                  <div className="border border-gray-100 rounded-2xl p-4 bg-gray-50/50 space-y-4 text-center">
+                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Quét mã QR để chuyển khoản</p>
+                    
+                    {storeConfig?.bankId && storeConfig?.bankAccountNo ? (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-48 h-48 bg-white border border-gray-200/60 rounded-2xl flex items-center justify-center p-2 relative shadow-md">
+                          <img
+                            src={`https://img.vietqr.io/image/${storeConfig.bankId}-${storeConfig.bankAccountNo}-compact2.png?amount=${tableTotal}&addInfo=Ban%20${selectedTable}%20Thanh%20Toan&accountName=${encodeURIComponent(storeConfig.bankAccountName || "")}`}
+                            alt="VietQR code"
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+
+                        <div className="w-full text-left bg-white border border-gray-100 rounded-xl p-3 text-xs space-y-2 font-medium">
+                          <div className="flex justify-between border-b border-gray-50 pb-1.5">
+                            <span className="text-gray-400">Ngân hàng</span>
+                            <span className="font-bold text-gray-800">{storeConfig.bankId}</span>
+                          </div>
+                          <div className="flex justify-between border-b border-gray-50 pb-1.5 items-center">
+                            <span className="text-gray-400">Số tài khoản</span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-gray-800">{storeConfig.bankAccountNo}</span>
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(storeConfig.bankAccountNo || "");
+                                  alert("Đã sao chép số tài khoản!");
+                                }}
+                                className="p-1 hover:bg-gray-100 rounded text-primary transition-colors"
+                              >
+                                <Copy size={12} />
+                              </button>
+                            </div>
+                          </div>
+                          <div className="flex justify-between border-b border-gray-50 pb-1.5">
+                            <span className="text-gray-400">Tên thụ hưởng</span>
+                            <span className="font-bold text-gray-800">{storeConfig.bankAccountName || "N/A"}</span>
+                          </div>
+                          <div className="flex justify-between border-b border-gray-50 pb-1.5 items-center">
+                            <span className="text-gray-400">Nội dung CK</span>
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-orange-600">Ban {selectedTable} Thanh Toan</span>
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(`Ban ${selectedTable} Thanh Toan`);
+                                  alert("Đã sao chép nội dung chuyển khoản!");
+                                }}
+                                className="p-1 hover:bg-gray-100 rounded text-primary transition-colors"
+                              >
+                                <Copy size={12} />
+                              </button>
+                            </div>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Tổng tiền</span>
+                            <span className="font-black text-orange-600 text-sm">{tableTotal.toLocaleString("vi-VN")} ₫</span>
+                          </div>
+                        </div>
+                        <p className="text-[10px] text-gray-400 font-bold leading-normal px-2 mt-1">
+                          Vui lòng giữ nguyên màn hình này cho đến khi nhân viên xác nhận đã nhận được tiền.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="py-6 text-center text-xs text-red-500 font-bold">
+                        Quán chưa thiết lập tài khoản ngân hàng. Vui lòng báo nhân viên.
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5 text-center space-y-3 font-medium text-xs text-gray-600">
+                    <Coins size={36} className="mx-auto text-amber-500 animate-bounce" />
+                    <p className="font-bold text-gray-800 text-sm">Thanh toán Tiền mặt</p>
+                    <p className="leading-relaxed text-gray-500">
+                      Vui lòng chuẩn bị sẵn số tiền <span className="font-black text-orange-600 text-sm">{tableTotal.toLocaleString("vi-VN")} ₫</span>. 
+                      Nhân viên phục vụ đang đến bàn của bạn để thu tiền và hoàn tất thanh toán.
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : !isCheckoutMode ? (
+              // Initial button
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Tổng tiền</span>
+                  <span className="text-base font-black text-orange-600">{tableTotal.toLocaleString("vi-VN")} ₫</span>
+                </div>
+                <button
+                  onClick={() => setIsCheckoutMode(true)}
+                  className="flex-1 bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-orange-100 hover:bg-orange-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
+                >
+                  <CreditCard size={18} />
+                  Thanh toán hóa đơn
+                </button>
+              </div>
+            ) : (
+              // Payment choice screen
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-sm text-gray-800">Phương thức thanh toán</h4>
+                  <button
+                    onClick={() => {
+                      setIsCheckoutMode(false);
+                      setSelectedPayment(null);
+                    }}
+                    className="text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    Quay lại
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => setSelectedPayment("CASH")}
+                    className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-2 group ${
+                      selectedPayment === "CASH"
+                        ? "border-primary bg-orange-50/20 text-primary"
+                        : "border-gray-100 hover:border-gray-200 text-gray-500"
+                    }`}
+                  >
+                    <Coins size={28} className={selectedPayment === "CASH" ? "text-primary" : "text-gray-400 group-hover:text-gray-500"} />
+                    <span className="text-xs font-black uppercase">Tiền mặt</span>
+                  </button>
+
+                  <button
+                    disabled={!(storeConfig?.bankId && storeConfig?.bankAccountNo)}
+                    onClick={() => setSelectedPayment("QR_TRANSFER")}
+                    className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-2 group disabled:opacity-50 ${
+                      selectedPayment === "QR_TRANSFER"
+                        ? "border-primary bg-orange-50/20 text-primary"
+                        : "border-gray-100 hover:border-gray-200 text-gray-500"
+                    }`}
+                  >
+                    <QrCode size={28} className={selectedPayment === "QR_TRANSFER" ? "text-primary" : "text-gray-400 group-hover:text-gray-500"} />
+                    <span className="text-xs font-black uppercase">Chuyển khoản QR</span>
+                  </button>
+                </div>
+
+                {selectedPayment === "QR_TRANSFER" && (
+                  <div className="border border-orange-100 rounded-xl p-3 bg-orange-50/30 text-[11px] font-medium text-orange-800 leading-normal flex gap-2">
+                    <Sparkles size={16} className="shrink-0 text-orange-500 mt-0.5" />
+                    <span>
+                      Hệ thống tự động tạo mã QR chuyển tiền đến tài khoản của quán.
+                    </span>
+                  </div>
+                )}
+
+                <button
+                  disabled={!selectedPayment || requestCheckoutMutation.isPending}
+                  onClick={() => {
+                    if (!selectedPayment) return;
+                    requestCheckoutMutation.mutate({
+                      tableNumber: selectedTable,
+                      paymentMethod: selectedPayment,
+                      paymentStatus: "PENDING"
+                    }, {
+                      onSuccess: () => {
+                        setIsCheckoutMode(false);
+                        setSelectedPayment(null);
+                      },
+                      onError: (err: any) => {
+                        alert(err.message || "Không thể gửi yêu cầu thanh toán");
+                      }
+                    });
+                  }}
+                  className="w-full bg-primary disabled:opacity-50 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-100 hover:bg-orange-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
+                >
+                  {requestCheckoutMutation.isPending ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Check size={18} />
+                      Gửi yêu cầu thanh toán
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </>
   );

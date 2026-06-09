@@ -9,7 +9,7 @@ import {
 import { useCartStore, Order, OrderStatus } from "@/store/cartStore";
 import TableStatusCard from "./components/TableStatusCard";
 import QRCodeCard from "./components/QRCodeCard";
-import { useOrders, useClearTable, useConfirmOrder } from "@/hooks/useOrders";
+import { useOrders, useClearTable, useConfirmOrder, useConfirmInvoicePayment } from "@/hooks/useOrders";
 import useIsMounted from "@/hooks/useIsMounted";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
@@ -19,6 +19,7 @@ export default function AdminTablesPage() {
   const { data: apiOrders = [] } = useOrders();
   const clearTableMutation = useClearTable();
   const confirmOrderMutation = useConfirmOrder();
+  const confirmInvoicePaymentMutation = useConfirmInvoicePayment();
   const isMounted = useIsMounted();
   const queryClient = useQueryClient();
   const { socket } = useSocket();
@@ -34,11 +35,13 @@ export default function AdminTablesPage() {
     socket.on('newOrder', refreshOrders);
     socket.on('orderUpdate', refreshOrders);
     socket.on('checkout', refreshOrders);
+    socket.on('payment_request', refreshOrders);
 
     return () => {
       socket.off('newOrder', refreshOrders);
       socket.off('orderUpdate', refreshOrders);
       socket.off('checkout', refreshOrders);
+      socket.off('payment_request', refreshOrders);
     };
   }, [socket, queryClient]);
 
@@ -64,7 +67,9 @@ export default function AdminTablesPage() {
   const [newTableNum, setNewTableNum] = useState("");
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
-  const activeOrders = orders.filter((o) => !o.invoiceId && o.status !== "cancelled");
+  const activeOrders = orders.filter(
+    (o) => (!o.invoiceId || o.invoice?.paymentStatus === "PENDING") && o.status !== "cancelled"
+  );
 
   const tableStatus = activeOrders.reduce((acc, order) => {
     const tNum = order.tableNumber || "??";
@@ -145,6 +150,7 @@ export default function AdminTablesPage() {
                   formatPrice={formatPrice}
                   onCheckout={handleCheckout}
                   onConfirmOrder={(id) => confirmOrderMutation.mutate(id)}
+                  onConfirmInvoicePayment={(id) => confirmInvoicePaymentMutation.mutate(id)}
                 />
               ))}
             </div>

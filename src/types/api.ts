@@ -50,6 +50,12 @@ export interface Order {
   updatedAt: string;
   totalAmount?: number;
   invoiceId?: string | null;
+  invoice?: {
+    id: string;
+    paymentMethod: string;
+    paymentStatus: string;
+    totalAmount: number;
+  } | null;
 }
 
 export interface CreateOrderDto {

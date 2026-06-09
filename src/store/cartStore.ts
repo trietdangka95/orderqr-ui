@@ -51,6 +51,9 @@ export interface StoreConfig {
   subscriptionPlan?: "FREE" | "PREMIUM";
   subscriptionStatus?: string;
   subscriptionEnd?: string | null;
+  bankId?: string | null;
+  bankAccountNo?: string | null;
+  bankAccountName?: string | null;
 }
 
 interface CartStore {
