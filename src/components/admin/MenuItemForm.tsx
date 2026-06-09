@@ -34,6 +34,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
 
   const [priceInput, setPriceInput] = useState(item?.price?.toString() || "0");
   const [previewError, setPreviewError] = useState(false);
+  const [isBannerUploading, setIsBannerUploading] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -47,6 +48,21 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
       setPreviewError(false);
     } catch {
       alert("Lỗi khi tải ảnh lên!");
+    }
+  };
+
+  const handleBannerFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsBannerUploading(true);
+    try {
+      const result = await uploadImage.mutateAsync(file);
+      setFormData((prev) => ({ ...prev, bannerUrl: result.url }));
+    } catch {
+      alert("Lỗi khi tải ảnh banner lên!");
+    } finally {
+      setIsBannerUploading(false);
     }
   };
 
@@ -290,15 +306,33 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
 
             <div>
               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">
-                Banner URL (Dành cho Slide quảng cáo)
+                Ảnh Banner quảng cáo
               </label>
-              <input
-                type="text"
-                value={formData.bannerUrl}
-                onChange={(e) => setFormData({ ...formData, bannerUrl: e.target.value })}
-                className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-medium text-gray-600"
-                placeholder="https://... (Hình khổ ngang 16:9)"
-              />
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={formData.bannerUrl}
+                    onChange={(e) => setFormData({ ...formData, bannerUrl: e.target.value })}
+                    className="flex-1 px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-medium text-gray-600 text-sm"
+                    placeholder="Dán link ảnh banner (URL) hoặc tải lên..."
+                  />
+                  <label className="shrink-0 flex items-center justify-center w-12 h-12 bg-gray-100 rounded-2xl cursor-pointer hover:bg-gray-200 transition-colors">
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleBannerFileChange}
+                      disabled={isBannerUploading}
+                    />
+                    {isBannerUploading ? (
+                      <Loader2 className="w-5 h-5 text-gray-500 animate-spin" />
+                    ) : (
+                      <Upload className="w-5 h-5 text-gray-500" />
+                    )}
+                  </label>
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -311,7 +345,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                   value={formData.promoTitle}
                   onChange={(e) => setFormData({ ...formData, promoTitle: e.target.value })}
                   className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-bold text-gray-700"
-                  placeholder="VD: Giảm giá 20%"
+                  placeholder="Để trống để lấy tự động..."
                 />
               </div>
               <div>
@@ -323,12 +357,69 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                   value={formData.promoDescription}
                   onChange={(e) => setFormData({ ...formData, promoDescription: e.target.value })}
                   className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-medium text-gray-600"
-                  placeholder="VD: Thứ 2 & Thứ 3"
+                  placeholder="Để trống để lấy tự động..."
                 />
               </div>
             </div>
+
+            {/* Live Preview of Banner Card */}
+            {formData.discountPercent > 0 && (
+              <div className="space-y-2 pt-2">
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                  Xem trước Banner ngoài trang chủ
+                </label>
+                <div className="relative h-36 rounded-2xl overflow-hidden shadow-lg bg-gray-950 border border-white/5 flex items-center p-4 select-none">
+                  {/* Ambient background blur using active image */}
+                  <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                    <Image
+                      src={getImageUrl(formData.bannerUrl || formData.image || "")}
+                      alt=""
+                      fill
+                      unoptimized
+                      className="object-cover blur-2xl opacity-20 scale-125 select-none pointer-events-none"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/90 to-gray-950"></div>
+                  </div>
+
+                  <div className="relative z-10 w-full h-full flex items-center justify-between gap-4">
+                    {/* Left text */}
+                    <div className="flex-1 flex flex-col justify-center text-left space-y-1 pr-2">
+                      <div className="inline-flex items-center gap-1 bg-red-500/15 text-red-400 text-[8px] font-black px-2 py-0.5 rounded-full w-fit uppercase tracking-wider">
+                        Khuyến mãi -{formData.discountPercent}%
+                      </div>
+                      <h4 className="text-white text-sm font-black line-clamp-1">
+                        {formData.promoTitle || `Thực đơn Ưu đãi: ${formData.name || "Tên món ăn"}`}
+                      </h4>
+                      <p className="text-gray-400 text-[10px] font-medium line-clamp-1">
+                        {formData.promoDescription || "Thưởng thức hương vị tuyệt vời với giá ưu đãi đặc biệt hôm nay!"}
+                      </p>
+                      <div className="flex items-center gap-2 pt-0.5">
+                        <span className="text-primary text-xs font-black">
+                          {(formData.price * (1 - formData.discountPercent / 100)).toLocaleString("vi-VN")}₫
+                        </span>
+                        <span className="text-gray-500 text-[9px] line-through font-bold">
+                          {formData.price.toLocaleString("vi-VN")}₫
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right Image */}
+                    <div className="w-16 h-16 relative rounded-xl overflow-hidden border border-white/10 shrink-0">
+                      <Image
+                        src={getImageUrl(formData.bannerUrl || formData.image || "")}
+                        alt=""
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <p className="text-[10px] text-gray-400 italic font-medium px-2">
-              * Banner chỉ hiển thị ngoài trang chủ nếu điền đủ cả 4 thông tin trên.
+              * Banner sẽ tự động hiển thị ở trang chủ nếu món ăn này được giảm giá (lớn hơn 0%). Ảnh banner và tiêu đề/mô tả sẽ tự động lấy mặc định từ thông tin món ăn nếu để trống.
             </p>
           </div>
 

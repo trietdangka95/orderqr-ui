@@ -80,7 +80,8 @@ function HomeContent() {
   }
 
   const banners = useMemo(() => products
-    .filter(item => item.bannerUrl && item.promoTitle && item.promoDescription && (item.discountPercent || 0) > 0)
+    .filter(item => (item.discountPercent || 0) > 0)
+    .sort((a, b) => (b.discountPercent || 0) - (a.discountPercent || 0))
     .slice(0, 5), [products]);
 
   useEffect(() => {
@@ -346,7 +347,7 @@ function HomeContent() {
           <div className="py-20 text-center font-bold text-gray-400">Đang tải dữ liệu...</div>
         ) : (
           <>
-            <BannerSlider banners={banners} />
+            {banners.length > 0 && <BannerSlider banners={banners} />}
 
             <CategoryTabs
               categories={storeCategories}
