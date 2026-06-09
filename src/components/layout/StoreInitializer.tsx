@@ -1,14 +1,64 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useSearchParams } from "next/navigation";
+
+// Helper function to extract store slug from host or search params
+function getSlug(searchParams: URLSearchParams): string | null {
+  if (typeof window === "undefined") return "default";
+
+  let host = window.location.hostname.toLowerCase();
+  if (host.startsWith("www.")) {
+    host = host.substring(4);
+  }
+  const storeQuery = searchParams.get("store");
+  const mainDomain = (process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn").toLowerCase();
+  const cleanMainDomain = mainDomain.split(":")[0];
+
+  const isMainDomain = 
+    host === cleanMainDomain || 
+    host === `www.${cleanMainDomain}` ||
+    host === "localhost" || 
+    host === "www.localhost" ||
+    host === "127.0.0.1";
+
+  if (isMainDomain && !storeQuery) {
+    return null;
+  }
+
+  let slug = "default";
+  if (storeQuery) {
+    slug = storeQuery;
+  } else {
+    // 1. If it's a subdomain of the main domain (e.g. banh-xeo.orderqr.id.vn)
+    if (host.endsWith(`.${cleanMainDomain}`)) {
+      const sub = host.substring(0, host.length - cleanMainDomain.length - 1);
+      if (sub && sub !== "www" && sub !== "admin" && sub !== "superadmin") {
+        slug = sub;
+      }
+    } 
+    // 2. If it's a subdomain of localhost (e.g. banh-xeo.localhost)
+    else if (host.endsWith(".localhost")) {
+      const sub = host.substring(0, host.length - ".localhost".length);
+      if (sub && sub !== "www" && sub !== "admin" && sub !== "superadmin") {
+        slug = sub;
+      }
+    }
+    // 3. Fallback for custom domains or other test setups
+    else if (!isMainDomain && !host.includes("orderpro")) {
+      slug = host.split(".")[0] || "default";
+    }
+  }
+  return slug;
+}
 
 export default function StoreInitializer() {
   const { fetchStoreConfig, storeConfig, storeError } = useCartStore();
   const searchParams = useSearchParams();
 
   const [isMounted, setIsMounted] = useState(false);
+  const fetchedSlugRef = useRef<string | null>(null);
 
   useEffect(() => {
     const handle = requestAnimationFrame(() => setIsMounted(true));
@@ -18,29 +68,16 @@ export default function StoreInitializer() {
   useEffect(() => {
     if (!isMounted) return;
 
-    // 1. Detect Slug from Subdomain or Query Param
-    let host = window.location.hostname.toLowerCase();
-    if (host.startsWith("www.")) {
-      host = host.substring(4);
-    }
-    const storeQuery = searchParams.get("store");
-    const mainDomain = (process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn").toLowerCase();
+    const slug = getSlug(searchParams);
 
-    // Remove any port suffix from mainDomain just in case (e.g. localhost:3000 -> localhost)
-    const cleanMainDomain = mainDomain.split(":")[0];
-
-    const isMainDomain = 
-      host === cleanMainDomain || 
-      host === `www.${cleanMainDomain}` ||
-      host === "localhost" || 
-      host === "www.localhost" ||
-      host === "127.0.0.1";
-
-    if (isMainDomain && !storeQuery) {
+    if (slug === null) {
       // Clear store context since we are on the main domain
-      if (storeConfig !== null || storeError !== null) {
+      const currentConfig = useCartStore.getState().storeConfig;
+      const currentError = useCartStore.getState().storeError;
+      if (currentConfig !== null || currentError !== null) {
         useCartStore.setState({ storeConfig: null, storeError: null });
       }
+      fetchedSlugRef.current = null;
 
       // Base landing/superadmin domain. Skip fetching.
       // Enforce domain routing: main domain only allows /, /super-login, and /superadmin
@@ -56,54 +93,39 @@ export default function StoreInitializer() {
       return;
     }
 
-    let slug = "default";
-
-    if (storeQuery) {
-      slug = storeQuery;
-    } else {
-      // 1. If it's a subdomain of the main domain (e.g. banh-xeo.orderqr.id.vn)
-      if (host.endsWith(`.${cleanMainDomain}`)) {
-        const sub = host.substring(0, host.length - cleanMainDomain.length - 1);
-        if (sub && sub !== "www" && sub !== "admin" && sub !== "superadmin") {
-          slug = sub;
-        }
-      } 
-      // 2. If it's a subdomain of localhost (e.g. banh-xeo.localhost)
-      else if (host.endsWith(".localhost")) {
-        const sub = host.substring(0, host.length - ".localhost".length);
-        if (sub && sub !== "www" && sub !== "admin" && sub !== "superadmin") {
-          slug = sub;
-        }
-      }
-      // 3. Fallback for custom domains or other test setups
-      else if (!isMainDomain && !host.includes("orderpro")) {
-        slug = host.split(".")[0] || "default";
-      }
-    }
-
-    // 2. Only Fetch if slug has changed or config is missing
-    if (!storeConfig || storeConfig.slug !== slug) {
+    // Fetch config if not yet fetched for this slug in this component session
+    if (fetchedSlugRef.current !== slug) {
       fetchStoreConfig(slug);
+      fetchedSlugRef.current = slug;
     }
-  }, [isMounted, fetchStoreConfig, searchParams, storeConfig]);
+
+    // Refetch store configuration when tab becomes visible (handles mobile resumes / screen wakeups)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible" && slug) {
+        fetchStoreConfig(slug);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isMounted, fetchStoreConfig, searchParams]);
 
   useEffect(() => {
     if (!isMounted) return;
 
-    // 3. Apply Theme Color & Page Title dynamically
+    // Apply Theme Color & Page Title dynamically
     if (storeConfig?.themeColor) {
       document.documentElement.style.setProperty("--primary", storeConfig.themeColor);
       document.documentElement.style.setProperty("--primary-soft", `${storeConfig.themeColor}1a`); // 10% opacity
-    }
-    if (storeConfig?.name) {
-      document.title = `${storeConfig.name} - Đặt Món Online`;
     }
   }, [isMounted, storeConfig]);
 
   useEffect(() => {
     if (!isMounted) return;
 
-    // 4. Redirect to home if there is an error loading the store on a subpath (e.g. store inactive/not found)
+    // Redirect to home if there is an error loading the store on a subpath (e.g. store inactive/not found)
     if (storeError && window.location.pathname !== "/") {
       window.location.href = "/";
     }

@@ -20,7 +20,7 @@ export default function StoreManagementPage() {
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
-    adminUsername: "",
+    adminUsername: "admin",
     adminPassword: "",
     themeColor: "#f97316",
     currency: "VND"
@@ -86,7 +86,7 @@ export default function StoreManagementPage() {
     setFormData({
       name: "",
       slug: "",
-      adminUsername: "",
+      adminUsername: "admin",
       adminPassword: "",
       themeColor: "#f97316",
       currency: "VND"
@@ -98,7 +98,7 @@ export default function StoreManagementPage() {
     setFormData({
       name: store.name,
       slug: store.slug,
-      adminUsername: store.users?.[0]?.username || "",
+      adminUsername: "",
       adminPassword: "",
       themeColor: store.themeColor,
       currency: store.currency

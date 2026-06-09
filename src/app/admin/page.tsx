@@ -20,7 +20,7 @@ export default function AdminDashboard() {
   const { data: orders = [] } = useOrders();
   const { data: invoices = [] } = useInvoices();
 
-  const totalRevenue = invoices.reduce((sum, i) => sum + i.totalAmount, 0);
+  const totalRevenue = invoices.reduce((sum, i) => sum + Number(i.totalAmount), 0);
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -102,47 +102,47 @@ export default function AdminDashboard() {
 
       {/* Recent Activity - Full Width Row */}
       <div className="mb-12">
-        <div className="flex items-center justify-between mb-6 px-4">
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-6 bg-blue-600 rounded-full"></div>
-            <h2 className="text-lg font-black text-gray-900 uppercase tracking-wider">Hóa đơn gần đây</h2>
+        <Link href="/admin/revenue" className="block group">
+          <div className="flex items-center justify-between mb-6 px-4">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-6 bg-blue-600 rounded-full"></div>
+              <h2 className="text-lg font-black text-gray-900 uppercase tracking-wider">Hóa đơn gần đây</h2>
+            </div>
+            <span className="text-xs font-bold text-blue-600 group-hover:underline">Xem tất cả</span>
           </div>
-          <Link href="/admin/revenue" className="text-sm font-bold text-blue-600 hover:underline">
-            Xem tất cả
-          </Link>
-        </div>
 
-        <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
-          <div className="divide-y divide-gray-50">
-            {invoices.length > 0 ? (
-              invoices.slice(0, 5).map((invoice) => (
-                <div key={invoice.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400">
-                      <ShoppingBag size={20} />
+          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden group-hover:border-blue-300 transition-all">
+            <div className="divide-y divide-gray-50">
+              {invoices.length > 0 ? (
+                invoices.slice(0, 5).map((invoice) => (
+                  <div key={invoice.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center text-gray-400">
+                        <ShoppingBag size={20} />
+                      </div>
+                      <div>
+                        <p className="font-black text-gray-900">Bàn {invoice.tableNumber}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          {new Date(invoice.createdAt).toLocaleDateString("vi-VN")} • {new Date(invoice.createdAt).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-black text-gray-900">Bàn {invoice.tableNumber}</p>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                        {new Date(invoice.createdAt).toLocaleDateString("vi-VN")} • {new Date(invoice.createdAt).toLocaleTimeString("vi-VN", { hour: '2-digit', minute: '2-digit' })}
+                    <div className="text-right">
+                      <p className="font-black text-gray-900">
+                        {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(Number(invoice.totalAmount))}
                       </p>
+                      <p className="text-[10px] font-bold text-green-500 uppercase tracking-widest">Đã thanh toán</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-black text-gray-900">
-                      {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(invoice.totalAmount)}
-                    </p>
-                    <p className="text-[10px] font-bold text-green-500 uppercase tracking-widest">Đã thanh toán</p>
-                  </div>
+                ))
+              ) : (
+                <div className="p-12 text-center text-gray-400 italic">
+                  Chưa có hóa đơn nào được xuất.
                 </div>
-              ))
-            ) : (
-              <div className="p-12 text-center text-gray-400 italic">
-                Chưa có hóa đơn nào được xuất.
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        </Link>
       </div>
 
       <div className="mt-12 text-center pb-12">

@@ -181,7 +181,7 @@ export default function LandingPage() {
       <section className="relative max-w-7xl mx-auto px-4 md:px-8 pt-16 md:pt-24 pb-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Column: Headlines & CTA */}
-          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
@@ -232,99 +232,6 @@ export default function LandingPage() {
                 Tìm Hiểu Tính Năng
                 <Play size={14} className="fill-white" />
               </a>
-            </motion.div>
-          </div>
-
-          {/* Right Column: Beautiful Customer Menu Phone Mockup */}
-          <div className="lg:col-span-5 flex items-center justify-center relative min-h-[450px]">
-            {/* Glowing background blob behind mockup */}
-            <div className="absolute w-[320px] h-[320px] bg-orange-600/10 rounded-full blur-[80px] -z-10 pointer-events-none"></div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, rotate: 2 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              transition={{ delay: 0.4, type: "spring", stiffness: 80 }}
-              className="bg-gray-50 border-[8px] border-gray-900 rounded-[2.75rem] shadow-2xl relative flex flex-col justify-between overflow-hidden text-gray-900 h-[480px] max-w-[260px] w-full shrink-0 hover:scale-[1.02] transition-transform duration-300"
-            >
-              {/* Notch */}
-              <div className="absolute top-2 left-1/2 transform -translate-x-1/2 w-24 h-3.5 bg-gray-900 rounded-full z-30"></div>
-
-              {/* Shop App Header */}
-              <div className="bg-white pt-6 pb-3 px-3 border-b border-gray-100 flex flex-col gap-2 shrink-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-black text-white overflow-hidden shrink-0">
-                      🥣
-                    </div>
-                    <div className="text-left">
-                      <h5 className="text-[10px] font-black leading-none text-gray-900">Bun Bo 97</h5>
-                      <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider block mt-0.5">Bàn 01</span>
-                    </div>
-                  </div>
-                  <ShoppingBag size={14} className="text-orange-500" />
-                </div>
-
-                {/* Category tabs */}
-                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[8px] font-black uppercase tracking-wider">
-                  <span className="px-2 py-1 bg-orange-500 text-white rounded-full">Món chính</span>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Nước uống</span>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Tráng miệng</span>
-                </div>
-              </div>
-
-              {/* Menu list */}
-              <div className="flex-grow py-3 px-3 space-y-3 overflow-y-auto bg-gray-50">
-                <div className="bg-white rounded-2xl p-2.5 border border-gray-100 flex gap-2.5 shadow-sm relative overflow-hidden">
-                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-50 flex items-center justify-center relative">
-                    <img
-                      src={getImageUrl("/public/uploads/1778770335484-images.jpeg")}
-                      alt="Bún Bò"
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLElement).style.display = "none";
-                      }}
-                    />
-                    <span className="absolute text-sm">🥣</span>
-                  </div>
-                  <div className="text-left flex-1 flex flex-col justify-between py-0.5">
-                    <div>
-                      <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">Bún Bò Đặc Biệt</p>
-                      <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">Bún bò nạm, chả bò, nước dùng ngọt đậm đà</p>
-                    </div>
-                    <div className="flex items-end justify-between mt-1">
-                      <span className="text-[10px] font-black text-orange-500">65.000 đ</span>
-                      <button className="w-5 h-5 rounded-lg bg-orange-500 text-white flex items-center justify-center active:scale-90">
-                        <Plus className="w-3 h-3" strokeWidth={3} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl p-2.5 border border-gray-100 flex gap-2.5 shadow-sm relative overflow-hidden">
-                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-50 flex items-center justify-center relative">
-                    <span className="absolute text-sm">🍹</span>
-                  </div>
-                  <div className="text-left flex-1 flex flex-col justify-between py-0.5">
-                    <div>
-                      <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">Trà Đào Cam Sả</p>
-                      <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">Hương vị sả thơm mát hòa quyện cùng đào miếng giòn ngọt</p>
-                    </div>
-                    <div className="flex items-end justify-between mt-1">
-                      <span className="text-[10px] font-black text-orange-500">30.000 đ</span>
-                      <button className="w-5 h-5 rounded-lg bg-orange-500 text-white flex items-center justify-center active:scale-90">
-                        <Plus className="w-3 h-3" strokeWidth={3} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Order button */}
-              <div className="pt-2 border-t border-gray-100 bg-white p-3 shrink-0">
-                <div className="w-full py-2 bg-orange-500 rounded-xl text-[10px] font-black text-white flex items-center justify-center gap-1 shadow-lg shadow-orange-100 active:scale-98">
-                  Gửi Đơn Vào Bếp (2 Món)
-                </div>
-              </div>
             </motion.div>
           </div>
         </div>

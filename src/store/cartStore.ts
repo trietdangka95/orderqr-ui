@@ -47,6 +47,7 @@ export interface StoreConfig {
   currency: string;
   isActive: boolean;
   tables: string[];
+  users?: { username: string }[];
 }
 
 interface CartStore {
@@ -277,8 +278,6 @@ export const useCartStore = create<CartStore>()(
         userId: state.userId,
         userStoreId: state.userStoreId,
         selectedTable: state.selectedTable,
-        tables: state.tables,
-        storeConfig: state.storeConfig,
       }),
     }
   )

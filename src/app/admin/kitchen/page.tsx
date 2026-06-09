@@ -37,24 +37,26 @@ export default function KitchenPage() {
     };
   }, [socket, queryClient]);
 
-  const orders = apiOrders.map(o => ({
-    ...o,
-    status: o.status.toLowerCase() as OrderStatus, // UI expects lowercase
-    timestamp: new Date(o.createdAt).getTime(),
-    isConfirmed: o.isConfirmed,
-    totalPrice: o.totalAmount || 0,
-    items: o.orderItems.map((i) => ({
-      ...i,
-      id: i.productId, // Use productId as id for CartItem compatibility
-      name: i.product?.name || 'Món ăn',
-      image: i.product?.image || '',
-      price: i.product?.price || 0,
-      description: i.product?.description || '',
-      category: i.product?.category || '',
-      categoryId: i.product?.categoryId || 0,
-      note: i.note || '',
-    }))
-  }));
+  const orders = apiOrders
+    .filter(o => !o.invoiceId)
+    .map(o => ({
+      ...o,
+      status: o.status.toLowerCase() as OrderStatus, // UI expects lowercase
+      timestamp: new Date(o.createdAt).getTime(),
+      isConfirmed: o.isConfirmed,
+      totalPrice: o.totalAmount || 0,
+      items: o.orderItems.map((i) => ({
+        ...i,
+        id: i.productId, // Use productId as id for CartItem compatibility
+        name: i.product?.name || 'Món ăn',
+        image: i.product?.image || '',
+        price: i.product?.price || 0,
+        description: i.product?.description || '',
+        category: i.product?.category || '',
+        categoryId: i.product?.categoryId || 0,
+        note: i.note || '',
+      }))
+    }));
   const audioRef = useRef<HTMLAudioElement>(null);
   const [view, setView] = useState<"board" | "summary">("board");
 
@@ -117,8 +119,8 @@ export default function KitchenPage() {
   if (!isMounted) return null;
 
   return (
-    <div className="max-w-[1600px] mx-auto">
-      <header className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
+    <div className="max-w-[1600px] mx-auto w-full h-full flex flex-col min-h-0">
+      <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6 shrink-0">
         <div>
           <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Hệ thống KDS</h1>
           <p className="text-gray-500 font-medium italic">Kitchen Display System - Quản lý chế biến món ăn</p>
@@ -157,22 +159,22 @@ export default function KitchenPage() {
         </div>
       </header>
 
-      <main>
+      <main className="flex-grow flex flex-col min-h-0">
 
         {view === "board" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 flex-grow min-h-0">
             {columns.map((col) => {
               const colOrders = orders.filter((o) => o.status === col.status);
               return (
-                <section key={col.status} className="flex flex-col h-full min-h-[500px]">
-                  <div className={`p-4 rounded-2xl border-t-4 mb-6 flex items-center justify-between shadow-xl shadow-gray-200/20 ${col.color}`}>
+                <section key={col.status} className="flex flex-col h-full min-h-0">
+                  <div className={`p-4 rounded-2xl border-t-4 mb-4 flex items-center justify-between shadow-xl shadow-gray-200/20 ${col.color} shrink-0`}>
                     <div className="flex items-center gap-3">
                       <div className={`w-2.5 h-2.5 rounded-full ${col.dot} animate-pulse shadow-sm`}></div>
                       <h2 className="font-black uppercase tracking-widest text-sm text-gray-900">{col.title}</h2>
                     </div>
                     <span className="bg-gray-100 text-gray-900 px-3 py-1 rounded-lg text-sm font-black shadow-sm">{colOrders.length}</span>
                   </div>
-                  <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-250px)] hide-scrollbar">
+                  <div className="space-y-4 overflow-y-auto flex-grow min-h-0 no-scrollbar pb-6">
                     {confirmedOrders.filter(o => o.status === col.status).map((order) => (
                       <OrderTicket
                         key={order.id}
@@ -191,12 +193,12 @@ export default function KitchenPage() {
             })}
           </div>
         ) : (
-          <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-            <div className="p-8 border-b bg-gray-50/50">
+          <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 flex-grow min-h-0 w-full flex flex-col">
+            <div className="p-8 border-b bg-gray-50/50 shrink-0">
               <h2 className="text-xl font-black text-gray-800">Danh sách món cần chuẩn bị</h2>
               <p className="text-sm text-gray-500">Tổng hợp tất cả món từ các đơn hàng Đợi xác nhận & Đang làm</p>
             </div>
-            <div className="p-8">
+            <div className="p-8 overflow-y-auto flex-1 min-h-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {Object.entries(itemSummary).length > 0 ? (
                   Object.entries(itemSummary).map(([name, data]) => (

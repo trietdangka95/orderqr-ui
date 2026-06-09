@@ -64,7 +64,9 @@ export default function AdminTablesPage() {
   const [newTableNum, setNewTableNum] = useState("");
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
-  const tableStatus = orders.reduce((acc, order) => {
+  const activeOrders = orders.filter((o) => !o.invoiceId && o.status !== "cancelled");
+
+  const tableStatus = activeOrders.reduce((acc, order) => {
     const tNum = order.tableNumber || "??";
     if (!acc[tNum]) {
       acc[tNum] = [];

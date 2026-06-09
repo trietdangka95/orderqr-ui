@@ -33,15 +33,17 @@ export default function OrderTicket({ order, onAdvance }: OrderTicketProps) {
       <div className="p-5">
         <ul className="space-y-3 mb-6">
           {order.items.map((item) => (
-            <li key={item.id} className="flex justify-between items-start gap-4">
-              <div className="flex gap-3">
-                <span className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center text-[10px] font-black text-gray-900 shrink-0">
-                  {item.quantity}
-                </span>
-                <span className="font-bold text-sm text-gray-700 leading-tight">{item.name}</span>
+            <li key={item.id} className="flex flex-col gap-1.5">
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex gap-3">
+                  <span className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center text-[10px] font-black text-gray-900 shrink-0">
+                    {item.quantity}
+                  </span>
+                  <span className="font-bold text-sm text-gray-700 leading-tight">{item.name}</span>
+                </div>
               </div>
               {item.note && (
-                <div className="text-[10px] bg-orange-50 text-orange-600 px-2 py-0.5 rounded-md font-bold italic">
+                <div className="ml-10 text-[10px] bg-orange-50/70 border border-orange-100/60 text-orange-600 px-2.5 py-1.5 rounded-xl font-bold italic self-start leading-relaxed">
                   {item.note}
                 </div>
               )}

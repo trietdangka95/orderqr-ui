@@ -11,11 +11,21 @@ import { useLogin } from "@/hooks/useAuth";
 export default function LoginView({ initialRole = "staff" }: { initialRole?: UserRole }) {
   const { login: storeLogin, storeConfig } = useCartStore();
   const [role, setRole] = useState<UserRole>(initialRole);
+
+  const getAdminUsernamePrefix = () => {
+    const adminUser = storeConfig?.users?.[0]?.username || "";
+    const suffix = `_${storeConfig?.slug}`;
+    if (adminUser && suffix && adminUser.endsWith(suffix)) {
+      return adminUser.slice(0, -suffix.length);
+    }
+    return "admin";
+  };
+
   const [username, setUsername] = useState(() => {
     if (initialRole === "staff") return "staff";
     if (initialRole === "kitchen") return "kitchen";
     if (initialRole === "superadmin") return "superadmin";
-    return "";
+    return getAdminUsernamePrefix();
   });
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -33,7 +43,7 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
     } else if (newRole === "superadmin") {
       setUsername("superadmin");
     } else {
-      setUsername("");
+      setUsername(getAdminUsernamePrefix());
     }
   };
 

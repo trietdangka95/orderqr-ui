@@ -30,7 +30,7 @@ export default function AdminLayout({
   if (userRole === "kitchen") {
     return (
       <AdminGuard>
-        <div className="h-screen overflow-y-auto bg-gray-50 p-6 md:p-12">
+        <div className="h-screen overflow-hidden bg-gray-50 p-6 md:p-8 flex flex-col">
           {children}
         </div>
       </AdminGuard>
@@ -129,8 +129,8 @@ export default function AdminLayout({
         )}
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto print:overflow-visible print:h-auto">
-          <div className="p-6 md:p-12 print:p-0">
+        <main className={`flex-1 ${pathname === "/admin/kitchen" ? "h-full overflow-hidden" : "overflow-y-auto"} print:overflow-visible print:h-auto`}>
+          <div className={`print:p-0 ${pathname === "/admin/kitchen" ? "p-6 md:p-8 h-full flex flex-col" : "p-6 md:p-12"}`}>
             {children}
           </div>
         </main>

@@ -11,6 +11,7 @@ export default function RevenuePage() {
 
   const revenue = apiInvoices.map(inv => ({
     ...inv,
+    totalAmount: Number(inv.totalAmount),
     timestamp: new Date(inv.createdAt).getTime(),
   }));
 
