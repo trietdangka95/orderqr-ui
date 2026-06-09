@@ -141,107 +141,192 @@ export default function SuperAdminRenewalsPage() {
           Không tìm thấy yêu cầu gia hạn nào ở mục này.
         </div>
       ) : (
-        <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm font-medium">
-              <thead className="bg-gray-50 text-[10px] font-black uppercase text-gray-400 border-b border-gray-100">
-                <tr>
-                  <th className="px-6 py-4">Cửa hàng</th>
-                  <th className="px-6 py-4">Gói & Số tháng</th>
-                  <th className="px-6 py-4">Số tiền</th>
-                  <th className="px-6 py-4">Ngày gửi</th>
-                  <th className="px-6 py-4">Ghi chú yêu cầu</th>
-                  <th className="px-6 py-4">Trạng thái</th>
-                  <th className="px-6 py-4 text-right">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50 text-gray-700">
-                {filteredRequests.map((req) => (
-                  <tr key={req.id} className="hover:bg-gray-50/50">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                          <Store size={18} />
-                        </div>
-                        <div>
-                          <p className="font-bold text-gray-900 leading-tight">
-                            {req.store?.name || "Cửa hàng ẩn"}
-                          </p>
-                          <p className="text-[10px] text-gray-400 font-mono mt-0.5">
-                            slug: {req.store?.slug || "N/A"}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div>
-                        <span className="font-bold text-gray-800">Premium</span>
-                        <span className="text-xs text-gray-400 block font-bold mt-0.5">+{req.months} tháng sử dụng</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="font-black text-orange-600">
-                        {Number(req.price).toLocaleString("vi-VN")} ₫
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1 text-xs text-gray-500 font-semibold">
-                        <Calendar size={12} className="text-gray-400 shrink-0" />
-                        <span>{new Date(req.createdAt).toLocaleDateString("vi-VN")}</span>
-                        <span className="text-[10px] text-gray-300">|</span>
-                        <Clock size={12} className="text-gray-400 shrink-0" />
-                        <span>{new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-start gap-1.5 max-w-xs text-xs italic text-gray-500">
-                        <MessageSquare size={13} className="text-gray-400 shrink-0 mt-0.5" />
-                        <span className="line-clamp-2">{req.notes || "Không có ghi chú"}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-wider ${
-                        req.status === "APPROVED" 
-                          ? "bg-green-100 text-green-700" 
-                          : req.status === "REJECTED" 
-                          ? "bg-red-100 text-red-700" 
-                          : "bg-amber-100 text-amber-700 animate-pulse"
-                      }`}>
-                        {req.status === "APPROVED" ? "Đã duyệt" : req.status === "REJECTED" ? "Từ chối" : "Chờ duyệt"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      {req.status === "PENDING" ? (
-                        <div className="flex items-center justify-end gap-2">
-                          <button
-                            disabled={approveMutation.isPending || rejectMutation.isPending}
-                            onClick={() => handleApprove(req.id, req.store?.name || "Store", req.months)}
-                            className="bg-green-500 hover:bg-green-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-green-100"
-                            title="Phê duyệt gia hạn"
-                          >
-                            <Check size={16} />
-                            Duyệt
-                          </button>
-                          <button
-                            disabled={approveMutation.isPending || rejectMutation.isPending}
-                            onClick={() => handleReject(req.id)}
-                            className="bg-red-500 hover:bg-red-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-red-100"
-                            title="Từ chối yêu cầu"
-                          >
-                            <X size={16} />
-                            Từ chối
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-400 italic">Đã xử lý</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <>
+          {/* Mobile Card List View (below md) */}
+          <div className="md:hidden space-y-4">
+            {filteredRequests.map((req) => (
+              <div key={req.id} className="bg-white rounded-3xl border border-gray-100 p-5 shadow-sm space-y-4">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                      <Store size={18} />
+                    </div>
+                    <div className="text-left">
+                      <h4 className="font-bold text-gray-900 leading-tight">
+                        {req.store?.name || "Cửa hàng ẩn"}
+                      </h4>
+                      <p className="text-[10px] text-gray-400 font-mono mt-0.5">
+                        slug: {req.store?.slug || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <span className={`px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-wider shrink-0 ${
+                    req.status === "APPROVED" 
+                      ? "bg-green-100 text-green-700" 
+                      : req.status === "REJECTED" 
+                      ? "bg-red-100 text-red-700" 
+                      : "bg-amber-100 text-amber-700 animate-pulse"
+                  }`}>
+                    {req.status === "APPROVED" ? "Đã duyệt" : req.status === "REJECTED" ? "Từ chối" : "Chờ duyệt"}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-50 text-left text-xs font-semibold">
+                  <div>
+                    <span className="text-gray-400 block mb-0.5">Gói cước</span>
+                    <span className="text-gray-800 font-bold">Premium (+{req.months} {req.notes?.includes('[TEST_MINUTES]') ? 'phút' : 'tháng'})</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-400 block mb-0.5">Số tiền chuyển</span>
+                    <span className="text-orange-600 font-black">{Number(req.price).toLocaleString("vi-VN")} ₫</span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="text-gray-400 block mb-0.5">Thời gian gửi</span>
+                    <span className="text-gray-600 flex items-center gap-1">
+                      <Calendar size={12} className="text-gray-400 shrink-0" />
+                      {new Date(req.createdAt).toLocaleDateString("vi-VN")} {new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  {req.notes && (
+                    <div className="col-span-2">
+                      <span className="text-gray-400 block mb-0.5">Ghi chú yêu cầu</span>
+                      <span className="text-gray-500 italic block bg-gray-50 p-2.5 rounded-xl border border-gray-100/60 leading-normal">{req.notes}</span>
+                    </div>
+                  )}
+                </div>
+
+                {req.status === "PENDING" ? (
+                  <div className="flex gap-2 pt-2 border-t border-gray-50">
+                    <button
+                      disabled={approveMutation.isPending || rejectMutation.isPending}
+                      onClick={() => handleApprove(req.id, req.store?.name || "Store", req.months)}
+                      className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 text-xs shadow-md shadow-green-100"
+                    >
+                      <Check size={16} />
+                      Duyệt
+                    </button>
+                    <button
+                      disabled={approveMutation.isPending || rejectMutation.isPending}
+                      onClick={() => handleReject(req.id)}
+                      className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 text-xs shadow-md shadow-red-100"
+                    >
+                      <X size={16} />
+                      Từ chối
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center pt-2 border-t border-gray-50 text-xs text-gray-400 italic">
+                    Đã xử lý
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-        </div>
+
+          {/* Desktop Table View (md and up) */}
+          <div className="hidden md:block bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm font-medium">
+                <thead className="bg-gray-50 text-[10px] font-black uppercase text-gray-400 border-b border-gray-100">
+                  <tr>
+                    <th className="px-6 py-4">Cửa hàng</th>
+                    <th className="px-6 py-4">Gói & Số tháng</th>
+                    <th className="px-6 py-4">Số tiền</th>
+                    <th className="px-6 py-4">Ngày gửi</th>
+                    <th className="px-6 py-4">Ghi chú yêu cầu</th>
+                    <th className="px-6 py-4">Trạng thái</th>
+                    <th className="px-6 py-4 text-right">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50 text-gray-700">
+                  {filteredRequests.map((req) => (
+                    <tr key={req.id} className="hover:bg-gray-50/50">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                            <Store size={18} />
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-900 leading-tight">
+                              {req.store?.name || "Cửa hàng ẩn"}
+                            </p>
+                            <p className="text-[10px] text-gray-400 font-mono mt-0.5">
+                              slug: {req.store?.slug || "N/A"}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div>
+                          <span className="font-bold text-gray-800">Premium</span>
+                          <span className="text-xs text-gray-400 block font-bold mt-0.5">+{req.months} {req.notes?.includes('[TEST_MINUTES]') ? 'phút' : 'tháng'} sử dụng</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="font-black text-orange-600">
+                          {Number(req.price).toLocaleString("vi-VN")} ₫
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-1 text-xs text-gray-500 font-semibold">
+                          <Calendar size={12} className="text-gray-400 shrink-0" />
+                          <span>{new Date(req.createdAt).toLocaleDateString("vi-VN")}</span>
+                          <span className="text-[10px] text-gray-300">|</span>
+                          <Clock size={12} className="text-gray-400 shrink-0" />
+                          <span>{new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-start gap-1.5 max-w-xs text-xs italic text-gray-500">
+                          <MessageSquare size={13} className="text-gray-400 shrink-0 mt-0.5" />
+                          <span className="line-clamp-2">{req.notes || "Không có ghi chú"}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-wider ${
+                          req.status === "APPROVED" 
+                            ? "bg-green-100 text-green-700" 
+                            : req.status === "REJECTED" 
+                            ? "bg-red-100 text-red-700" 
+                            : "bg-amber-100 text-amber-700 animate-pulse"
+                        }`}>
+                          {req.status === "APPROVED" ? "Đã duyệt" : req.status === "REJECTED" ? "Từ chối" : "Chờ duyệt"}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        {req.status === "PENDING" ? (
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              disabled={approveMutation.isPending || rejectMutation.isPending}
+                              onClick={() => handleApprove(req.id, req.store?.name || "Store", req.months)}
+                              className="bg-green-500 hover:bg-green-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-green-100"
+                              title="Phê duyệt gia hạn"
+                            >
+                              <Check size={16} />
+                              Duyệt
+                            </button>
+                            <button
+                              disabled={approveMutation.isPending || rejectMutation.isPending}
+                              onClick={() => handleReject(req.id)}
+                              className="bg-red-500 hover:bg-red-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-red-100"
+                              title="Từ chối yêu cầu"
+                            >
+                              <X size={16} />
+                              Từ chối
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400 italic">Đã xử lý</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
  
       {/* Reject Reason Modal */}
