@@ -17,6 +17,32 @@ import {
 } from "lucide-react";
 import useIsMounted from "@/hooks/useIsMounted";
 
+const sanitizeBankId = (bankId: string | undefined | null): string => {
+  if (!bankId) return "";
+  const cleaned = bankId.trim().replace(/\s+/g, "").toUpperCase();
+  const mapping: Record<string, string> = {
+    "MBBANK": "MB",
+    "VIETCOMBANK": "VCB",
+    "VIETINBANK": "CTG",
+    "TECHCOMBANK": "TCB",
+    "BIDVBANK": "BIDV",
+    "ACBBANK": "ACB",
+    "VPBANK": "VPB",
+    "TPBANK": "TPB",
+    "SACOMBANK": "STB",
+    "HDBANK": "HDB",
+    "AGRIBANK": "VBA",
+    "ABBANK": "ABB",
+    "MSBBANK": "MSB",
+    "VIBBANK": "VIB",
+    "SHBANK": "SHB",
+    "OCBBANK": "OCB",
+    "SCBBANK": "SCB",
+    "SEABANK": "SEAB",
+  };
+  return mapping[cleaned] || cleaned;
+};
+
 export default function AdminBillingPage() {
   const { storeConfig } = useCartStore();
   const isMounted = useIsMounted();
@@ -349,7 +375,7 @@ export default function AdminBillingPage() {
                 <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Chuyển khoản VietQR đến hệ thống</p>
                 <div className="w-44 h-44 bg-white border border-gray-200/60 rounded-xl flex items-center justify-center p-2 relative shadow-md">
                   <img
-                    src={`https://img.vietqr.io/image/${superAdminBankId}-${superAdminBankAcc}-compact2.png?amount=${selectedPkg.price}&addInfo=GIAHAN%20${storeConfig?.slug}%20${selectedPkg.months}%20${isTestMode ? 'PHUT' : 'THANG'}&accountName=${encodeURIComponent(superAdminBankName)}`}
+                    src={`https://img.vietqr.io/image/${sanitizeBankId(superAdminBankId)}-${superAdminBankAcc}-compact2.png?amount=${selectedPkg.price}&addInfo=GIAHAN%20${storeConfig?.slug}%20${selectedPkg.months}%20${isTestMode ? 'PHUT' : 'THANG'}&accountName=${encodeURIComponent(superAdminBankName)}`}
                     alt="VietQR code"
                     className="w-full h-full object-contain"
                   />

@@ -10,6 +10,32 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { getImageUrl } from "@/utils/image";
 
+const sanitizeBankId = (bankId: string | undefined | null): string => {
+  if (!bankId) return "";
+  const cleaned = bankId.trim().replace(/\s+/g, "").toUpperCase();
+  const mapping: Record<string, string> = {
+    "MBBANK": "MB",
+    "VIETCOMBANK": "VCB",
+    "VIETINBANK": "CTG",
+    "TECHCOMBANK": "TCB",
+    "BIDVBANK": "BIDV",
+    "ACBBANK": "ACB",
+    "VPBANK": "VPB",
+    "TPBANK": "TPB",
+    "SACOMBANK": "STB",
+    "HDBANK": "HDB",
+    "AGRIBANK": "VBA",
+    "ABBANK": "ABB",
+    "MSBBANK": "MSB",
+    "VIBBANK": "VIB",
+    "SHBANK": "SHB",
+    "OCBBANK": "OCB",
+    "SCBBANK": "SCB",
+    "SEABANK": "SEAB",
+  };
+  return mapping[cleaned] || cleaned;
+};
+
 interface MappedOrderItem {
   id: string;
   productId: string;
@@ -411,7 +437,7 @@ export default function OrdersDrawer() {
                       <div className="flex flex-col items-center gap-3">
                         <div className="w-48 h-48 bg-white border border-gray-200/60 rounded-2xl flex items-center justify-center p-2 relative shadow-md">
                           <img
-                            src={`https://img.vietqr.io/image/${storeConfig.bankId}-${storeConfig.bankAccountNo}-compact2.png?amount=${tableTotal}&addInfo=Ban%20${selectedTable}%20Thanh%20Toan&accountName=${encodeURIComponent(storeConfig.bankAccountName || "")}`}
+                            src={`https://img.vietqr.io/image/${sanitizeBankId(storeConfig.bankId)}-${storeConfig.bankAccountNo}-compact2.png?amount=${tableTotal}&addInfo=Ban%20${selectedTable}%20Thanh%20Toan&accountName=${encodeURIComponent(storeConfig.bankAccountName || "")}`}
                             alt="VietQR code"
                             className="w-full h-full object-contain"
                           />
