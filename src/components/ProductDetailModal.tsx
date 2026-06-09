@@ -99,7 +99,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                 <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight leading-tight">
                   {product.name}
                 </h2>
-                <div className="inline-block px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-sm font-bold mb-6">
+                <div className="inline-block px-3 py-1 bg-primary-soft text-primary rounded-full text-sm font-bold mb-6">
                   {product.price.toLocaleString("vi-VN")} ₫
                 </div>
                 <div className="space-y-4">
@@ -124,7 +124,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
               <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col gap-4">
                 <button
                   onClick={handleAddToCart}
-                  className="w-full bg-primary text-white py-4 rounded-2xl font-black flex items-center justify-center gap-3 shadow-xl shadow-orange-200 hover:bg-orange-600 transition-all active:scale-95"
+                  className="w-full bg-primary text-white py-4 rounded-2xl font-black flex items-center justify-center gap-3 shadow-xl shadow-primary hover:bg-primary transition-all active:scale-95"
                 >
                   <Plus size={20} strokeWidth={3} />
                   Thêm vào giỏ hàng

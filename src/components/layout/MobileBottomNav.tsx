@@ -100,7 +100,7 @@ export default function MobileBottomNav() {
                 <motion.div
                   layoutId="activeTabPill"
                   className={`absolute inset-0 rounded-2xl ${
-                    tab.id === "orders" ? "bg-blue-50" : "bg-orange-50"
+                    tab.id === "orders" ? "bg-blue-50" : "bg-primary-soft"
                   }`}
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />

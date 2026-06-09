@@ -160,7 +160,7 @@ export default function StoreInitializer() {
       <div className="fixed inset-0 z-[9999] bg-gray-950 flex items-center justify-center p-6 text-center select-none">
         {/* Decorative background blurs */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
         
         <div className="relative max-w-md w-full bg-white/5 border border-white/10 backdrop-blur-xl p-10 rounded-[3rem] shadow-2xl flex flex-col items-center">
           <div className="w-20 h-20 bg-red-500/10 border border-red-500/20 text-red-500 rounded-[2rem] flex items-center justify-center mb-6">

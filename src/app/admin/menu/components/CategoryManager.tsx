@@ -42,7 +42,7 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
   return (
     <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-gray-200/50 border border-gray-100 mb-8">
       <div className="flex items-center gap-2 mb-6">
-        <div className="w-1.5 h-6 bg-orange-500 rounded-full"></div>
+        <div className="w-1.5 h-6 bg-primary rounded-full"></div>
         <h2 className="text-lg font-black text-gray-900 uppercase tracking-wider">
           Quản lý Danh mục
         </h2>
@@ -83,7 +83,7 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
         <button
           type="submit"
           disabled={createCategoryMutation.isPending || !newCategoryName.trim()}
-          className="px-8 py-4 bg-orange-500 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-orange-600 shadow-lg shadow-orange-100 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
+          className="px-8 py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary shadow-lg shadow-primary transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
         >
           {createCategoryMutation.isPending ? (
             <Loader2 size={16} className="animate-spin" />

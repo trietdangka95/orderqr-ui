@@ -140,7 +140,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
           {/* Basic Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-1 h-4 bg-orange-500 rounded-full"></div>
+              <div className="w-1 h-4 bg-primary rounded-full"></div>
               <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Thông tin cơ bản</h3>
             </div>
             
@@ -434,7 +434,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
             <button
               type="submit"
               disabled={createProduct.isPending || updateProduct.isPending || categories.length === 0}
-              className="flex-1 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 shadow-lg shadow-orange-200 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="flex-1 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary shadow-lg shadow-primary transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {createProduct.isPending || updateProduct.isPending ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

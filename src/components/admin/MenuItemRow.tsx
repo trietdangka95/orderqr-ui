@@ -101,7 +101,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
             className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
           />
           <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm">
-            <span className="text-[10px] font-black text-orange-600 uppercase tracking-wider">{item.category}</span>
+            <span className="text-[10px] font-black text-primary uppercase tracking-wider">{item.category}</span>
           </div>
         </motion.div>
 
@@ -110,7 +110,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
             <motion.h3 layoutId={`name-${item.id}`} className="font-bold text-gray-900 text-sm sm:text-lg leading-tight group-hover:text-orange-500 transition-colors">
               {item.name}
             </motion.h3>
-            <motion.div layoutId={`price-${item.id}`} className="font-black text-orange-600 text-lg sm:text-xl mt-1">
+            <motion.div layoutId={`price-${item.id}`} className="font-black text-primary text-lg sm:text-xl mt-1">
               {formatPrice(item.price)}
             </motion.div>
 
@@ -122,7 +122,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
           </div>
           <ActionButtons {...actionProps} isGrid />
         </div>
-        <div className="absolute -right-4 -bottom-4 w-16 h-16 bg-orange-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity -z-10 scale-150"></div>
+        <div className="absolute -right-4 -bottom-4 w-16 h-16 bg-primary-soft rounded-full opacity-0 group-hover:opacity-100 transition-opacity -z-10 scale-150"></div>
       </motion.div>
     );
   }
@@ -143,7 +143,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
           className="object-cover transition-transform group-hover:scale-110 duration-500"
         />
         <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-white/90 backdrop-blur-sm rounded-md shadow-sm">
-          <span className="text-[8px] font-black text-orange-600 uppercase tracking-wider">{item.category}</span>
+          <span className="text-[8px] font-black text-primary uppercase tracking-wider">{item.category}</span>
         </div>
       </motion.div>
 
@@ -153,7 +153,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
             <motion.h3 layoutId={`name-${item.id}`} className="font-bold text-gray-900 text-sm sm:text-lg leading-tight group-hover:text-orange-500 transition-colors">
               {item.name}
             </motion.h3>
-            <motion.div layoutId={`price-${item.id}`} className="font-black text-orange-600 text-sm sm:text-lg">
+            <motion.div layoutId={`price-${item.id}`} className="font-black text-primary text-sm sm:text-lg">
               {formatPrice(item.price)}
             </motion.div>
           </div>
@@ -165,7 +165,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
         </div>
         <ActionButtons {...actionProps} />
       </div>
-      <div className="absolute -right-4 -bottom-4 w-16 h-16 bg-orange-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity -z-10 scale-150"></div>
+      <div className="absolute -right-4 -bottom-4 w-16 h-16 bg-primary-soft rounded-full opacity-0 group-hover:opacity-100 transition-opacity -z-10 scale-150"></div>
     </motion.div>
   );
 }

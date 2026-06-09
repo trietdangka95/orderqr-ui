@@ -25,7 +25,7 @@ export default function DesktopSidebar() {
           <button
             key={cat.id}
             className={`flex items-center space-x-3 py-3 px-4 rounded-xl text-left transition-colors ${
-              index === 0 ? "bg-primary text-white shadow-md shadow-orange-200" : "bg-white text-gray-700 hover:bg-gray-50"
+              index === 0 ? "bg-primary text-white shadow-md shadow-primary" : "bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
             {/* Giả lập icon */}

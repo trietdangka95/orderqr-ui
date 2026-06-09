@@ -86,7 +86,7 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
     switch (role) {
       case "superadmin": return { color: "bg-gray-900", text: "Super Admin", icon: ShieldAlert, accent: "text-gray-900" };
       case "admin": return { color: "bg-purple-600", text: "Quản trị viên", icon: ShieldCheck, accent: "text-purple-600" };
-      case "kitchen": return { color: "bg-orange-500", text: "Bộ phận Bếp", icon: LogIn, accent: "text-orange-500" };
+      case "kitchen": return { color: "bg-primary", text: "Bộ phận Bếp", icon: LogIn, accent: "text-orange-500" };
       default: return { color: "bg-blue-600", text: "Nhân viên phục vụ", icon: UserCheck, accent: "text-blue-600" };
     }
   };
@@ -100,7 +100,7 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-orange-100/50 overflow-hidden border border-gray-100">
+        <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-primary/50 overflow-hidden border border-gray-100">
           {/* Header Area */}
           <div className={`p-8 transition-colors duration-500 flex flex-col items-center justify-center text-white relative ${theme.color}`}>
             <Link

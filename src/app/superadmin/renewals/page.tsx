@@ -179,7 +179,7 @@ export default function SuperAdminRenewalsPage() {
                   </div>
                   <div>
                     <span className="text-gray-400 block mb-0.5">Số tiền chuyển</span>
-                    <span className="text-orange-600 font-black">{Number(req.price).toLocaleString("vi-VN")} ₫</span>
+                    <span className="text-primary font-black">{Number(req.price).toLocaleString("vi-VN")} ₫</span>
                   </div>
                   <div className="col-span-2">
                     <span className="text-gray-400 block mb-0.5">Thời gian gửi</span>
@@ -264,7 +264,7 @@ export default function SuperAdminRenewalsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="font-black text-orange-600">
+                        <span className="font-black text-primary">
                           {Number(req.price).toLocaleString("vi-VN")} ₫
                         </span>
                       </td>

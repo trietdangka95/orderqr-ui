@@ -55,7 +55,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
     return (
       <motion.div
         layoutId={`product-${product.id}`}
-        className={`bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex flex-col w-full relative overflow-hidden group hover:shadow-xl transition-all duration-300 h-full ${product.isAvailable === false ? 'opacity-60 grayscale' : 'hover:shadow-orange-100/50'}`}
+        className={`bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex flex-col w-full relative overflow-hidden group hover:shadow-xl transition-all duration-300 h-full ${product.isAvailable === false ? 'opacity-60 grayscale' : 'hover:shadow-primary/50'}`}
       >
         {/* Badge Section */}
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
@@ -118,7 +118,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
                 handleAddToCart();
               }}
               disabled={product.isAvailable === false}
-              className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-lg active:scale-90 ${product.isAvailable === false ? 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed' : 'bg-primary text-white hover:bg-orange-600 shadow-orange-100'}`}
+              className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-lg active:scale-90 ${product.isAvailable === false ? 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed' : 'bg-primary text-white hover:bg-primary shadow-primary'}`}
             >
               <Plus className="w-6 h-6" strokeWidth={3} />
             </button>
@@ -191,7 +191,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
               handleAddToCart();
             }}
             disabled={product.isAvailable === false}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-lg active:scale-90 ${product.isAvailable === false ? 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed' : 'bg-primary text-white hover:bg-orange-600 shadow-orange-100'}`}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-lg active:scale-90 ${product.isAvailable === false ? 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed' : 'bg-primary text-white hover:bg-primary shadow-primary'}`}
           >
             <Plus className="w-5 h-5" strokeWidth={3} />
           </button>

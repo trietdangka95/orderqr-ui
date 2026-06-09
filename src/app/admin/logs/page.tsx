@@ -41,7 +41,7 @@ export default function LogsPage() {
         );
       case "UPDATE_ITEM_QUANTITY":
         return (
-          <span className="px-3 py-1 bg-orange-100 text-orange-700 border border-orange-200 rounded-full font-black text-[10px] uppercase tracking-wider">
+          <span className="px-3 py-1 bg-primary-soft text-orange-700 border border-orange-200 rounded-full font-black text-[10px] uppercase tracking-wider">
             Sửa số lượng
           </span>
         );
@@ -103,7 +103,7 @@ export default function LogsPage() {
             transition={{ delay: 0.2 }}
             className="bg-white p-6 rounded-[2rem] shadow-xl shadow-orange-50/50 border border-orange-50"
           >
-            <div className="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-orange-200">
+            <div className="w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-primary">
               <Clock size={24} />
             </div>
             <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Sửa đổi số lượng</p>

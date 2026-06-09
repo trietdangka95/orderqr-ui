@@ -99,9 +99,9 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white font-sans overflow-x-hidden relative selection:bg-orange-500 selection:text-white">
+    <div className="min-h-screen bg-gray-950 text-white font-sans overflow-x-hidden relative selection:bg-primary selection:text-white">
       {/* Background Glowing Blobs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-orange-600/10 blur-[120px] pointer-events-none animate-pulse"></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px] pointer-events-none animate-pulse"></div>
       <div className="absolute top-[30%] right-[-10%] w-[600px] h-[600px] rounded-full bg-red-600/5 blur-[150px] pointer-events-none animate-pulse delay-1000"></div>
       <div className="absolute bottom-[10%] left-[20%] w-[500px] h-[500px] rounded-full bg-amber-600/5 blur-[120px] pointer-events-none animate-pulse delay-700"></div>
 
@@ -201,7 +201,7 @@ export default function LandingPage() {
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-500 text-xs font-black tracking-widest uppercase mb-6"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-orange-500/30 bg-primary/10 text-orange-500 text-xs font-black tracking-widest uppercase mb-6"
             >
               <Sparkles size={14} className="animate-spin-slow" />
               Giải Pháp Số Hóa Nhà Hàng 2026
@@ -319,7 +319,7 @@ export default function LandingPage() {
                     <div className="bg-white pt-6 pb-3 px-3 border-b border-gray-100 flex flex-col gap-2 shrink-0">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-[10px] font-black text-white overflow-hidden shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-[10px] font-black text-white overflow-hidden shrink-0">
                             🥣
                           </div>
                           <div className="text-left">
@@ -332,7 +332,7 @@ export default function LandingPage() {
 
                       {/* Category tabs */}
                       <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[8px] font-black uppercase tracking-wider">
-                        <span className="px-2 py-1 bg-orange-500 text-white rounded-full">Món chính</span>
+                        <span className="px-2 py-1 bg-primary text-white rounded-full">Món chính</span>
                         <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Nước uống</span>
                         <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Tráng miệng</span>
                       </div>
@@ -359,7 +359,7 @@ export default function LandingPage() {
                           </div>
                           <div className="flex items-end justify-between mt-1">
                             <span className="text-[10px] font-black text-orange-500">65.000 đ</span>
-                            <button className="w-5 h-5 rounded-lg bg-orange-500 text-white flex items-center justify-center active:scale-90">
+                            <button className="w-5 h-5 rounded-lg bg-primary text-white flex items-center justify-center active:scale-90">
                               <Plus className="w-3 h-3" strokeWidth={3} />
                             </button>
                           </div>
@@ -377,7 +377,7 @@ export default function LandingPage() {
                           </div>
                           <div className="flex items-end justify-between mt-1">
                             <span className="text-[10px] font-black text-orange-500">30.000 đ</span>
-                            <button className="w-5 h-5 rounded-lg bg-orange-500 text-white flex items-center justify-center active:scale-90">
+                            <button className="w-5 h-5 rounded-lg bg-primary text-white flex items-center justify-center active:scale-90">
                               <Plus className="w-3 h-3" strokeWidth={3} />
                             </button>
                           </div>
@@ -387,7 +387,7 @@ export default function LandingPage() {
 
                     {/* Order button */}
                     <div className="pt-2 border-t border-gray-100 bg-white p-3 shrink-0">
-                      <div className="w-full py-2 bg-orange-500 rounded-xl text-[10px] font-black text-white flex items-center justify-center gap-1 shadow-lg shadow-orange-100 active:scale-98">
+                      <div className="w-full py-2 bg-primary rounded-xl text-[10px] font-black text-white flex items-center justify-center gap-1 shadow-lg shadow-primary active:scale-98">
                         Gửi Đơn Vào Bếp (2 Món)
                       </div>
                     </div>
@@ -424,7 +424,7 @@ export default function LandingPage() {
                             </div>
                           </div>
                         </div>
-                        <button className="w-full mt-3 py-1.5 bg-orange-500 text-white rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-orange-600 transition-all">
+                        <button className="w-full mt-3 py-1.5 bg-primary text-white rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-primary transition-all">
                           Xong Hết Món
                         </button>
                       </div>
@@ -442,7 +442,7 @@ export default function LandingPage() {
                             </div>
                           </div>
                         </div>
-                        <button className="w-full mt-3 py-1.5 bg-orange-500 text-white rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-orange-600 transition-all">
+                        <button className="w-full mt-3 py-1.5 bg-primary text-white rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-primary transition-all">
                           Xong Hết Món
                         </button>
                       </div>
@@ -469,7 +469,7 @@ export default function LandingPage() {
                     </div>
                     <div className="flex-grow flex bg-gray-950 text-left">
                       <div className="w-24 bg-gray-900/60 border-r border-white/5 p-2 space-y-1 font-bold shrink-0">
-                        <div className="px-2 py-1 bg-orange-500/10 text-orange-500 rounded flex items-center gap-1">
+                        <div className="px-2 py-1 bg-primary/10 text-orange-500 rounded flex items-center gap-1">
                           📊 Dashboard
                         </div>
                         <div className="px-2 py-1 text-gray-500 hover:text-gray-300 rounded flex items-center gap-1">
@@ -582,19 +582,19 @@ export default function LandingPage() {
                 {showcaseTab === "menu" && (
                   <>
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">Không lo trễ đơn, nhầm bàn ăn trong giờ cao điểm</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">Tiết kiệm chi phí in ấn và thiết kế thực đơn giấy</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">Hình ảnh món ăn sinh động giúp kích thích gọi món nhiều hơn</span>
@@ -604,19 +604,19 @@ export default function LandingPage() {
                 {showcaseTab === "kitchen" && (
                   <>
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">Đồng bộ tức thời theo thời gian thực từ bàn đến bếp</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">Hiển thị rõ ràng các ghi chú đặc biệt (ít cay, không hành...)</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">Quản lý và cập nhật trạng thái chế biến món ăn dễ dàng</span>
@@ -626,19 +626,19 @@ export default function LandingPage() {
                 {showcaseTab === "admin" && (
                   <>
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">Báo cáo doanh số trực quan bằng biểu đồ chi tiết theo ngày/tuần</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">Chỉnh sửa thực đơn, món ăn và giá bán linh hoạt chỉ trong 3 giây</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">
+                      <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">Quản lý sơ đồ bàn ăn thực tế tương thích với hoạt động của quán</span>
@@ -670,7 +670,7 @@ export default function LandingPage() {
               whileHover={{ y: -6, borderColor: "rgba(249, 115, 22, 0.3)" }}
               className="bg-gray-900/20 border border-white/5 rounded-3xl p-8 backdrop-blur-xl transition-all duration-300 group"
             >
-              <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 {feature.icon}
               </div>
               <h4 className="text-lg font-black text-white group-hover:text-orange-500 transition-colors">
@@ -699,9 +699,9 @@ export default function LandingPage() {
               <div
                 key={idx}
                 onClick={() => setActiveStep(idx)}
-                className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 flex gap-4 ${activeStep === idx ? 'bg-orange-500/10 border-orange-500' : 'bg-gray-900/10 border-white/5 hover:border-white/10'}`}
+                className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 flex gap-4 ${activeStep === idx ? 'bg-primary/10 border-orange-500' : 'bg-gray-900/10 border-white/5 hover:border-white/10'}`}
               >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm shrink-0 ${activeStep === idx ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400'}`}>
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm shrink-0 ${activeStep === idx ? 'bg-primary text-white' : 'bg-gray-800 text-gray-400'}`}>
                   {idx + 1}
                 </div>
                 <div className="text-left">
@@ -714,7 +714,7 @@ export default function LandingPage() {
 
           <div className="lg:col-span-7 aspect-[16/10] bg-gray-900/30 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-2xl flex items-center justify-center min-h-[360px]">
             {/* Background glowing sphere inside box */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
 
             <AnimatePresence mode="wait">
               <motion.div
@@ -731,7 +731,7 @@ export default function LandingPage() {
                       animate={{ rotate: 0 }}
                       className="bg-white p-5 rounded-2xl shadow-2xl border border-gray-100 flex flex-col items-center justify-center w-[160px] h-[220px] text-gray-900 relative shrink-0"
                     >
-                      <div className="w-full py-1 bg-orange-500 text-white text-[7px] font-black rounded uppercase mb-2">QUÉT MÃ GỌI MÓN</div>
+                      <div className="w-full py-1 bg-primary text-white text-[7px] font-black rounded uppercase mb-2">QUÉT MÃ GỌI MÓN</div>
                       <div className="p-1.5 border border-gray-100 rounded-xl bg-gray-50 flex items-center justify-center mb-2">
                         <QrCode size={70} className="text-gray-900" />
                       </div>
@@ -771,7 +771,7 @@ export default function LandingPage() {
                         </div>
                       </div>
                       <div className="p-2 bg-white border-t border-gray-100">
-                        <div className="w-full py-1.5 bg-orange-500 text-white rounded-lg text-[7px] font-black uppercase tracking-wider text-center animate-pulse">
+                        <div className="w-full py-1.5 bg-primary text-white rounded-lg text-[7px] font-black uppercase tracking-wider text-center animate-pulse">
                           Xác Nhận Đặt Món
                         </div>
                       </div>
@@ -910,7 +910,7 @@ export default function LandingPage() {
           {/* Premium Package */}
           <div className="bg-gray-900/20 border-2 border-orange-500 rounded-[2rem] p-8 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden shadow-2xl shadow-orange-950/20 group">
             {/* Pop tag */}
-            <div className="absolute top-0 right-0 px-4 py-1.5 bg-orange-500 text-white text-[9px] font-black uppercase tracking-widest rounded-bl-xl shadow-lg">
+            <div className="absolute top-0 right-0 px-4 py-1.5 bg-primary text-white text-[9px] font-black uppercase tracking-widest rounded-bl-xl shadow-lg">
               Phổ Biến Nhất
             </div>
 
@@ -973,7 +973,7 @@ export default function LandingPage() {
           <div className="mt-8 relative z-10 w-full sm:w-auto">
             <a
               href="#pricing"
-              className="w-full sm:w-auto px-8 py-4 bg-white text-orange-600 hover:bg-gray-100 rounded-2xl text-base font-black shadow-xl hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-4 bg-white text-primary hover:bg-gray-100 rounded-2xl text-base font-black shadow-xl hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
             >
               Xem Bảng Giá & Đăng Ký
               <ArrowRight size={18} />
@@ -987,7 +987,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 items-start">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
                 <ChefHat size={16} />
               </div>
               <span className="text-base font-black text-white tracking-tight">MENU VIỆT</span>

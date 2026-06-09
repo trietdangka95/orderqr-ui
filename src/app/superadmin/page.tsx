@@ -49,8 +49,8 @@ export default function SuperAdminDashboard() {
       label: "Total Revenue", 
       value: statsLoading ? "..." : formatCurrency(statsData?.totalRevenue || 0), 
       icon: TrendingUp, 
-      color: "text-orange-600", 
-      bg: "bg-orange-50" 
+      color: "text-primary", 
+      bg: "bg-primary-soft" 
     },
   ];
 

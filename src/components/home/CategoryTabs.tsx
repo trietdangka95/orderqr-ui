@@ -20,8 +20,8 @@ export default function CategoryTabs({
             onClick={() => onTabChange(cat)}
             className={`px-5 py-2.5 rounded-xl font-bold whitespace-nowrap transition-all shadow-sm cursor-pointer text-sm ${
               activeTab === cat
-                ? "bg-primary text-white shadow-lg shadow-orange-200"
-                : "bg-white text-gray-500 hover:bg-orange-50 hover:text-primary border border-gray-100"
+                ? "bg-primary text-white shadow-lg shadow-primary"
+                : "bg-white text-gray-500 hover:bg-primary-soft hover:text-primary border border-gray-100"
             }`}
           >
             {cat}

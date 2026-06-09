@@ -46,7 +46,7 @@ export default function HomeHeader({
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 md:w-12 md:h-12 bg-primary rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-orange-100 rotate-3">
+          <div className="w-9 h-9 md:w-12 md:h-12 bg-primary rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-primary rotate-3">
             <Soup className="text-white w-5 h-5 md:w-7 md:h-7" />
           </div>
           <div>
@@ -82,11 +82,11 @@ export default function HomeHeader({
               />
             </button>
           ) : (
-            <div className="bg-orange-50 border-2 border-orange-100 px-4 md:px-6 py-2 rounded-xl flex items-center justify-center shadow-sm gap-2">
-              <span className="text-[10px] md:text-xs text-orange-600 font-bold uppercase tracking-wider hidden md:inline-block">
+            <div className="bg-primary-soft border-2 border-primary px-4 md:px-6 py-2 rounded-xl flex items-center justify-center shadow-sm gap-2">
+              <span className="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider hidden md:inline-block">
                 Bàn số
               </span>
-              <span className="text-[10px] md:text-xs text-orange-600 font-bold uppercase tracking-wider md:hidden mb-0.5">
+              <span className="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider md:hidden mb-0.5">
                 Bàn
               </span>
               <span className="font-black text-xl md:text-2xl text-primary leading-none">
@@ -144,7 +144,7 @@ export default function HomeHeader({
 
           <button
             onClick={toggleCart}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white hover:bg-orange-600 transition-all font-bold text-sm shadow-lg shadow-orange-100 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary transition-all font-bold text-sm shadow-lg shadow-primary cursor-pointer"
           >
             <ShoppingBag size={18} />
             <span>Giỏ hàng</span>

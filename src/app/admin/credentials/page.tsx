@@ -55,7 +55,7 @@ export default function CredentialsPage() {
   const getRoleInfo = () => {
     switch (userRole) {
       case "admin": return { text: "Quản trị viên", color: "bg-gray-900", icon: ShieldCheck };
-      case "kitchen": return { text: "Nhà bếp", color: "bg-orange-500", icon: ShieldCheck };
+      case "kitchen": return { text: "Nhà bếp", color: "bg-primary", icon: ShieldCheck };
       case "staff": return { text: "Nhân viên", color: "bg-blue-600", icon: ShieldCheck };
       default: return { text: "Người dùng", color: "bg-gray-500", icon: ShieldCheck };
     }

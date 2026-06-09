@@ -160,7 +160,7 @@ export default function CartDrawer() {
             <button
               onClick={handleCheckout}
               disabled={createOrder.isPending}
-              className="w-full bg-primary text-white font-bold text-lg py-3.5 rounded-xl shadow-lg shadow-orange-200 hover:bg-orange-600 transition-transform active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+              className="w-full bg-primary text-white font-bold text-lg py-3.5 rounded-xl shadow-lg shadow-primary hover:bg-primary transition-transform active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
             >
               {createOrder.isPending ? (
                 <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />

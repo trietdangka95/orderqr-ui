@@ -175,7 +175,7 @@ export default function AdminTablesPage() {
                   />
                   <button
                     type="submit"
-                    className="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-orange-600 transition-all active:scale-95"
+                    className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary transition-all active:scale-95"
                   >
                     Thêm bàn
                   </button>

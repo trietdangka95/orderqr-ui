@@ -213,7 +213,7 @@ function HomeContent() {
       <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-center items-center p-6 relative overflow-hidden">
         {/* Background Decorative Gradients for Wow Factor */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary opacity-10 rounded-full blur-3xl filter animate-pulse"></div>
-        <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-orange-500 opacity-10 rounded-full blur-3xl filter animate-pulse delay-700"></div>
+        <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-primary opacity-10 rounded-full blur-3xl filter animate-pulse delay-700"></div>
 
         <div className="text-center space-y-4 relative z-10">
           <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-primary animate-spin">
@@ -235,7 +235,7 @@ function HomeContent() {
       <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between p-6 relative overflow-hidden">
         {/* Background Decorative Gradients for Wow Factor */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary opacity-10 rounded-full blur-3xl filter animate-pulse"></div>
-        <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-orange-500 opacity-10 rounded-full blur-3xl filter animate-pulse delay-700"></div>
+        <div className="absolute bottom-10 right-1/4 w-96 h-96 bg-primary opacity-10 rounded-full blur-3xl filter animate-pulse delay-700"></div>
 
         {/* Header */}
         <header className="flex flex-col items-center text-center mt-12 space-y-4 relative z-10">
@@ -408,7 +408,7 @@ function HomeContent() {
               {userRole === "kitchen" && (
                 <Link
                   href="/admin/kitchen"
-                  className="text-orange-500 hover:text-orange-600 font-bold text-sm flex items-center justify-center gap-2 transition-colors"
+                  className="text-orange-500 hover:text-primary font-bold text-sm flex items-center justify-center gap-2 transition-colors"
                 >
                   <LayoutDashboard size={16} />
                   Vào Bếp

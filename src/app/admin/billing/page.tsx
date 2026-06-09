@@ -142,7 +142,7 @@ export default function AdminBillingPage() {
               <div>
                 <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
                   storeConfig?.subscriptionPlan === "PREMIUM" 
-                    ? "bg-orange-100 text-orange-600 border border-orange-200" 
+                    ? "bg-primary-soft text-primary border border-orange-200" 
                     : "bg-gray-100 text-gray-600 border border-gray-200"
                 }`}>
                   Gói {storeConfig?.subscriptionPlan || "FREE"}
@@ -225,7 +225,7 @@ export default function AdminBillingPage() {
           </h3>
 
           {/* Test Mode Toggle */}
-          <div className="flex items-center gap-3 bg-orange-50 border border-orange-100 px-4 py-2 rounded-2xl shrink-0">
+          <div className="flex items-center gap-3 bg-primary-soft border border-primary px-4 py-2 rounded-2xl shrink-0">
             <span className="text-xs font-bold text-orange-700">Chế độ test (phút)</span>
             <label className="relative inline-flex items-center cursor-pointer">
               <input 
@@ -237,7 +237,7 @@ export default function AdminBillingPage() {
                 }}
                 className="sr-only peer" 
               />
-              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-500"></div>
+              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
         </div>
@@ -247,7 +247,7 @@ export default function AdminBillingPage() {
             <div 
               key={pkg.months} 
               className={`bg-white rounded-3xl border-2 p-6 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:border-primary/40 transition-all ${
-                pkg.popular ? "border-primary shadow-orange-100/50" : "border-gray-100"
+                pkg.popular ? "border-primary shadow-primary/50" : "border-gray-100"
               }`}
             >
               {pkg.popular && (
@@ -273,7 +273,7 @@ export default function AdminBillingPage() {
                 onClick={() => handleOpenModal(pkg)}
                 className={`w-full mt-6 py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] ${
                   pkg.popular 
-                    ? "bg-primary text-white shadow-lg shadow-orange-200 hover:bg-orange-600" 
+                    ? "bg-primary text-white shadow-lg shadow-primary hover:bg-primary" 
                     : "bg-gray-50 border border-gray-100 text-gray-700 hover:bg-gray-100"
                 }`}
               >
@@ -319,7 +319,7 @@ export default function AdminBillingPage() {
                       <td className="px-6 py-4 font-bold">
                         {req.months} {req.notes?.includes('[TEST_MINUTES]') ? 'phút (test)' : 'tháng'}
                       </td>
-                      <td className="px-6 py-4 font-black text-orange-600">
+                      <td className="px-6 py-4 font-black text-primary">
                         {Number(req.price).toLocaleString("vi-VN")} ₫
                       </td>
                       <td className="px-6 py-4 text-xs font-semibold text-gray-500">
@@ -371,7 +371,7 @@ export default function AdminBillingPage() {
             </div>
 
             <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
-              <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 flex flex-col items-center gap-3">
+              <div className="bg-primary-soft border border-primary rounded-2xl p-4 flex flex-col items-center gap-3">
                 <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Chuyển khoản VietQR đến hệ thống</p>
                 <div className="w-44 h-44 bg-white border border-gray-200/60 rounded-xl flex items-center justify-center p-2 relative shadow-md">
                   <img
@@ -393,7 +393,7 @@ export default function AdminBillingPage() {
                     <span className="font-bold text-gray-800">{superAdminBankAcc}</span>
                     <button 
                       onClick={() => handleCopy(superAdminBankAcc, "Số tài khoản")}
-                      className="text-primary hover:text-orange-600 transition-colors"
+                      className="text-primary hover:text-primary transition-colors"
                     >
                       <Copy size={12} />
                     </button>
@@ -406,10 +406,10 @@ export default function AdminBillingPage() {
                 <div className="flex justify-between border-b border-gray-200/50 pb-1.5 items-center">
                   <span className="text-gray-400 font-bold">Nội dung chuyển khoản</span>
                   <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-orange-600">GIAHAN {storeConfig?.slug} {selectedPkg.months} {isTestMode ? 'PHUT' : 'THANG'}</span>
+                    <span className="font-bold text-primary">GIAHAN {storeConfig?.slug} {selectedPkg.months} {isTestMode ? 'PHUT' : 'THANG'}</span>
                     <button 
                       onClick={() => handleCopy(`GIAHAN ${storeConfig?.slug} ${selectedPkg.months} ${isTestMode ? 'PHUT' : 'THANG'}`, "Nội dung chuyển khoản")}
-                      className="text-primary hover:text-orange-600 transition-colors"
+                      className="text-primary hover:text-primary transition-colors"
                     >
                       <Copy size={12} />
                     </button>
@@ -417,7 +417,7 @@ export default function AdminBillingPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400 font-bold">Số tiền chuyển</span>
-                  <span className="font-black text-orange-600 text-sm">{selectedPkg.price.toLocaleString("vi-VN")} ₫</span>
+                  <span className="font-black text-primary text-sm">{selectedPkg.price.toLocaleString("vi-VN")} ₫</span>
                 </div>
               </div>
 
@@ -446,7 +446,7 @@ export default function AdminBillingPage() {
               <button
                 disabled={createRequestMutation.isPending}
                 onClick={handleSubmitRenewal}
-                className="flex-1 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-orange-600 shadow-lg shadow-orange-100 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                className="flex-1 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary shadow-lg shadow-primary transition-all active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 {createRequestMutation.isPending ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

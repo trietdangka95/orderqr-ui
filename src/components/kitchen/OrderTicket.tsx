@@ -43,7 +43,7 @@ export default function OrderTicket({ order, onAdvance }: OrderTicketProps) {
                 </div>
               </div>
               {item.note && (
-                <div className="ml-10 text-[10px] bg-orange-50/70 border border-orange-100/60 text-orange-600 px-2.5 py-1.5 rounded-xl font-bold italic self-start leading-relaxed">
+                <div className="ml-10 text-[10px] bg-primary-soft/70 border border-primary/60 text-primary px-2.5 py-1.5 rounded-xl font-bold italic self-start leading-relaxed">
                   {item.note}
                 </div>
               )}
@@ -61,7 +61,7 @@ export default function OrderTicket({ order, onAdvance }: OrderTicketProps) {
           {order.status === "pending" && (
             <button
               onClick={onAdvance}
-              className="flex items-center gap-2 bg-orange-500 text-white px-5 py-3 rounded-2xl hover:bg-orange-600 transition-all active:scale-95 shadow-lg shadow-orange-200"
+              className="flex items-center gap-2 bg-primary text-white px-5 py-3 rounded-2xl hover:bg-primary transition-all active:scale-95 shadow-lg shadow-primary"
             >
               <ArrowRight size={16} strokeWidth={3} />
               <span className="font-black text-[10px] uppercase tracking-widest">Chế biến</span>

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Store as StoreData, superAdminApi } from "@/api/superadmin";
 
 export const THEME_PALETTES = [
-  { name: "Hỏa - Cam Tiêu Chuẩn", color: "#f97316", bgClass: "bg-orange-500", element: "Hỏa" },
+  { name: "Hỏa - Cam Tiêu Chuẩn", color: "#f97316", bgClass: "bg-primary", element: "Hỏa" },
   { name: "Hỏa - Đỏ Nồng Nhiệt", color: "#dc2626", bgClass: "bg-red-600", element: "Hỏa" },
   { name: "Kim - Vàng Hoàng Kim", color: "#d4af37", bgClass: "bg-[#d4af37]", element: "Kim" },
   { name: "Mộc - Xanh Lá Mạ", color: "#22c55e", bgClass: "bg-green-500", element: "Mộc" },

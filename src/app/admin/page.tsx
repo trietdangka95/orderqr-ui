@@ -53,7 +53,7 @@ export default function AdminDashboard() {
           value={new Set(orders.map(o => o.tableNumber)).size}
           label="Bàn đang phục vụ"
           colorClass="text-orange-500"
-          bgClass="bg-orange-50"
+          bgClass="bg-primary-soft"
         />
         <AdminStatCard
           href="/admin/menu"

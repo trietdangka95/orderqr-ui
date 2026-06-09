@@ -111,7 +111,7 @@ export default function KitchenPage() {
 
   const columns: { status: OrderStatus; title: string; color: string; dot: string }[] = [
     { status: "pending", title: "Đợi xác nhận", dot: "bg-red-500", color: "bg-white border-t-red-500 shadow-red-100" },
-    { status: "cooking", title: "Đang chế biến", dot: "bg-orange-500", color: "bg-white border-t-orange-500 shadow-orange-100" },
+    { status: "cooking", title: "Đang chế biến", dot: "bg-primary", color: "bg-white border-t-orange-500 shadow-primary" },
     { status: "serving", title: "Chờ phục vụ", dot: "bg-blue-500", color: "bg-white border-t-blue-500 shadow-blue-100" },
     { status: "completed", title: "Hoàn thành", dot: "bg-green-500", color: "bg-white border-t-green-500 shadow-green-100" },
   ];

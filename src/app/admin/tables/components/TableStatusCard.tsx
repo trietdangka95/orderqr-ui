@@ -47,7 +47,7 @@ export default function TableStatusCard({
             ? "bg-amber-50/40"
             : hasUnconfirmed
             ? "bg-red-50"
-            : "bg-orange-50/50"
+            : "bg-primary-soft/50"
         }`}
       >
         <div className="flex items-center gap-3">
@@ -57,7 +57,7 @@ export default function TableStatusCard({
                 ? "bg-amber-500 shadow-amber-200 animate-pulse"
                 : hasUnconfirmed
                 ? "bg-red-500 shadow-red-200"
-                : "bg-orange-500 shadow-orange-200"
+                : "bg-primary shadow-primary"
             }`}
           >
             {tableNumber}
@@ -85,7 +85,7 @@ export default function TableStatusCard({
         </div>
         <div className="text-right">
           <div className="text-xs text-gray-400 uppercase font-bold tracking-wider">Tổng cộng</div>
-          <div className="text-lg font-black text-orange-600">{formatPrice(totalAmount)}</div>
+          <div className="text-lg font-black text-primary">{formatPrice(totalAmount)}</div>
         </div>
       </div>
  
@@ -139,7 +139,7 @@ export default function TableStatusCard({
                       ? "bg-amber-100 text-amber-700"
                       : order.status === "completed"
                       ? "bg-green-100 text-green-600"
-                      : "bg-orange-100 text-orange-600"
+                      : "bg-primary-soft text-primary"
                   }`}
                 >
                   {pendingInvoice ? "Chờ duyệt chi" : order.status === "completed" ? "Đã phục vụ" : "Đang xử lý"}

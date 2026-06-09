@@ -51,7 +51,7 @@ export default function UserPasswordManager() {
             >
               <div className="flex items-center gap-4">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white ${
-                  user.role?.toUpperCase() === 'KITCHEN' ? "bg-orange-500" : "bg-blue-600"
+                  user.role?.toUpperCase() === 'KITCHEN' ? "bg-primary" : "bg-blue-600"
                 }`}>
                   {user.role?.toUpperCase() === 'KITCHEN' ? <Key size={20} /> : <UserCircle size={20} />}
                 </div>

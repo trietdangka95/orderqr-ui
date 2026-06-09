@@ -103,9 +103,9 @@ export default function RevenuePage() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white p-6 rounded-[2rem] shadow-xl shadow-orange-100/50 border border-orange-50"
+            className="bg-white p-6 rounded-[2rem] shadow-xl shadow-primary/50 border border-orange-50"
           >
-            <div className="w-12 h-12 bg-orange-500 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-orange-200">
+            <div className="w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-primary">
               <TrendingUp size={24} />
             </div>
             <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Tổng doanh thu</p>

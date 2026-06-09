@@ -197,13 +197,13 @@ export default function OrdersDrawer() {
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
           {/* Cumulative Subtotal Banner */}
           {selectedTable && tableOrders.length > 0 && (
-            <div className="bg-orange-50 border border-orange-100 rounded-2xl p-4 flex justify-between items-center mb-2 shadow-sm">
+            <div className="bg-primary-soft border border-primary rounded-2xl p-4 flex justify-between items-center mb-2 shadow-sm">
               <div>
                 <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Tổng tạm tính (Chưa thanh toán)</p>
                 <p className="text-[10px] text-gray-400 font-bold mt-0.5">Bao gồm {tableOrders.length} đợt gọi món</p>
               </div>
               <div className="text-right">
-                <p className="text-xl font-black text-orange-600">{tableTotal.toLocaleString("vi-VN")} ₫</p>
+                <p className="text-xl font-black text-primary">{tableTotal.toLocaleString("vi-VN")} ₫</p>
               </div>
             </div>
           )}
@@ -220,7 +220,7 @@ export default function OrdersDrawer() {
                   <div key={name} className="flex items-center justify-between bg-white/60 p-2 rounded-xl text-sm">
                     <span className="font-bold text-gray-700">{name} <span className="text-blue-500">x{data.quantity}</span></span>
                     <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase ${data.status === "pending" ? "bg-red-100 text-red-600" :
-                      data.status === "cooking" ? "bg-orange-100 text-orange-600" :
+                      data.status === "cooking" ? "bg-primary-soft text-primary" :
                         "bg-blue-100 text-blue-600"
                       }`}>
                       {data.status === "pending" ? "Chờ làm" : data.status === "cooking" ? "Đang nấu" : "Xong"}
@@ -241,7 +241,7 @@ export default function OrdersDrawer() {
           ) : (
             displayOrders.map((order, index) => (
               <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:border-primary/20 transition-all">
-                <div className={`px-4 py-3 border-b border-gray-100 flex justify-between items-center ${!order.isConfirmed ? "bg-red-50" : order.status === "serving" ? "bg-blue-50" : "bg-orange-50/50"}`}>
+                <div className={`px-4 py-3 border-b border-gray-100 flex justify-between items-center ${!order.isConfirmed ? "bg-red-50" : order.status === "serving" ? "bg-blue-50" : "bg-primary-soft/50"}`}>
                   <div className="flex items-center gap-2">
                     {(activeTab === "all" || activeTab === "serving") && (
                       <span className="bg-primary text-white px-2 py-0.5 rounded text-[10px] font-black uppercase">Bàn {order.tableNumber}</span>
@@ -272,7 +272,7 @@ export default function OrdersDrawer() {
                         }`}>
                         <Clock className="w-4 h-4" />
                       </div>
-                      <span className={`text-[10px] font-bold ${!order.isConfirmed ? "text-red-600" : order.status === "pending" ? "text-orange-600" : "text-gray-400"}`}>
+                      <span className={`text-[10px] font-bold ${!order.isConfirmed ? "text-red-600" : order.status === "pending" ? "text-primary" : "text-gray-400"}`}>
                         {!order.isConfirmed ? "Xác nhận" : "Bếp nhận"}
                       </span>
                     </div>
@@ -280,11 +280,11 @@ export default function OrdersDrawer() {
                     <div className="flex flex-col items-center gap-1.5">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${order.status === "pending" ? "bg-white border-2 border-gray-200 text-gray-300" :
                         order.status === "cooking" ? "bg-white border-2 border-orange-500 text-orange-500 animate-pulse" :
-                          "bg-orange-500 text-white"
+                          "bg-primary text-white"
                         }`}>
                         <ChefHat className="w-4 h-4" />
                       </div>
-                      <span className={`text-[10px] font-bold ${order.status === "cooking" ? "text-orange-600" : "text-gray-400"}`}>Đang nấu</span>
+                      <span className={`text-[10px] font-bold ${order.status === "cooking" ? "text-primary" : "text-gray-400"}`}>Đang nấu</span>
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5">
@@ -470,7 +470,7 @@ export default function OrdersDrawer() {
                           <div className="flex justify-between border-b border-gray-50 pb-1.5 items-center">
                             <span className="text-gray-400">Nội dung CK</span>
                             <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-orange-600">Ban {selectedTable} Thanh Toan</span>
+                              <span className="font-bold text-primary">Ban {selectedTable} Thanh Toan</span>
                               <button
                                 onClick={() => {
                                   navigator.clipboard.writeText(`Ban ${selectedTable} Thanh Toan`);
@@ -484,7 +484,7 @@ export default function OrdersDrawer() {
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-400">Tổng tiền</span>
-                            <span className="font-black text-orange-600 text-sm">{tableTotal.toLocaleString("vi-VN")} ₫</span>
+                            <span className="font-black text-primary text-sm">{tableTotal.toLocaleString("vi-VN")} ₫</span>
                           </div>
                         </div>
                         <p className="text-[10px] text-gray-400 font-bold leading-normal px-2 mt-1">
@@ -502,7 +502,7 @@ export default function OrdersDrawer() {
                     <Coins size={36} className="mx-auto text-amber-500 animate-bounce" />
                     <p className="font-bold text-gray-800 text-sm">Thanh toán Tiền mặt</p>
                     <p className="leading-relaxed text-gray-500">
-                      Vui lòng chuẩn bị sẵn số tiền <span className="font-black text-orange-600 text-sm">{tableTotal.toLocaleString("vi-VN")} ₫</span>. 
+                      Vui lòng chuẩn bị sẵn số tiền <span className="font-black text-primary text-sm">{tableTotal.toLocaleString("vi-VN")} ₫</span>. 
                       Nhân viên phục vụ đang đến bàn của bạn để thu tiền và hoàn tất thanh toán.
                     </p>
                   </div>
@@ -513,11 +513,11 @@ export default function OrdersDrawer() {
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Tổng tiền</span>
-                  <span className="text-base font-black text-orange-600">{tableTotal.toLocaleString("vi-VN")} ₫</span>
+                  <span className="text-base font-black text-primary">{tableTotal.toLocaleString("vi-VN")} ₫</span>
                 </div>
                 <button
                   onClick={() => setIsCheckoutMode(true)}
-                  className="flex-1 bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-orange-100 hover:bg-orange-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
+                  className="flex-1 bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-primary hover:bg-primary active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
                 >
                   <CreditCard size={18} />
                   Thanh toán hóa đơn
@@ -544,7 +544,7 @@ export default function OrdersDrawer() {
                     onClick={() => setSelectedPayment("CASH")}
                     className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-2 group ${
                       selectedPayment === "CASH"
-                        ? "border-primary bg-orange-50/20 text-primary"
+                        ? "border-primary bg-primary-soft/20 text-primary"
                         : "border-gray-100 hover:border-gray-200 text-gray-500"
                     }`}
                   >
@@ -557,7 +557,7 @@ export default function OrdersDrawer() {
                     onClick={() => setSelectedPayment("QR_TRANSFER")}
                     className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-2 group disabled:opacity-50 ${
                       selectedPayment === "QR_TRANSFER"
-                        ? "border-primary bg-orange-50/20 text-primary"
+                        ? "border-primary bg-primary-soft/20 text-primary"
                         : "border-gray-100 hover:border-gray-200 text-gray-500"
                     }`}
                   >
@@ -567,7 +567,7 @@ export default function OrdersDrawer() {
                 </div>
 
                 {selectedPayment === "QR_TRANSFER" && (
-                  <div className="border border-orange-100 rounded-xl p-3 bg-orange-50/30 text-[11px] font-medium text-orange-800 leading-normal flex gap-2">
+                  <div className="border border-primary rounded-xl p-3 bg-primary-soft/30 text-[11px] font-medium text-orange-800 leading-normal flex gap-2">
                     <Sparkles size={16} className="shrink-0 text-orange-500 mt-0.5" />
                     <span>
                       Hệ thống tự động tạo mã QR chuyển tiền đến tài khoản của quán.
@@ -593,7 +593,7 @@ export default function OrdersDrawer() {
                       }
                     });
                   }}
-                  className="w-full bg-primary disabled:opacity-50 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-100 hover:bg-orange-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
+                  className="w-full bg-primary disabled:opacity-50 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-primary hover:bg-primary active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
                 >
                   {requestCheckoutMutation.isPending ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
