@@ -23,7 +23,14 @@ export default function StoreManagementPage() {
     adminUsername: "admin",
     adminPassword: "",
     themeColor: "#f97316",
-    currency: "VND"
+    currency: "VND",
+    logo: null as string | null,
+    subscriptionPlan: "FREE" as "FREE" | "PREMIUM",
+    subscriptionStatus: "ACTIVE",
+    subscriptionStart: new Date().toISOString().split("T")[0],
+    subscriptionEnd: "",
+    subscriptionPrice: 0,
+    subscriptionNotes: "",
   });
 
   const [editingStoreId, setEditingStoreId] = useState<string | null>(null);
@@ -53,6 +60,13 @@ export default function StoreManagementPage() {
           name: modalFormData.name,
           themeColor: modalFormData.themeColor,
           currency: modalFormData.currency,
+          logo: modalFormData.logo,
+          subscriptionPlan: modalFormData.subscriptionPlan,
+          subscriptionStatus: modalFormData.subscriptionStatus,
+          subscriptionStart: modalFormData.subscriptionStart ? new Date(modalFormData.subscriptionStart).toISOString() : null,
+          subscriptionEnd: modalFormData.subscriptionEnd ? new Date(modalFormData.subscriptionEnd).toISOString() : null,
+          subscriptionPrice: Number(modalFormData.subscriptionPrice),
+          subscriptionNotes: modalFormData.subscriptionNotes,
           ...(modalFormData.adminUsername && { adminUsername: modalFormData.adminUsername.trim() }),
           ...(modalFormData.adminPassword && { adminPassword: modalFormData.adminPassword }),
         }
@@ -69,6 +83,9 @@ export default function StoreManagementPage() {
     } else {
       createStoreMutation.mutate({
         ...modalFormData,
+        subscriptionStart: modalFormData.subscriptionStart ? new Date(modalFormData.subscriptionStart).toISOString() : null,
+        subscriptionEnd: modalFormData.subscriptionEnd ? new Date(modalFormData.subscriptionEnd).toISOString() : null,
+        subscriptionPrice: Number(modalFormData.subscriptionPrice),
         adminUsername: modalFormData.adminUsername.trim()
       }, {
         onSuccess: () => {
@@ -89,7 +106,14 @@ export default function StoreManagementPage() {
       adminUsername: "admin",
       adminPassword: "",
       themeColor: "#f97316",
-      currency: "VND"
+      currency: "VND",
+      logo: null,
+      subscriptionPlan: "FREE",
+      subscriptionStatus: "ACTIVE",
+      subscriptionStart: new Date().toISOString().split("T")[0],
+      subscriptionEnd: "",
+      subscriptionPrice: 0,
+      subscriptionNotes: "",
     });
   };
 
@@ -101,7 +125,14 @@ export default function StoreManagementPage() {
       adminUsername: "",
       adminPassword: "",
       themeColor: store.themeColor,
-      currency: store.currency
+      currency: store.currency,
+      logo: store.logo,
+      subscriptionPlan: store.subscriptionPlan || "FREE",
+      subscriptionStatus: store.subscriptionStatus || "ACTIVE",
+      subscriptionStart: store.subscriptionStart ? new Date(store.subscriptionStart).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+      subscriptionEnd: store.subscriptionEnd ? new Date(store.subscriptionEnd).toISOString().split("T")[0] : "",
+      subscriptionPrice: store.subscriptionPrice ? Number(store.subscriptionPrice) : 0,
+      subscriptionNotes: store.subscriptionNotes || "",
     });
     setIsModalOpen(true);
   };

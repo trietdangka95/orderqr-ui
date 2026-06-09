@@ -131,6 +131,36 @@ export default function StoreInitializer() {
     }
   }, [isMounted, storeError]);
 
+  const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+  const isExpired = storeConfig?.subscriptionEnd && new Date() > new Date(storeConfig.subscriptionEnd);
+  const isSuspended = storeConfig?.subscriptionStatus === 'EXPIRED' || isExpired;
+  const isAdminOrSuperAdminPath = pathname.startsWith("/admin") || pathname.startsWith("/superadmin") || pathname.startsWith("/super-login");
+
+  if (isSuspended && !isAdminOrSuperAdminPath) {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-gray-950 flex items-center justify-center p-6 text-center select-none">
+        {/* Decorative background blurs */}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl"></div>
+        
+        <div className="relative max-w-md w-full bg-white/5 border border-white/10 backdrop-blur-xl p-10 rounded-[3rem] shadow-2xl flex flex-col items-center">
+          <div className="w-20 h-20 bg-red-500/10 border border-red-500/20 text-red-500 rounded-[2rem] flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 animate-pulse">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+          </div>
+          <h2 className="text-white text-2xl font-black mb-3 tracking-tight">Cửa hàng tạm ngưng dịch vụ</h2>
+          <p className="text-gray-400 text-sm leading-relaxed mb-8">
+            Dịch vụ của cửa hàng <span className="text-white font-bold">{storeConfig?.name || "này"}</span> hiện đang tạm thời bị gián đoạn do hết hạn gói thuê.
+          </p>
+          <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">
+            Vui lòng liên hệ Quản trị viên để gia hạn
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <title>{storeConfig?.name ? `${storeConfig.name} - Đặt Món Online` : "Order QR - Đặt Món Online"}</title>

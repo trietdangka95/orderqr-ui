@@ -10,6 +10,12 @@ export interface Store {
   isActive: boolean;
   createdAt: string;
   users?: { username: string }[];
+  subscriptionPlan: "FREE" | "PREMIUM";
+  subscriptionStatus: string;
+  subscriptionStart: string | null;
+  subscriptionEnd: string | null;
+  subscriptionPrice: number | null;
+  subscriptionNotes: string | null;
 }
 
 export interface CreateStoreData {
@@ -19,6 +25,13 @@ export interface CreateStoreData {
   adminPassword: string;
   themeColor?: string;
   currency?: string;
+  logo?: string | null;
+  subscriptionPlan?: "FREE" | "PREMIUM";
+  subscriptionStatus?: string;
+  subscriptionStart?: string | null;
+  subscriptionEnd?: string | null;
+  subscriptionPrice?: number | null;
+  subscriptionNotes?: string | null;
 }
 
 export interface PlatformStats {
@@ -41,6 +54,17 @@ export const superAdminApi = {
   
   updateStore: async (id: string, storeData: Partial<Store> & { adminUsername?: string; adminPassword?: string }): Promise<Store> => {
     const { data } = await axiosInstance.patch(`/superadmin/stores/${id}`, storeData);
+    return data;
+  },
+
+  uploadLogo: async (file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const { data } = await axiosInstance.post<{ url: string }>("/superadmin/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return data;
   },
   

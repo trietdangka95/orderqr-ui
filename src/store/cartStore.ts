@@ -48,6 +48,9 @@ export interface StoreConfig {
   isActive: boolean;
   tables: string[];
   users?: { username: string }[];
+  subscriptionPlan?: "FREE" | "PREMIUM";
+  subscriptionStatus?: string;
+  subscriptionEnd?: string | null;
 }
 
 interface CartStore {

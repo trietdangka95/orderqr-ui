@@ -39,11 +39,62 @@ export default function RevenuePage() {
     });
   };
 
+  const handleExportCSV = () => {
+    const headers = [
+      "Mã hóa đơn",
+      "Thời gian",
+      "Bàn ăn",
+      "Danh sách chi tiết món ăn",
+      "Tổng tiền (VND)",
+      "Trạng thái"
+    ];
+
+    const rows = filteredRevenue.map(record => {
+      const itemsDetail = record.orders
+        ?.flatMap((order: any) => order.orderItems || [])
+        ?.map((item: any) => `${item.quantity}x ${item.product?.name || 'Món ăn'} (${Number(item.priceAtTime).toLocaleString('vi-VN')}₫)`)
+        ?.join("; ") || "";
+
+      return [
+        record.id,
+        formatDate(record.timestamp),
+        `Bàn ${record.tableNumber}`,
+        `"${itemsDetail.replace(/"/g, '""')}"`,
+        record.totalAmount,
+        "Đã hoàn tất"
+      ];
+    });
+
+    const csvContent = 
+      "\uFEFF" + 
+      [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `doanh_thu_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
-      <header className="mb-12">
-        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Quản lý Doanh thu</h1>
-        <p className="text-gray-500 font-medium italic">Thống kê doanh số và lịch sử đơn hàng đã hoàn tất</p>
+      <header className="mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Quản lý Doanh thu</h1>
+          <p className="text-gray-500 font-medium italic">Thống kê doanh số và lịch sử đơn hàng đã hoàn tất</p>
+        </div>
+        <button
+          onClick={handleExportCSV}
+          className="flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 text-white font-black rounded-xl transition-all shadow-md shadow-green-100 hover:scale-[1.02] active:scale-95 text-sm"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          Xuất báo cáo Excel
+        </button>
       </header>
 
       <main className="py-8">

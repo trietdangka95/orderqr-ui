@@ -30,39 +30,85 @@ export function StoreCard({
       animate={{ opacity: 1 }}
       className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6"
     >
-      <div className="flex items-center gap-6 flex-1 w-full">
-        <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center text-gray-300 border border-gray-100">
-          <Store size={32} />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-1">
-            <h2 className="text-2xl font-black text-gray-900">{store.name}</h2>
-            {store.isActive ? (
-              <span className="px-3 py-1 bg-green-100 text-green-600 text-[10px] font-black rounded-full uppercase">Active</span>
-            ) : (
-              <span className="px-3 py-1 bg-red-100 text-red-600 text-[10px] font-black rounded-full uppercase">Inactive</span>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest items-center">
-            <div className="flex items-center gap-1.5">
-              <Globe size={14} className="text-blue-500" />
-              <span>{store.slug}.{process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn"}</span>
+      {(() => {
+        const isExpired = store.subscriptionEnd && new Date() > new Date(store.subscriptionEnd);
+        const daysLeft = store.subscriptionEnd 
+          ? Math.ceil((new Date(store.subscriptionEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) 
+          : null;
+
+        return (
+          <div className="flex items-center gap-6 flex-1 w-full">
+            <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center text-gray-300 border border-gray-100 overflow-hidden relative shrink-0">
+              {store.logo ? (
+                <img src={store.logo} alt={store.name} className="w-full h-full object-cover" />
+              ) : (
+                <Store size={32} />
+              )}
             </div>
-            <div className="flex items-center gap-1.5">
-              <Layout size={14} className="text-purple-500" />
-              <span className="flex items-center gap-1">
-                Theme:
-                <span className="w-3 h-3 rounded-full border border-gray-100" style={{ backgroundColor: store.themeColor }}></span>
-              </span>
-            </div>
-            {store.users && store.users.length > 0 && (
-              <div className="flex items-center gap-1 px-2.5 py-0.5 bg-purple-50 text-purple-600 border border-purple-100 rounded-lg text-[10px] font-black uppercase tracking-wider">
-                Admin: {store.users[0].username}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-1">
+                <h2 className="text-2xl font-black text-gray-900">{store.name}</h2>
+                {store.isActive ? (
+                  <span className="px-3 py-1 bg-green-100 text-green-600 text-[10px] font-black rounded-full uppercase">Active</span>
+                ) : (
+                  <span className="px-3 py-1 bg-red-100 text-red-600 text-[10px] font-black rounded-full uppercase">Inactive</span>
+                )}
+                {isExpired || store.subscriptionStatus === 'EXPIRED' ? (
+                  <span className="px-3 py-1 bg-red-500 text-white text-[10px] font-black rounded-full uppercase animate-pulse">Expired</span>
+                ) : null}
               </div>
-            )}
+              <div className="flex flex-wrap gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest items-center">
+                <div className="flex items-center gap-1.5">
+                  <Globe size={14} className="text-blue-500" />
+                  <span>{store.slug}.{process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn"}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Layout size={14} className="text-purple-500" />
+                  <span className="flex items-center gap-1">
+                    Theme:
+                    <span className="w-3 h-3 rounded-full border border-gray-100" style={{ backgroundColor: store.themeColor }}></span>
+                  </span>
+                </div>
+                {store.users && store.users.length > 0 && (
+                  <div className="flex items-center gap-1 px-2.5 py-0.5 bg-purple-50 text-purple-600 border border-purple-100 rounded-lg text-[10px] font-black uppercase tracking-wider">
+                    Admin: {store.users[0].username}
+                  </div>
+                )}
+                
+                <div className={`flex items-center gap-1 px-2.5 py-0.5 border rounded-lg text-[10px] font-black uppercase tracking-wider ${
+                  store.subscriptionPlan === 'PREMIUM'
+                    ? 'bg-purple-50 text-purple-600 border-purple-100'
+                    : 'bg-blue-50 text-blue-600 border-blue-100'
+                }`}>
+                  Gói: {store.subscriptionPlan || 'FREE'}
+                </div>
+
+                {store.subscriptionEnd && (
+                  <div className={`flex items-center gap-1 px-2.5 py-0.5 border rounded-lg text-[10px] font-black uppercase tracking-wider ${
+                    isExpired || store.subscriptionStatus === 'EXPIRED'
+                      ? 'bg-red-50 text-red-600 border-red-100'
+                      : daysLeft !== null && daysLeft <= 7
+                      ? 'bg-yellow-50 text-yellow-600 border-yellow-100'
+                      : 'bg-green-50 text-green-600 border-green-100'
+                  }`}>
+                    {isExpired || store.subscriptionStatus === 'EXPIRED'
+                      ? 'Hết hạn sử dụng'
+                      : daysLeft !== null && daysLeft < 0
+                      ? 'Hết hạn'
+                      : `Hạn: ${daysLeft} ngày`}
+                  </div>
+                )}
+
+                {store.subscriptionPrice !== undefined && Number(store.subscriptionPrice) > 0 && (
+                  <div className="flex items-center gap-1 px-2.5 py-0.5 bg-gray-50 text-gray-600 border border-gray-100 rounded-lg text-[10px] font-black uppercase tracking-wider">
+                    Giá: {Number(store.subscriptionPrice).toLocaleString('vi-VN')}₫
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       <div className="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0">
         <button
