@@ -22,13 +22,13 @@ export function StoreFilters({
           placeholder="Search stores by name or domain..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 text-sm"
+          className="w-full pl-12 pr-4 h-12 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
         />
       </div>
       <select
         value={statusFilter}
         onChange={(e) => setStatusFilter(e.target.value)}
-        className="px-6 py-3 bg-gray-50 border-none rounded-2xl font-bold text-gray-600 focus:ring-2 focus:ring-blue-500/20 text-sm"
+        className="px-6 h-12 bg-gray-50 border-none rounded-2xl font-bold text-gray-600 focus:ring-2 focus:ring-blue-500/20 text-sm outline-none cursor-pointer"
       >
         <option value="all">All Status</option>
         <option value="active">Active Only</option>

@@ -153,7 +153,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-bold text-gray-700"
+                className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-bold text-gray-700"
                 placeholder="VD: Phở Bò Tái Lăn"
               />
             </div>
@@ -169,7 +169,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                     type="text"
                     value={formatPrice(priceInput)}
                     onChange={handlePriceChange}
-                    className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-bold text-gray-900"
+                    className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-bold text-gray-900"
                     placeholder="Ví dụ: 100.000"
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₫</span>
@@ -187,7 +187,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-bold text-gray-700 bg-white"
+                    className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-bold text-gray-700 bg-white cursor-pointer"
                   >
                     {categories.map((cat) => (
                       <option key={cat} value={cat}>
@@ -212,7 +212,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                       setFormData({ ...formData, image: e.target.value });
                       setPreviewError(false);
                     }}
-                    className="flex-1 px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-medium text-gray-600 text-sm"
+                    className="flex-1 h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-medium text-gray-600 text-sm"
                     placeholder="Dán link ảnh (URL)..."
                   />
                   <label className="shrink-0 flex items-center justify-center w-12 h-12 bg-gray-100 rounded-2xl cursor-pointer hover:bg-gray-200 transition-colors">
@@ -299,7 +299,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 max="100"
                 value={formData.discountPercent}
                 onChange={(e) => setFormData({ ...formData, discountPercent: Number(e.target.value) })}
-                className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-bold text-red-600"
+                className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-bold text-red-600"
                 placeholder="VD: 20 (giảm 20%)"
               />
             </div>
@@ -314,7 +314,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                     type="text"
                     value={formData.bannerUrl}
                     onChange={(e) => setFormData({ ...formData, bannerUrl: e.target.value })}
-                    className="flex-1 px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-medium text-gray-600 text-sm"
+                    className="flex-1 h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-medium text-gray-600 text-sm"
                     placeholder="Dán link ảnh banner (URL) hoặc tải lên..."
                   />
                   <label className="shrink-0 flex items-center justify-center w-12 h-12 bg-gray-100 rounded-2xl cursor-pointer hover:bg-gray-200 transition-colors">
@@ -344,7 +344,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                   type="text"
                   value={formData.promoTitle}
                   onChange={(e) => setFormData({ ...formData, promoTitle: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-bold text-gray-700"
+                  className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-bold text-gray-700"
                   placeholder="Để trống để lấy tự động..."
                 />
               </div>
@@ -356,7 +356,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                   type="text"
                   value={formData.promoDescription}
                   onChange={(e) => setFormData({ ...formData, promoDescription: e.target.value })}
-                  className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-medium text-gray-600"
+                  className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-medium text-gray-600"
                   placeholder="Để trống để lấy tự động..."
                 />
               </div>

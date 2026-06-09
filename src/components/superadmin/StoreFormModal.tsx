@@ -146,7 +146,7 @@ export function StoreFormModal({
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
+                    className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
                     placeholder="e.g. Quán Ăn Việt"
                   />
                 </div>
@@ -159,7 +159,7 @@ export function StoreFormModal({
                       type="text"
                       value={formData.slug}
                       onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/ /g, '-') })}
-                      className="flex-1 px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 font-mono text-sm disabled:opacity-50 outline-none"
+                      className="flex-1 h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 font-mono text-sm disabled:opacity-50 outline-none"
                       placeholder="e.g. quan-an-viet"
                     />
                     <span className="text-gray-400 font-bold text-xs">.{process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn"}</span>
@@ -171,7 +171,7 @@ export function StoreFormModal({
                         type="text"
                         readOnly
                         value={currentEditingStore?.users?.[0]?.username || "admin"}
-                        className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl font-mono text-sm uppercase text-gray-500 cursor-not-allowed outline-none opacity-75"
+                        className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl font-mono text-sm uppercase text-gray-500 cursor-not-allowed outline-none opacity-75"
                         title="Tên đăng nhập quản trị của cửa hàng"
                       />
                     </div>
@@ -190,7 +190,7 @@ export function StoreFormModal({
                           type="text"
                           value={formData.adminUsername}
                           onChange={(e) => setFormData({ ...formData, adminUsername: e.target.value })}
-                          className="w-full px-5 py-3 bg-gray-50 border-2 border-purple-50 focus:border-purple-500 rounded-xl outline-none focus:ring-2 focus:ring-purple-500/20 text-sm"
+                          className="w-full h-12 px-5 bg-gray-50 border-2 border-purple-50 focus:border-purple-500 rounded-xl outline-none focus:ring-2 focus:ring-purple-500/20 text-sm"
                           placeholder="Để trống nếu không đổi"
                         />
                       </div>
@@ -201,7 +201,7 @@ export function StoreFormModal({
                             type={showPassword ? "text" : "password"}
                             value={formData.adminPassword}
                             onChange={(e) => setFormData({ ...formData, adminPassword: e.target.value })}
-                            className="w-full pl-5 pr-11 py-3 bg-gray-50 border-2 border-purple-50 focus:border-purple-500 rounded-xl outline-none focus:ring-2 focus:ring-purple-500/20 text-sm"
+                            className="w-full h-12 pl-5 pr-11 bg-gray-50 border-2 border-purple-50 focus:border-purple-500 rounded-xl outline-none focus:ring-2 focus:ring-purple-500/20 text-sm"
                             placeholder="Để trống nếu không đổi"
                           />
                           <button
@@ -228,7 +228,7 @@ export function StoreFormModal({
                           type="text"
                           value={formData.adminUsername}
                           onChange={(e) => setFormData({ ...formData, adminUsername: e.target.value })}
-                          className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
+                          className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
                           placeholder="admin-username"
                         />
                       </div>
@@ -240,7 +240,7 @@ export function StoreFormModal({
                             type={showPassword ? "text" : "password"}
                             value={formData.adminPassword}
                             onChange={(e) => setFormData({ ...formData, adminPassword: e.target.value })}
-                            className="w-full pl-5 pr-11 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
+                            className="w-full h-12 pl-5 pr-11 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
                             placeholder="••••••••"
                           />
                           <button
@@ -298,7 +298,7 @@ export function StoreFormModal({
                     <select
                       value={formData.subscriptionPlan}
                       onChange={(e) => setFormData({ ...formData, subscriptionPlan: e.target.value as "FREE" | "PREMIUM" })}
-                      className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
+                      className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none cursor-pointer"
                     >
                       <option value="FREE">Gói FREE (Hạn dùng ngắn)</option>
                       <option value="PREMIUM">Gói PREMIUM (Vô thời hạn)</option>
@@ -309,7 +309,7 @@ export function StoreFormModal({
                     <select
                       value={formData.subscriptionStatus}
                       onChange={(e) => setFormData({ ...formData, subscriptionStatus: e.target.value })}
-                      className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
+                      className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none cursor-pointer"
                     >
                       <option value="ACTIVE">Hoạt động (Active)</option>
                       <option value="EXPIRED">Đã hết hạn (Expired)</option>
@@ -325,7 +325,7 @@ export function StoreFormModal({
                       type="date"
                       value={formData.subscriptionStart}
                       onChange={(e) => setFormData({ ...formData, subscriptionStart: e.target.value })}
-                      className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
+                      className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
                     />
                   </div>
                   <div>
@@ -334,7 +334,7 @@ export function StoreFormModal({
                       type="date"
                       value={formData.subscriptionEnd}
                       onChange={(e) => setFormData({ ...formData, subscriptionEnd: e.target.value })}
-                      className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
+                      className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
                       placeholder="Không giới hạn"
                     />
                   </div>
@@ -347,7 +347,7 @@ export function StoreFormModal({
                       type="number"
                       value={formData.subscriptionPrice}
                       onChange={(e) => setFormData({ ...formData, subscriptionPrice: Number(e.target.value) })}
-                      className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none font-mono"
+                      className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none font-mono"
                       placeholder="Ví dụ: 199000"
                     />
                   </div>
