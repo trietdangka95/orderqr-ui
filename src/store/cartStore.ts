@@ -284,6 +284,7 @@ export const useCartStore = create<CartStore>()(
         userId: state.userId,
         userStoreId: state.userStoreId,
         selectedTable: state.selectedTable,
+        storeConfigId: state.storeConfig?.id,
       }),
     }
   )

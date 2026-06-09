@@ -25,6 +25,8 @@ axiosInstance.interceptors.request.use(
           const { state } = JSON.parse(cartStorage);
           if (state?.storeConfig?.id) {
             config.headers['x-store-id'] = state.storeConfig.id;
+          } else if (state?.storeConfigId) {
+            config.headers['x-store-id'] = state.storeConfigId;
           }
         } catch (e) {
           console.error('Error parsing cart-storage', e);
