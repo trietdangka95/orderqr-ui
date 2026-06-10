@@ -21,7 +21,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Zap,
-  Plus
+  Plus,
 } from "lucide-react";
 import Link from "next/link";
 import { getImageUrl } from "@/utils/image";
@@ -31,11 +31,14 @@ import axiosInstance from "@/api/axiosInstance";
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
-  const [showcaseTab, setShowcaseTab] = useState<"menu" | "kitchen" | "admin">("menu");
+  const [showcaseTab, setShowcaseTab] = useState<"menu" | "kitchen" | "admin">(
+    "menu",
+  );
   const [monthlyPrice, setMonthlyPrice] = useState<number>(599000);
 
   useEffect(() => {
-    axiosInstance.get("/stores/premium-price")
+    axiosInstance
+      .get("/stores/premium-price")
       .then((res) => {
         if (res.data?.monthlyPrice) {
           setMonthlyPrice(res.data.monthlyPrice);
@@ -50,52 +53,52 @@ export default function LandingPage() {
     {
       icon: <QrCode className="w-6 h-6 text-orange-500" />,
       title: "Menu QR Linh Hoạt",
-      desc: "Tạo menu số chỉ trong vài phút. Khách hàng quét mã tại bàn, xem thực đơn sinh động, sắc nét và gọi món ngay lập tức."
+      desc: "Tạo menu số chỉ trong vài phút. Khách hàng quét mã tại bàn, xem thực đơn sinh động, sắc nét và gọi món ngay lập tức.",
     },
     {
       icon: <ChefHat className="w-6 h-6 text-orange-500" />,
       title: "Đơn Bếp Tức Thời (Real-time)",
-      desc: "Đơn hàng tự động gửi trực tiếp đến màn hình bếp của nhân viên qua kết nối thời gian thực. Giảm thiểu sai sót tối đa."
+      desc: "Đơn hàng tự động gửi trực tiếp đến màn hình bếp của nhân viên qua kết nối thời gian thực. Giảm thiểu sai sót tối đa.",
     },
     {
       icon: <Layers className="w-6 h-6 text-orange-500" />,
       title: "Quản Lý Đa Cửa Hàng",
-      desc: "Hệ thống hỗ trợ phân quyền multi-tenancy. Mỗi cửa hàng hoạt động riêng biệt trên subdomain riêng cực kỳ chuyên nghiệp."
+      desc: "Hệ thống hỗ trợ phân quyền multi-tenancy. Mỗi cửa hàng hoạt động riêng biệt trên subdomain riêng cực kỳ chuyên nghiệp.",
     },
     {
       icon: <TrendingUp className="w-6 h-6 text-orange-500" />,
       title: "Thống Kê Doanh Thu trực quan",
-      desc: "Theo dõi doanh số bán hàng, số lượng đơn hàng, món ăn bán chạy nhất theo ngày, tuần, tháng với giao diện dashboard chi tiết."
+      desc: "Theo dõi doanh số bán hàng, số lượng đơn hàng, món ăn bán chạy nhất theo ngày, tuần, tháng với giao diện dashboard chi tiết.",
     },
     {
       icon: <Smartphone className="w-6 h-6 text-orange-500" />,
       title: "Tương Thích Mọi Thiết Bị",
-      desc: "Giao diện được thiết kế tối ưu hóa cho di động (Mobile First), mang lại trải nghiệm mượt mà, trực quan như ứng dụng gốc."
+      desc: "Giao diện được thiết kế tối ưu hóa cho di động (Mobile First), mang lại trải nghiệm mượt mà, trực quan như ứng dụng gốc.",
     },
     {
       icon: <Sparkles className="w-6 h-6 text-orange-500" />,
       title: "Tùy Biến Giao Diện Độc Bản",
-      desc: "Thay đổi màu sắc chủ đạo (Theme), Logo, và cấu hình danh sách bàn ăn tương thích chính xác với sơ đồ quán thực tế."
-    }
+      desc: "Thay đổi màu sắc chủ đạo (Theme), Logo, và cấu hình danh sách bàn ăn tương thích chính xác với sơ đồ quán thực tế.",
+    },
   ];
 
   const steps = [
     {
       title: "Quét Mã QR",
-      desc: "Khách hàng quét mã QR độc bản được dán tại bàn ăn bằng điện thoại để truy cập thực đơn trực tuyến tức thì."
+      desc: "Khách hàng quét mã QR độc bản được dán tại bàn ăn bằng điện thoại để truy cập thực đơn trực tuyến tức thì.",
     },
     {
       title: "Chọn Món & Đặt Hàng",
-      desc: "Xem món ăn kèm hình ảnh sống động, lọc theo danh mục, thêm ghi chú và bấm đặt món không cần đợi nhân viên."
+      desc: "Xem món ăn kèm hình ảnh sống động, lọc theo danh mục, thêm ghi chú và bấm đặt món không cần đợi nhân viên.",
     },
     {
       title: "Bếp Chế Biến",
-      desc: "Bếp nhận thông tin đặt món theo thời gian thực và tiến hành chuẩn bị món ăn nhanh chóng, chính xác."
+      desc: "Bếp nhận thông tin đặt món theo thời gian thực và tiến hành chuẩn bị món ăn nhanh chóng, chính xác.",
     },
     {
       title: "Phục Vụ & Thanh Toán",
-      desc: "Nhân viên phục vụ món ăn đúng số bàn đã đặt. Sau khi dùng bữa xong, khách yêu cầu thanh toán nhanh chóng."
-    }
+      desc: "Nhân viên phục vụ món ăn đúng số bàn đã đặt. Sau khi dùng bữa xong, khách yêu cầu thanh toán nhanh chóng.",
+    },
   ];
 
   return (
@@ -114,16 +117,26 @@ export default function LandingPage() {
               <ChefHat className="text-white w-5.5 h-5.5" />
             </div>
             <div>
-              <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase block leading-none">Order QR</span>
-              <span className="text-lg font-black text-white tracking-tight">MENU VIỆT</span>
+              <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase block leading-none">
+                Order QR
+              </span>
+              <span className="text-lg font-black text-white tracking-tight">
+                MENU VIỆT
+              </span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-400">
-            <a href="#features" className="hover:text-white transition-colors">Tính năng</a>
-            <a href="#workflow" className="hover:text-white transition-colors">Quy trình</a>
-            <a href="#pricing" className="hover:text-white transition-colors">Bảng giá</a>
+            <a href="#features" className="hover:text-white transition-colors">
+              Tính năng
+            </a>
+            <a href="#workflow" className="hover:text-white transition-colors">
+              Quy trình
+            </a>
+            <a href="#pricing" className="hover:text-white transition-colors">
+              Bảng giá
+            </a>
           </nav>
 
           {/* CTAs */}
@@ -194,7 +207,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative max-w-7xl mx-auto px-4 md:px-8 pt-16 md:pt-24 pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="grid grid-cols-1 gap-12 items-center">
           {/* Left Column: Headlines & CTA */}
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
             {/* Badge */}
@@ -223,7 +236,9 @@ export default function LandingPage() {
               transition={{ delay: 0.2 }}
               className="text-gray-400 text-base md:text-xl font-medium mt-6 leading-relaxed max-w-2xl"
             >
-              Cách mạng hóa trải nghiệm ăn uống tại nhà hàng của bạn. Khách hàng quét mã gọi món trực tiếp, đơn chuyển tức thì đến Bếp. Tiết kiệm nhân lực, tăng tốc phục vụ.
+              Cách mạng hóa trải nghiệm ăn uống tại nhà hàng của bạn. Khách hàng
+              quét mã gọi món trực tiếp, đơn chuyển tức thì đến Bếp. Tiết kiệm
+              nhân lực, tăng tốc phục vụ.
             </motion.p>
 
             {/* Buttons */}
@@ -255,12 +270,15 @@ export default function LandingPage() {
       {/* System Experience Showcase Section */}
       <section className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">Trải Nghiệm Thực Tế</span>
+          <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">
+            Trải Nghiệm Thực Tế
+          </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3">
             Hệ Thống Vận Hành Toàn Diện
           </h2>
           <p className="text-gray-400 text-sm md:text-base font-medium mt-4">
-            Khám phá quy trình tương tác và quản lý khép kín được thiết kế tối ưu, giúp vận hành quán ăn chuyên nghiệp và tinh gọn.
+            Khám phá quy trình tương tác và quản lý khép kín được thiết kế tối
+            ưu, giúp vận hành quán ăn chuyên nghiệp và tinh gọn.
           </p>
         </div>
 
@@ -300,7 +318,6 @@ export default function LandingPage() {
             {showcaseTab === "admin" && "Hệ Thống Admin & Doanh Thu"}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-
             {/* Left Column: Device Mockup */}
             <div className="md:col-span-5 flex items-center justify-center min-h-[420px] md:min-h-[520px]">
               <AnimatePresence mode="wait">
@@ -323,8 +340,12 @@ export default function LandingPage() {
                             🥣
                           </div>
                           <div className="text-left">
-                            <h5 className="text-[10px] font-black leading-none text-gray-900">Bun Bo 97</h5>
-                            <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider block mt-0.5">Bàn 01</span>
+                            <h5 className="text-[10px] font-black leading-none text-gray-900">
+                              Bun Bo 97
+                            </h5>
+                            <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider block mt-0.5">
+                              Bàn 01
+                            </span>
                           </div>
                         </div>
                         <ShoppingBag size={14} className="text-orange-500" />
@@ -332,9 +353,15 @@ export default function LandingPage() {
 
                       {/* Category tabs */}
                       <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[8px] font-black uppercase tracking-wider">
-                        <span className="px-2 py-1 bg-primary text-white rounded-full">Món chính</span>
-                        <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Nước uống</span>
-                        <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">Tráng miệng</span>
+                        <span className="px-2 py-1 bg-primary text-white rounded-full">
+                          Món chính
+                        </span>
+                        <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
+                          Nước uống
+                        </span>
+                        <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
+                          Tráng miệng
+                        </span>
                       </div>
                     </div>
 
@@ -343,7 +370,9 @@ export default function LandingPage() {
                       <div className="bg-white rounded-2xl p-2.5 border border-gray-100 flex gap-2.5 shadow-sm relative overflow-hidden">
                         <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-50 flex items-center justify-center relative">
                           <img
-                            src={getImageUrl("/public/uploads/1778770335484-images.jpeg")}
+                            src={getImageUrl(
+                              "/public/uploads/1778770335484-images.jpeg",
+                            )}
                             alt="Bún Bò"
                             className="w-full h-full object-cover"
                             onError={(e) => {
@@ -354,11 +383,17 @@ export default function LandingPage() {
                         </div>
                         <div className="text-left flex-1 flex flex-col justify-between py-0.5">
                           <div>
-                            <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">Bún Bò Đặc Biệt</p>
-                            <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">Bún bò nạm, chả bò, nước dùng ngọt đậm đà</p>
+                            <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">
+                              Bún Bò Đặc Biệt
+                            </p>
+                            <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">
+                              Bún bò nạm, chả bò, nước dùng ngọt đậm đà
+                            </p>
                           </div>
                           <div className="flex items-end justify-between mt-1">
-                            <span className="text-[10px] font-black text-orange-500">65.000 đ</span>
+                            <span className="text-[10px] font-black text-orange-500">
+                              65.000 đ
+                            </span>
                             <button className="w-5 h-5 rounded-lg bg-primary text-white flex items-center justify-center active:scale-90">
                               <Plus className="w-3 h-3" strokeWidth={3} />
                             </button>
@@ -372,11 +407,18 @@ export default function LandingPage() {
                         </div>
                         <div className="text-left flex-1 flex flex-col justify-between py-0.5">
                           <div>
-                            <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">Trà Đào Cam Sả</p>
-                            <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">Hương vị sả thơm mát hòa quyện cùng đào miếng giòn ngọt</p>
+                            <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">
+                              Trà Đào Cam Sả
+                            </p>
+                            <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">
+                              Hương vị sả thơm mát hòa quyện cùng đào miếng giòn
+                              ngọt
+                            </p>
                           </div>
                           <div className="flex items-end justify-between mt-1">
-                            <span className="text-[10px] font-black text-orange-500">30.000 đ</span>
+                            <span className="text-[10px] font-black text-orange-500">
+                              30.000 đ
+                            </span>
                             <button className="w-5 h-5 rounded-lg bg-primary text-white flex items-center justify-center active:scale-90">
                               <Plus className="w-3 h-3" strokeWidth={3} />
                             </button>
@@ -403,20 +445,30 @@ export default function LandingPage() {
                     className="w-full bg-gray-900 border-[8px] border-gray-800 rounded-[2rem] shadow-2xl overflow-hidden text-gray-100 h-[380px] max-w-[450px] flex flex-col text-xs"
                   >
                     <div className="bg-gray-800 px-4 py-2.5 border-b border-gray-700 flex justify-between items-center text-[10px] shrink-0">
-                      <span className="font-black tracking-wider text-orange-500">KITCHEN BOARD • MÀN BẾP</span>
-                      <span className="bg-green-500/20 text-green-400 font-bold px-2 py-0.5 rounded-full">Connected ✔</span>
+                      <span className="font-black tracking-wider text-orange-500">
+                        KITCHEN BOARD • MÀN BẾP
+                      </span>
+                      <span className="bg-green-500/20 text-green-400 font-bold px-2 py-0.5 rounded-full">
+                        Connected ✔
+                      </span>
                     </div>
                     <div className="flex-grow p-3 grid grid-cols-2 gap-3 bg-gray-950 overflow-y-auto">
                       <div className="bg-gray-900 rounded-xl p-3 border border-orange-500/30 flex flex-col justify-between h-fit min-h-[140px]">
                         <div>
                           <div className="flex justify-between items-center mb-1.5">
-                            <span className="font-black text-xs text-orange-400">BÀN SỐ: 01</span>
-                            <span className="text-[8px] text-gray-500">Vừa xong</span>
+                            <span className="font-black text-xs text-orange-400">
+                              BÀN SỐ: 01
+                            </span>
+                            <span className="text-[8px] text-gray-500">
+                              Vừa xong
+                            </span>
                           </div>
                           <div className="space-y-1.5 text-[10px] text-left">
                             <div className="flex justify-between font-bold text-gray-300">
                               <span>1x Bún Bò Đặc Biệt</span>
-                              <span className="text-orange-500 font-black animate-pulse">Chờ nấu</span>
+                              <span className="text-orange-500 font-black animate-pulse">
+                                Chờ nấu
+                              </span>
                             </div>
                             <div className="flex justify-between font-bold text-gray-300">
                               <span>1x Trà Đào Cam Sả</span>
@@ -432,13 +484,19 @@ export default function LandingPage() {
                       <div className="bg-gray-900 rounded-xl p-3 border border-white/5 flex flex-col justify-between h-fit min-h-[140px]">
                         <div>
                           <div className="flex justify-between items-center mb-1.5">
-                            <span className="font-black text-xs text-gray-400">BÀN SỐ: 03</span>
-                            <span className="text-[8px] text-gray-500">5 phút trước</span>
+                            <span className="font-black text-xs text-gray-400">
+                              BÀN SỐ: 03
+                            </span>
+                            <span className="text-[8px] text-gray-500">
+                              5 phút trước
+                            </span>
                           </div>
                           <div className="space-y-1.5 text-[10px] text-left">
                             <div className="flex justify-between font-bold text-gray-300">
                               <span>2x Phở Bò Tái</span>
-                              <span className="text-orange-500 font-black animate-pulse">Chờ nấu</span>
+                              <span className="text-orange-500 font-black animate-pulse">
+                                Chờ nấu
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -464,7 +522,9 @@ export default function LandingPage() {
                         <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
                         <span className="w-2 h-2 rounded-full bg-green-500"></span>
                       </div>
-                      <span className="text-gray-500 text-[8px]">bun-bo.orderqr.id.vn/admin</span>
+                      <span className="text-gray-500 text-[8px]">
+                        bun-bo.orderqr.id.vn/admin
+                      </span>
                       <div className="w-6"></div>
                     </div>
                     <div className="flex-grow flex bg-gray-950 text-left">
@@ -485,28 +545,47 @@ export default function LandingPage() {
                       <div className="flex-grow p-3 space-y-3 overflow-y-auto">
                         <div className="grid grid-cols-3 gap-2">
                           <div className="bg-gray-900 p-2 rounded-lg border border-white/5">
-                            <span className="text-[7px] text-gray-500 uppercase block font-black">Hôm nay</span>
-                            <span className="text-[10px] font-black text-white mt-0.5 block">2.350.000 đ</span>
+                            <span className="text-[7px] text-gray-500 uppercase block font-black">
+                              Hôm nay
+                            </span>
+                            <span className="text-[10px] font-black text-white mt-0.5 block">
+                              2.350.000 đ
+                            </span>
                           </div>
                           <div className="bg-gray-900 p-2 rounded-lg border border-white/5">
-                            <span className="text-[7px] text-gray-500 uppercase block font-black">Số đơn</span>
-                            <span className="text-[10px] font-black text-white mt-0.5 block">36 đơn</span>
+                            <span className="text-[7px] text-gray-500 uppercase block font-black">
+                              Số đơn
+                            </span>
+                            <span className="text-[10px] font-black text-white mt-0.5 block">
+                              36 đơn
+                            </span>
                           </div>
                           <div className="bg-gray-900 p-2 rounded-lg border border-white/5">
-                            <span className="text-[7px] text-gray-500 uppercase block font-black">Chạy nhất</span>
-                            <span className="text-[8px] font-black text-orange-500 mt-0.5 block truncate">Bún Bò ĐB</span>
+                            <span className="text-[7px] text-gray-500 uppercase block font-black">
+                              Chạy nhất
+                            </span>
+                            <span className="text-[8px] font-black text-orange-500 mt-0.5 block truncate">
+                              Bún Bò ĐB
+                            </span>
                           </div>
                         </div>
                         <div className="bg-gray-900/40 border border-white/5 rounded-lg p-2">
-                          <p className="text-[7px] text-gray-500 uppercase font-black mb-1.5">Doanh số tuần này</p>
+                          <p className="text-[7px] text-gray-500 uppercase font-black mb-1.5">
+                            Doanh số tuần này
+                          </p>
                           <div className="h-24 flex items-end justify-between px-1 gap-1 pt-2">
                             {[30, 50, 45, 65, 80, 55, 95].map((val, idx) => (
-                              <div key={idx} className="flex-grow flex flex-col items-center gap-1">
+                              <div
+                                key={idx}
+                                className="flex-grow flex flex-col items-center gap-1"
+                              >
                                 <div
                                   className="w-full bg-gradient-to-t from-orange-600 to-orange-400 rounded-t"
                                   style={{ height: `${val * 0.5}px` }}
                                 ></div>
-                                <span className="text-[6px] text-gray-600">Th {idx + 2}</span>
+                                <span className="text-[6px] text-gray-600">
+                                  Th {idx + 2}
+                                </span>
                               </div>
                             ))}
                           </div>
@@ -538,7 +617,11 @@ export default function LandingPage() {
                       Khách hàng chủ động chọn món và gửi bếp tức thì
                     </h3>
                     <p className="text-gray-400 text-sm font-medium leading-relaxed">
-                      Thực khách chỉ cần quét mã QR đặt tại bàn bằng camera điện thoại để truy cập ngay menu điện tử sinh động, chi tiết mà không cần tải ứng dụng. Việc đặt món trở nên dễ dàng, tự động điền số bàn và chuyển đơn thẳng vào bếp chỉ với vài cú chạm.
+                      Thực khách chỉ cần quét mã QR đặt tại bàn bằng camera điện
+                      thoại để truy cập ngay menu điện tử sinh động, chi tiết mà
+                      không cần tải ứng dụng. Việc đặt món trở nên dễ dàng, tự
+                      động điền số bàn và chuyển đơn thẳng vào bếp chỉ với vài
+                      cú chạm.
                     </p>
                   </motion.div>
                 )}
@@ -555,7 +638,11 @@ export default function LandingPage() {
                       Nhà bếp xử lý đơn chuyên nghiệp, không sợ nhầm món
                     </h3>
                     <p className="text-gray-400 text-sm font-medium leading-relaxed">
-                      Khi khách đặt món, màn hình bếp sẽ lập tức phát cảnh báo và hiển thị đầy đủ thông tin: số lượng món, số bàn và các ghi chú đặc biệt (ví dụ: ít cay, nhiều rau). Trạng thái nấu được đồng bộ hóa tức thì giúp tối ưu hóa tiến độ chuẩn bị món ăn.
+                      Khi khách đặt món, màn hình bếp sẽ lập tức phát cảnh báo
+                      và hiển thị đầy đủ thông tin: số lượng món, số bàn và các
+                      ghi chú đặc biệt (ví dụ: ít cay, nhiều rau). Trạng thái
+                      nấu được đồng bộ hóa tức thì giúp tối ưu hóa tiến độ chuẩn
+                      bị món ăn.
                     </p>
                   </motion.div>
                 )}
@@ -572,7 +659,11 @@ export default function LandingPage() {
                       Kiểm soát doanh thu chặt chẽ, thay đổi thực đơn linh hoạt
                     </h3>
                     <p className="text-gray-400 text-sm font-medium leading-relaxed">
-                      Trang quản lý admin cung cấp hệ thống báo cáo doanh thu trực quan theo ngày/tuần/tháng, số lượng hóa đơn phát sinh. Đồng thời, chủ quán dễ dàng thêm bớt món ăn, thay đổi giá, tạo bàn ăn mới hay cấu hình logo và màu sắc quán chỉ trong tích tắc.
+                      Trang quản lý admin cung cấp hệ thống báo cáo doanh thu
+                      trực quan theo ngày/tuần/tháng, số lượng hóa đơn phát
+                      sinh. Đồng thời, chủ quán dễ dàng thêm bớt món ăn, thay
+                      đổi giá, tạo bàn ăn mới hay cấu hình logo và màu sắc quán
+                      chỉ trong tích tắc.
                     </p>
                   </motion.div>
                 )}
@@ -585,19 +676,26 @@ export default function LandingPage() {
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
-                      <span className="text-sm font-bold text-gray-300">Không lo trễ đơn, nhầm bàn ăn trong giờ cao điểm</span>
+                      <span className="text-sm font-bold text-gray-300">
+                        Không lo trễ đơn, nhầm bàn ăn trong giờ cao điểm
+                      </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
-                      <span className="text-sm font-bold text-gray-300">Tiết kiệm chi phí in ấn và thiết kế thực đơn giấy</span>
+                      <span className="text-sm font-bold text-gray-300">
+                        Tiết kiệm chi phí in ấn và thiết kế thực đơn giấy
+                      </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
-                      <span className="text-sm font-bold text-gray-300">Hình ảnh món ăn sinh động giúp kích thích gọi món nhiều hơn</span>
+                      <span className="text-sm font-bold text-gray-300">
+                        Hình ảnh món ăn sinh động giúp kích thích gọi món nhiều
+                        hơn
+                      </span>
                     </div>
                   </>
                 )}
@@ -607,19 +705,26 @@ export default function LandingPage() {
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
-                      <span className="text-sm font-bold text-gray-300">Đồng bộ tức thời theo thời gian thực từ bàn đến bếp</span>
+                      <span className="text-sm font-bold text-gray-300">
+                        Đồng bộ tức thời theo thời gian thực từ bàn đến bếp
+                      </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
-                      <span className="text-sm font-bold text-gray-300">Hiển thị rõ ràng các ghi chú đặc biệt (ít cay, không hành...)</span>
+                      <span className="text-sm font-bold text-gray-300">
+                        Hiển thị rõ ràng các ghi chú đặc biệt (ít cay, không
+                        hành...)
+                      </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
-                      <span className="text-sm font-bold text-gray-300">Quản lý và cập nhật trạng thái chế biến món ăn dễ dàng</span>
+                      <span className="text-sm font-bold text-gray-300">
+                        Quản lý và cập nhật trạng thái chế biến món ăn dễ dàng
+                      </span>
                     </div>
                   </>
                 )}
@@ -629,19 +734,28 @@ export default function LandingPage() {
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
-                      <span className="text-sm font-bold text-gray-300">Báo cáo doanh số trực quan bằng biểu đồ chi tiết theo ngày/tuần</span>
+                      <span className="text-sm font-bold text-gray-300">
+                        Báo cáo doanh số trực quan bằng biểu đồ chi tiết theo
+                        ngày/tuần
+                      </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
-                      <span className="text-sm font-bold text-gray-300">Chỉnh sửa thực đơn, món ăn và giá bán linh hoạt chỉ trong 3 giây</span>
+                      <span className="text-sm font-bold text-gray-300">
+                        Chỉnh sửa thực đơn, món ăn và giá bán linh hoạt chỉ
+                        trong 3 giây
+                      </span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center text-orange-500">
                         <CheckCircle2 size={12} />
                       </div>
-                      <span className="text-sm font-bold text-gray-300">Quản lý sơ đồ bàn ăn thực tế tương thích với hoạt động của quán</span>
+                      <span className="text-sm font-bold text-gray-300">
+                        Quản lý sơ đồ bàn ăn thực tế tương thích với hoạt động
+                        của quán
+                      </span>
                     </div>
                   </>
                 )}
@@ -652,14 +766,20 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10 scroll-mt-20">
+      <section
+        id="features"
+        className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10 scroll-mt-20"
+      >
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">Đầy Đủ Công Cụ</span>
+          <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">
+            Đầy Đủ Công Cụ
+          </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3">
             Tính Năng Vượt Trội Nhất
           </h2>
           <p className="text-gray-400 text-sm md:text-base font-medium mt-4">
-            Được thiết kế chuyên biệt dựa trên các nghiên cứu vận hành của hàng ngàn quán ăn, nhà hàng, tiệm cà phê tại Việt Nam.
+            Được thiết kế chuyên biệt dựa trên các nghiên cứu vận hành của hàng
+            ngàn quán ăn, nhà hàng, tiệm cà phê tại Việt Nam.
           </p>
         </div>
 
@@ -685,9 +805,14 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="workflow" className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10 scroll-mt-20">
+      <section
+        id="workflow"
+        className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10 scroll-mt-20"
+      >
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">Vận Hành Đơn Giản</span>
+          <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">
+            Vận Hành Đơn Giản
+          </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3">
             Hoạt Động Như Thế Nào?
           </h2>
@@ -699,14 +824,22 @@ export default function LandingPage() {
               <div
                 key={idx}
                 onClick={() => setActiveStep(idx)}
-                className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 flex gap-4 ${activeStep === idx ? 'bg-primary/10 border-orange-500' : 'bg-gray-900/10 border-white/5 hover:border-white/10'}`}
+                className={`p-6 rounded-2xl border cursor-pointer transition-all duration-300 flex gap-4 ${activeStep === idx ? "bg-primary/10 border-orange-500" : "bg-gray-900/10 border-white/5 hover:border-white/10"}`}
               >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm shrink-0 ${activeStep === idx ? 'bg-primary text-white' : 'bg-gray-800 text-gray-400'}`}>
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm shrink-0 ${activeStep === idx ? "bg-primary text-white" : "bg-gray-800 text-gray-400"}`}
+                >
                   {idx + 1}
                 </div>
                 <div className="text-left">
-                  <h5 className={`font-black text-sm ${activeStep === idx ? 'text-orange-500' : 'text-white'}`}>{step.title}</h5>
-                  <p className="text-gray-400 text-[11px] md:text-xs font-medium mt-1 leading-normal">{step.desc}</p>
+                  <h5
+                    className={`font-black text-sm ${activeStep === idx ? "text-orange-500" : "text-white"}`}
+                  >
+                    {step.title}
+                  </h5>
+                  <p className="text-gray-400 text-[11px] md:text-xs font-medium mt-1 leading-normal">
+                    {step.desc}
+                  </p>
                 </div>
               </div>
             ))}
@@ -731,17 +864,27 @@ export default function LandingPage() {
                       animate={{ rotate: 0 }}
                       className="bg-white p-5 rounded-2xl shadow-2xl border border-gray-100 flex flex-col items-center justify-center w-[160px] h-[220px] text-gray-900 relative shrink-0"
                     >
-                      <div className="w-full py-1 bg-primary text-white text-[7px] font-black rounded uppercase mb-2">QUÉT MÃ GỌI MÓN</div>
+                      <div className="w-full py-1 bg-primary text-white text-[7px] font-black rounded uppercase mb-2">
+                        QUÉT MÃ GỌI MÓN
+                      </div>
                       <div className="p-1.5 border border-gray-100 rounded-xl bg-gray-50 flex items-center justify-center mb-2">
                         <QrCode size={70} className="text-gray-900" />
                       </div>
-                      <span className="text-[9px] font-black text-gray-800 bg-gray-100 px-2 py-0.5 rounded-full">BÀN SỐ 01</span>
-                      <span className="absolute -bottom-3 -right-3 text-2xl animate-bounce">📱</span>
+                      <span className="text-[9px] font-black text-gray-800 bg-gray-100 px-2 py-0.5 rounded-full">
+                        BÀN SỐ 01
+                      </span>
+                      <span className="absolute -bottom-3 -right-3 text-2xl animate-bounce">
+                        📱
+                      </span>
                     </motion.div>
                     <div className="text-center space-y-2">
-                      <h4 className="text-lg font-black text-white">Bước 1: Thực Khách Quét Mã QR</h4>
+                      <h4 className="text-lg font-black text-white">
+                        Bước 1: Thực Khách Quét Mã QR
+                      </h4>
                       <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
-                        Khi ngồi vào bàn, khách dùng camera điện thoại quét mã QR. Mỗi bàn sẽ tương ứng một mã duy nhất để tự động ghi nhận số bàn chính xác.
+                        Khi ngồi vào bàn, khách dùng camera điện thoại quét mã
+                        QR. Mỗi bàn sẽ tương ứng một mã duy nhất để tự động ghi
+                        nhận số bàn chính xác.
                       </p>
                     </div>
                   </div>
@@ -758,14 +901,18 @@ export default function LandingPage() {
                         <div className="bg-white p-1.5 rounded-xl border border-gray-100 flex gap-2 items-center">
                           <span className="text-xs">🥣</span>
                           <div className="text-[7px]">
-                            <p className="font-bold text-gray-900">Bún Bò Đặc Biệt</p>
+                            <p className="font-bold text-gray-900">
+                              Bún Bò Đặc Biệt
+                            </p>
                             <p className="font-bold text-orange-500">65.000đ</p>
                           </div>
                         </div>
                         <div className="bg-white p-1.5 rounded-xl border border-gray-100 flex gap-2 items-center">
                           <span className="text-xs">🍹</span>
                           <div className="text-[7px]">
-                            <p className="font-bold text-gray-900">Trà Đào Cam Sả</p>
+                            <p className="font-bold text-gray-900">
+                              Trà Đào Cam Sả
+                            </p>
                             <p className="font-bold text-orange-500">30.000đ</p>
                           </div>
                         </div>
@@ -777,9 +924,13 @@ export default function LandingPage() {
                       </div>
                     </div>
                     <div className="text-center space-y-2">
-                      <h4 className="text-lg font-black text-white">Bước 2: Xem Thực Đơn & Đặt Món</h4>
+                      <h4 className="text-lg font-black text-white">
+                        Bước 2: Xem Thực Đơn & Đặt Món
+                      </h4>
                       <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
-                        Thực khách duyệt danh mục, thêm ghi chú và tự xác nhận gửi đơn. Trải nghiệm gọi món mượt mà, trực quan mà không cần gọi phục vụ.
+                        Thực khách duyệt danh mục, thêm ghi chú và tự xác nhận
+                        gửi đơn. Trải nghiệm gọi món mượt mà, trực quan mà không
+                        cần gọi phục vụ.
                       </p>
                     </div>
                   </div>
@@ -789,13 +940,17 @@ export default function LandingPage() {
                   <div className="flex flex-col items-center gap-6">
                     <div className="bg-gray-900 rounded-2xl border border-white/10 w-[240px] p-3 text-left shadow-2xl shrink-0">
                       <div className="flex justify-between items-center border-b border-white/5 pb-1.5 mb-2">
-                        <span className="text-[8px] font-black text-orange-500">BẾP CHẾ BIẾN</span>
+                        <span className="text-[8px] font-black text-orange-500">
+                          BẾP CHẾ BIẾN
+                        </span>
                         <span className="text-[7px] text-gray-500">Bàn 01</span>
                       </div>
                       <div className="space-y-1 text-[9px] font-bold text-gray-300">
                         <div className="flex justify-between">
                           <span>1x Bún Bò Đặc Biệt</span>
-                          <span className="text-orange-500 font-black animate-pulse">Chờ nấu...</span>
+                          <span className="text-orange-500 font-black animate-pulse">
+                            Chờ nấu...
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span>1x Trà Đào Cam Sả</span>
@@ -809,9 +964,13 @@ export default function LandingPage() {
                       </div>
                     </div>
                     <div className="text-center space-y-2">
-                      <h4 className="text-lg font-black text-white">Bước 3: Nhà Bếp Tự Động Nhận Đơn</h4>
+                      <h4 className="text-lg font-black text-white">
+                        Bước 3: Nhà Bếp Tự Động Nhận Đơn
+                      </h4>
                       <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
-                        Đầu bếp lập tức nhìn thấy danh sách gọi món trên màn hình bếp. Phân chia chuẩn xác, chế biến nhanh và không lo thất lạc thông tin.
+                        Đầu bếp lập tức nhìn thấy danh sách gọi món trên màn
+                        hình bếp. Phân chia chuẩn xác, chế biến nhanh và không
+                        lo thất lạc thông tin.
                       </p>
                     </div>
                   </div>
@@ -821,8 +980,12 @@ export default function LandingPage() {
                   <div className="flex flex-col items-center gap-6">
                     <div className="bg-white p-4 rounded-xl shadow-2xl border border-gray-100 text-gray-800 w-[180px] text-left relative overflow-hidden shrink-0">
                       <div className="text-center border-b border-dashed border-gray-200 pb-2 mb-2">
-                        <h5 className="font-black text-[10px] text-gray-900">HÓA ĐƠN TẠM TÍNH</h5>
-                        <span className="text-[7px] text-gray-400">Bàn 01 • Order QR</span>
+                        <h5 className="font-black text-[10px] text-gray-900">
+                          HÓA ĐƠN TẠM TÍNH
+                        </h5>
+                        <span className="text-[7px] text-gray-400">
+                          Bàn 01 • Order QR
+                        </span>
                       </div>
                       <div className="space-y-1 text-[8px] font-bold text-gray-600 border-b border-dashed border-gray-200 pb-2 mb-2">
                         <div className="flex justify-between">
@@ -843,9 +1006,13 @@ export default function LandingPage() {
                       </div>
                     </div>
                     <div className="text-center space-y-2">
-                      <h4 className="text-lg font-black text-white">Bước 4: Phục Vụ & Thu Ngân</h4>
+                      <h4 className="text-lg font-black text-white">
+                        Bước 4: Phục Vụ & Thu Ngân
+                      </h4>
                       <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
-                        Nhân viên bưng bê món ăn đến bàn tương ứng. Thu ngân in hóa đơn và hoàn tất giao dịch tự động nhanh chóng và chính xác.
+                        Nhân viên bưng bê món ăn đến bàn tương ứng. Thu ngân in
+                        hóa đơn và hoàn tất giao dịch tự động nhanh chóng và
+                        chính xác.
                       </p>
                     </div>
                   </div>
@@ -857,14 +1024,20 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10 scroll-mt-20">
+      <section
+        id="pricing"
+        className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10 scroll-mt-20"
+      >
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">Chi Phí Tối Ưu</span>
+          <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">
+            Chi Phí Tối Ưu
+          </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3">
             Bảng Giá Dịch Vụ
           </h2>
           <p className="text-gray-400 text-sm md:text-base font-medium mt-4">
-            Lựa chọn gói dịch vụ phù hợp để khởi động hành trình chuyển đổi số của nhà hàng bạn ngay hôm nay.
+            Lựa chọn gói dịch vụ phù hợp để khởi động hành trình chuyển đổi số
+            của nhà hàng bạn ngay hôm nay.
           </p>
         </div>
 
@@ -872,9 +1045,15 @@ export default function LandingPage() {
           {/* Free Package */}
           <div className="bg-gray-900/10 border border-white/5 rounded-[2rem] p-8 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden group hover:border-white/10 transition-all duration-300">
             <div>
-              <span className="text-xs font-black text-gray-500 uppercase tracking-widest">GÓI TRẢI NGHIỆM</span>
-              <h3 className="text-2xl font-black text-white mt-2">Dùng Thử Miễn Phí</h3>
-              <p className="text-gray-400 text-xs font-bold mt-2">Không giới hạn thời gian chạy thử</p>
+              <span className="text-xs font-black text-gray-500 uppercase tracking-widest">
+                GÓI TRẢI NGHIỆM
+              </span>
+              <h3 className="text-2xl font-black text-white mt-2">
+                Dùng Thử Miễn Phí
+              </h3>
+              <p className="text-gray-400 text-xs font-bold mt-2">
+                Không giới hạn thời gian chạy thử
+              </p>
 
               <div className="flex items-baseline gap-1 mt-6 border-b border-white/5 pb-6">
                 <span className="text-4xl font-black text-white">0đ</span>
@@ -915,30 +1094,50 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <span className="text-xs font-black text-orange-500 uppercase tracking-widest">GÓI CHUYÊN NGHIỆP</span>
-              <h3 className="text-2xl font-black text-white mt-2">Premium Partner</h3>
-              <p className="text-gray-400 text-xs font-bold mt-2">Dành cho nhà hàng lớn, hoạt động tần suất cao</p>
+              <span className="text-xs font-black text-orange-500 uppercase tracking-widest">
+                GÓI CHUYÊN NGHIỆP
+              </span>
+              <h3 className="text-2xl font-black text-white mt-2">
+                Premium Partner
+              </h3>
+              <p className="text-gray-400 text-xs font-bold mt-2">
+                Dành cho nhà hàng lớn, hoạt động tần suất cao
+              </p>
 
               <div className="flex items-baseline gap-1 mt-6 border-b border-orange-500/20 pb-6">
-                <span className="text-4xl font-black text-white">{monthlyPrice.toLocaleString("vi-VN")}đ</span>
+                <span className="text-4xl font-black text-white">
+                  {monthlyPrice.toLocaleString("vi-VN")}đ
+                </span>
                 <span className="text-gray-500 text-sm font-bold">/ tháng</span>
               </div>
 
               <ul className="space-y-4 mt-6 text-left">
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-200 font-bold">
-                  <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
+                  <CheckCircle2
+                    size={16}
+                    className="text-orange-500 shrink-0"
+                  />
                   Không giới hạn số bàn ăn
                 </li>
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-200 font-bold">
-                  <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
+                  <CheckCircle2
+                    size={16}
+                    className="text-orange-500 shrink-0"
+                  />
                   Băng thông truyền tin ưu tiên (Siêu tốc)
                 </li>
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-200 font-bold">
-                  <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
+                  <CheckCircle2
+                    size={16}
+                    className="text-orange-500 shrink-0"
+                  />
                   Tùy chỉnh subdomain theo ý muốn
                 </li>
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-200 font-bold">
-                  <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
+                  <CheckCircle2
+                    size={16}
+                    className="text-orange-500 shrink-0"
+                  />
                   Báo cáo doanh số & phân tích nâng cao
                 </li>
               </ul>
@@ -962,12 +1161,15 @@ export default function LandingPage() {
           {/* Glowing element */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
 
-          <span className="text-xs font-black text-white/80 tracking-[0.25em] uppercase relative z-10">Sẵn Sàng Số Hóa?</span>
+          <span className="text-xs font-black text-white/80 tracking-[0.25em] uppercase relative z-10">
+            Sẵn Sàng Số Hóa?
+          </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3 max-w-2xl relative z-10">
             Bắt đầu trải nghiệm menu điện tử ngay hôm nay!
           </h2>
           <p className="text-white/80 text-xs md:text-sm font-bold mt-4 max-w-lg relative z-10">
-            Chỉ mất chưa đầy 5 phút để tạo thực đơn và in mã QR cho quán ăn của bạn. Hãy thử nghiệm miễn phí hoàn toàn.
+            Chỉ mất chưa đầy 5 phút để tạo thực đơn và in mã QR cho quán ăn của
+            bạn. Hãy thử nghiệm miễn phí hoàn toàn.
           </p>
 
           <div className="mt-8 relative z-10 w-full sm:w-auto">
@@ -990,24 +1192,52 @@ export default function LandingPage() {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
                 <ChefHat size={16} />
               </div>
-              <span className="text-base font-black text-white tracking-tight">MENU VIỆT</span>
+              <span className="text-base font-black text-white tracking-tight">
+                MENU VIỆT
+              </span>
             </div>
             <p className="text-gray-500 text-xs font-medium leading-relaxed">
-              Giải pháp menu QR điện tử toàn diện cho các đơn vị kinh doanh F&B tại Việt Nam. Vận hành tinh gọn, phục vụ nhanh chóng.
+              Giải pháp menu QR điện tử toàn diện cho các đơn vị kinh doanh F&B
+              tại Việt Nam. Vận hành tinh gọn, phục vụ nhanh chóng.
             </p>
           </div>
 
           <div className="space-y-3">
-            <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest">Sản Phẩm</h5>
+            <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest">
+              Sản Phẩm
+            </h5>
             <ul className="space-y-2 text-xs font-bold text-gray-500">
-              <li><a href="#features" className="hover:text-white transition-colors">Tính năng</a></li>
-              <li><a href="#workflow" className="hover:text-white transition-colors">Quy trình</a></li>
-              <li><a href="#pricing" className="hover:text-white transition-colors">Bảng giá</a></li>
+              <li>
+                <a
+                  href="#features"
+                  className="hover:text-white transition-colors"
+                >
+                  Tính năng
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#workflow"
+                  className="hover:text-white transition-colors"
+                >
+                  Quy trình
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#pricing"
+                  className="hover:text-white transition-colors"
+                >
+                  Bảng giá
+                </a>
+              </li>
             </ul>
           </div>
 
           <div className="space-y-3">
-            <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest">Liên Hệ Hỗ Trợ</h5>
+            <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest">
+              Liên Hệ Hỗ Trợ
+            </h5>
             <ul className="space-y-2 text-xs font-bold text-gray-500">
               <li>Hotline: 090 123 4567</li>
               <li>Email: support@orderqr.id.vn</li>
@@ -1015,7 +1245,9 @@ export default function LandingPage() {
           </div>
 
           <div className="space-y-3">
-            <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest">Bảo Mật & Tin Cậy</h5>
+            <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest">
+              Bảo Mật & Tin Cậy
+            </h5>
             <div className="flex items-center gap-2 text-gray-500">
               <ShieldCheck size={18} className="text-orange-500/80" />
               <span className="text-xs font-bold">Bảo mật dữ liệu 100%</span>
