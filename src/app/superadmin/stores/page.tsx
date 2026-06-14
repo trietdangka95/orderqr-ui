@@ -31,6 +31,7 @@ export default function StoreManagementPage() {
     subscriptionEnd: "",
     subscriptionPrice: 0,
     subscriptionNotes: "",
+    description: "Chào mừng quý khách đến với cửa hàng!",
   });
 
   const [editingStoreId, setEditingStoreId] = useState<string | null>(null);
@@ -67,6 +68,7 @@ export default function StoreManagementPage() {
           subscriptionEnd: modalFormData.subscriptionEnd ? new Date(modalFormData.subscriptionEnd).toISOString() : null,
           subscriptionPrice: Number(modalFormData.subscriptionPrice),
           subscriptionNotes: modalFormData.subscriptionNotes,
+          description: modalFormData.description,
           ...(modalFormData.adminUsername && { adminUsername: modalFormData.adminUsername.trim() }),
           ...(modalFormData.adminPassword && { adminPassword: modalFormData.adminPassword }),
         }
@@ -114,6 +116,7 @@ export default function StoreManagementPage() {
       subscriptionEnd: "",
       subscriptionPrice: 0,
       subscriptionNotes: "",
+      description: "Chào mừng quý khách đến với cửa hàng!",
     });
   };
 
@@ -133,6 +136,7 @@ export default function StoreManagementPage() {
       subscriptionEnd: store.subscriptionEnd ? new Date(store.subscriptionEnd).toISOString().split("T")[0] : "",
       subscriptionPrice: store.subscriptionPrice ? Number(store.subscriptionPrice) : 0,
       subscriptionNotes: store.subscriptionNotes || "",
+      description: store.description || "Chào mừng quý khách đến với cửa hàng!",
     });
     setIsModalOpen(true);
   };

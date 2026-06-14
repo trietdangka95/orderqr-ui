@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { X, ClipboardList, CheckCircle2, Clock, ChefHat, Copy, Check, CreditCard, Coins, QrCode, Sparkles, AlertCircle } from "lucide-react";
 import Image from "next/image";
-import { useOrders, useConfirmOrder, useUpdateOrderStatus, useTableOrders, useUpdateOrderItemQuantity, useRequestCheckout } from "@/hooks/useOrders";
+import { useOrders, useConfirmOrder, useUpdateOrderStatus, useTableOrders, useUpdateOrderItemQuantity, useRequestCheckout, useUpdateOrderItemStatus } from "@/hooks/useOrders";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -39,11 +39,14 @@ const sanitizeBankId = (bankId: string | undefined | null): string => {
 interface MappedOrderItem {
   id: string;
   productId: string;
+  orderItemId: string;
   name: string;
   image: string;
   price: number;
   quantity: number;
   note?: string | null;
+  isCooked?: boolean;
+  isServed?: boolean;
 }
 
 export default function OrdersDrawer() {
@@ -62,6 +65,7 @@ export default function OrdersDrawer() {
   const updateStatusMutation = useUpdateOrderStatus();
   const updateOrderItemMutation = useUpdateOrderItemQuantity();
   const requestCheckoutMutation = useRequestCheckout();
+  const updateItemStatusMutation = useUpdateOrderItemStatus();
 
   const [activeTab, setActiveTab] = useState<"current" | "all" | "serving">("current");
   const [isCheckoutMode, setIsCheckoutMode] = useState(false);
@@ -103,15 +107,21 @@ export default function OrdersDrawer() {
       name: i.product?.name || 'Món ăn',
       image: i.product?.image || '',
       price: i.product?.price || 0,
-      id: i.productId
+      id: i.productId,
+      orderItemId: i.id,
     })),
-    totalPrice: o.totalAmount || o.orderItems.reduce((sum: number, i) => sum + (i.product?.price || 0) * i.quantity, 0)
+    totalPrice: Number(o.totalPrice || o.orderItems.reduce((sum: number, i) => sum + (i.product?.price || 0) * i.quantity, 0))
   }));
 
   // Active orders: either not checked out, or waiting for payment approval
   const activeOrders = orders.filter(o => (!o.invoiceId || o.invoice?.paymentStatus === "PENDING") && o.status !== "cancelled");
   const tableOrders = activeOrders.filter(o => o.tableNumber === selectedTable);
   
+  // Check if there are any unserved items on the table
+  const hasUnservedItems = tableOrders.some(order => 
+    order.items.some(item => !item.isServed)
+  );
+
   // Find if there is an active pending invoice for this table
   const pendingInvoice = orders.find(o => o.invoiceId && o.invoice?.paymentStatus === "PENDING")?.invoice;
   const tableTotal = pendingInvoice 
@@ -310,13 +320,34 @@ export default function OrdersDrawer() {
 
                 <div className="p-4 space-y-3">
                   {order.items.map((item: MappedOrderItem) => (
-                    <div key={item.id} className="flex gap-3">
+                    <div key={item.id} className="flex gap-3 items-center">
+                      {(userRole === "staff" || userRole === "admin") && order.status !== "completed" && order.status !== "cancelled" && (
+                        <button
+                          disabled={updateItemStatusMutation.isPending}
+                          onClick={() => {
+                            updateItemStatusMutation.mutate({
+                              orderId: order.id,
+                              orderItemId: item.orderItemId,
+                              isServed: !item.isServed,
+                            });
+                          }}
+                          className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all shrink-0 ${
+                            item.isServed
+                              ? "bg-green-500 border-green-500 text-white"
+                              : "bg-gray-50 border-gray-200 text-gray-400 hover:text-gray-600"
+                          }`}
+                        >
+                          {item.isServed ? <Check size={14} strokeWidth={3} /> : null}
+                        </button>
+                      )}
                       <div className="w-12 h-12 rounded-lg bg-gray-50 overflow-hidden relative flex-shrink-0">
                         <Image src={getImageUrl(item.image)} alt={item.name} fill className="object-cover" />
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-center">
-                          <h4 className="font-semibold text-sm text-gray-900 leading-tight pr-4">{item.name}</h4>
+                          <h4 className={`font-semibold text-sm text-gray-900 leading-tight pr-4 ${item.isServed ? "line-through text-gray-400" : ""}`}>
+                            {item.name}
+                          </h4>
                           
                           {(userRole === "staff" || userRole === "admin") && order.status !== "completed" && order.status !== "cancelled" ? (
                             <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-xl px-1.5 py-0.5">
@@ -515,13 +546,20 @@ export default function OrdersDrawer() {
                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Tổng tiền</span>
                   <span className="text-base font-black text-primary">{tableTotal.toLocaleString("vi-VN")} ₫</span>
                 </div>
-                <button
-                  onClick={() => setIsCheckoutMode(true)}
-                  className="flex-1 bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-primary hover:bg-primary active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
-                >
-                  <CreditCard size={18} />
-                  Thanh toán hóa đơn
-                </button>
+                {hasUnservedItems ? (
+                  <div className="flex-1 text-center bg-gray-100 text-gray-400 font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 border border-gray-200">
+                    <AlertCircle size={14} className="text-amber-500 animate-pulse" />
+                    <span>Chờ phục vụ hết món để thanh toán</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setIsCheckoutMode(true)}
+                    className="flex-1 bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-primary hover:bg-primary active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
+                  >
+                    <CreditCard size={18} />
+                    Thanh toán hóa đơn
+                  </button>
+                )}
               </div>
             ) : (
               // Payment choice screen

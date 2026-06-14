@@ -54,6 +54,7 @@ export interface StoreConfig {
   bankId?: string | null;
   bankAccountNo?: string | null;
   bankAccountName?: string | null;
+  description?: string | null;
 }
 
 interface CartStore {

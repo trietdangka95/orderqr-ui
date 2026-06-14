@@ -16,6 +16,7 @@ export interface Store {
   subscriptionEnd: string | null;
   subscriptionPrice: number | null;
   subscriptionNotes: string | null;
+  description?: string | null;
 }
 
 export interface CreateStoreData {
@@ -32,6 +33,7 @@ export interface CreateStoreData {
   subscriptionEnd?: string | null;
   subscriptionPrice?: number | null;
   subscriptionNotes?: string | null;
+  description?: string | null;
 }
 
 export interface PlatformStats {

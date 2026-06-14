@@ -109,3 +109,15 @@ export const useConfirmInvoicePayment = () => {
     },
   });
 };
+
+export const useUpdateOrderItemStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ orderId, orderItemId, isCooked, isServed }: { orderId: string; orderItemId: string; isCooked?: boolean; isServed?: boolean }) =>
+      ordersApi.updateOrderItemStatus(orderId, orderItemId, { isCooked, isServed }),
+    onSuccess: (updatedOrder) => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders", "table", updatedOrder.tableNumber] });
+    },
+  });
+};

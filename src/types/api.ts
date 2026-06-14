@@ -34,10 +34,13 @@ export interface Product {
 export type OrderStatus = 'PENDING' | 'COOKING' | 'SERVING' | 'COMPLETED' | 'CANCELLED';
 
 export interface OrderItem {
+  id: string;
   productId: string;
   quantity: number;
   note?: string;
   product?: Product;
+  isCooked?: boolean;
+  isServed?: boolean;
 }
 
 export interface Order {
@@ -49,6 +52,7 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   totalAmount?: number;
+  totalPrice?: number | string;
   invoiceId?: string | null;
   invoice?: {
     id: string;

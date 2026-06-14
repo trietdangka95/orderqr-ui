@@ -105,8 +105,8 @@ export default function RevenuePage() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-white p-6 rounded-[2rem] shadow-xl shadow-primary/50 border border-orange-50"
           >
-            <div className="w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-primary">
-              <TrendingUp size={24} />
+            <div className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-primary">
+              <TrendingUp size={18} />
             </div>
             <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Tổng doanh thu</p>
             <h2 className="text-3xl font-black text-gray-900">{formatPrice(totalRevenue)}</h2>
@@ -118,8 +118,8 @@ export default function RevenuePage() {
             transition={{ delay: 0.1 }}
             className="bg-white p-6 rounded-[2rem] shadow-xl shadow-blue-100/50 border border-blue-50"
           >
-            <div className="w-12 h-12 bg-blue-500 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-blue-200">
-              <Calendar size={24} />
+            <div className="w-10 h-10 bg-blue-500 text-white rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-blue-200">
+              <Calendar size={18} />
             </div>
             <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Hôm nay</p>
             <h2 className="text-3xl font-black text-gray-900">{formatPrice(todayRevenue)}</h2>
@@ -131,8 +131,8 @@ export default function RevenuePage() {
             transition={{ delay: 0.2 }}
             className="bg-white p-6 rounded-[2rem] shadow-xl shadow-gray-100/50 border border-gray-100"
           >
-            <div className="w-12 h-12 bg-gray-800 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-gray-200">
-              <CreditCard size={24} />
+            <div className="w-10 h-10 bg-gray-800 text-white rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-gray-200">
+              <CreditCard size={18} />
             </div>
             <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Tổng số đơn</p>
             <h2 className="text-3xl font-black text-gray-900">{revenue.length}</h2>
@@ -169,7 +169,7 @@ export default function RevenuePage() {
                     <tr key={record.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-8 py-6 font-medium text-gray-600 text-sm">{formatDate(record.timestamp)}</td>
                       <td className="px-8 py-6">
-                        <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg font-black text-xs">
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-md font-bold text-[10px] uppercase tracking-wider">
                           Bàn {record.tableNumber}
                         </span>
                       </td>

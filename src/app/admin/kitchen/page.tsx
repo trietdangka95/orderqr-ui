@@ -38,7 +38,7 @@ export default function KitchenPage() {
   }, [socket, queryClient]);
 
   const orders = apiOrders
-    .filter(o => !o.invoiceId)
+    .filter(o => !o.invoiceId && o.isConfirmed)
     .map(o => ({
       ...o,
       status: o.status.toLowerCase() as OrderStatus, // UI expects lowercase
@@ -48,6 +48,7 @@ export default function KitchenPage() {
       items: o.orderItems.map((i) => ({
         ...i,
         id: i.productId, // Use productId as id for CartItem compatibility
+        orderItemId: i.id, // Database OrderItem ID
         name: i.product?.name || 'Món ăn',
         image: i.product?.image || '',
         price: i.product?.price || 0,
@@ -110,7 +111,7 @@ export default function KitchenPage() {
     }, {} as Record<string, { count: number; tables: Set<string> }>);
 
   const columns: { status: OrderStatus; title: string; color: string; dot: string }[] = [
-    { status: "pending", title: "Đợi xác nhận", dot: "bg-red-500", color: "bg-white border-t-red-500 shadow-red-100" },
+    { status: "pending", title: "Chờ chế biến", dot: "bg-red-500", color: "bg-white border-t-red-500 shadow-red-100" },
     { status: "cooking", title: "Đang chế biến", dot: "bg-primary", color: "bg-white border-t-orange-500 shadow-primary" },
     { status: "serving", title: "Chờ phục vụ", dot: "bg-blue-500", color: "bg-white border-t-blue-500 shadow-blue-100" },
     { status: "completed", title: "Hoàn thành", dot: "bg-green-500", color: "bg-white border-t-green-500 shadow-green-100" },
@@ -196,7 +197,7 @@ export default function KitchenPage() {
           <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 flex-grow min-h-0 w-full flex flex-col">
             <div className="p-8 border-b bg-gray-50/50 shrink-0">
               <h2 className="text-xl font-black text-gray-800">Danh sách món cần chuẩn bị</h2>
-              <p className="text-sm text-gray-500">Tổng hợp tất cả món từ các đơn hàng Đợi xác nhận & Đang làm</p>
+              <p className="text-sm text-gray-500">Tổng hợp tất cả món từ các đơn hàng Chờ chế biến & Đang làm</p>
             </div>
             <div className="p-8 overflow-y-auto flex-1 min-h-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

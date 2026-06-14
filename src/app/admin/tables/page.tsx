@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Receipt as ReceiptIcon,
   QrCode as QrCodeIcon,
@@ -15,7 +15,7 @@ import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function AdminTablesPage() {
-  const { tables, addTable, addMultipleTables, removeTable } = useCartStore();
+  const { tables, addTable, addMultipleTables, removeTable, storeConfig } = useCartStore();
   const { data: apiOrders = [] } = useOrders();
   const clearTableMutation = useClearTable();
   const confirmOrderMutation = useConfirmOrder();
@@ -65,6 +65,7 @@ export default function AdminTablesPage() {
   }));
   const [activeTab, setActiveTab] = useState<"status" | "qr">("status");
   const [newTableNum, setNewTableNum] = useState("");
+  const [printingTable, setPrintingTable] = useState<string | null>(null);
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   const activeOrders = orders.filter(
@@ -91,6 +92,114 @@ export default function AdminTablesPage() {
     if (confirm(`Xác nhận thanh toán và giải phóng Bàn ${tableNumber}?`)) {
       clearTableMutation.mutate(tableNumber);
     }
+  };
+
+  const receiptOrders = printingTable ? (tableStatus[printingTable] || []) : [];
+  const receiptTotal = receiptOrders.reduce((sum, order) => sum + order.totalPrice, 0);
+
+  const receiptItems = useMemo(() => {
+    const itemMap: Record<string, { name: string; quantity: number; price: number }> = {};
+    receiptOrders.forEach((order) => {
+      order.items.forEach((item: any) => {
+        if (!itemMap[item.productId]) {
+          itemMap[item.productId] = {
+            name: item.name,
+            quantity: 0,
+            price: Number(item.price)
+          };
+        }
+        itemMap[item.productId].quantity += item.quantity;
+      });
+    });
+    return Object.values(itemMap);
+  }, [receiptOrders]);
+
+  const handlePrintReceipt = () => {
+    const printEl = document.querySelector(".thermal-receipt-print-area");
+    if (!printEl) return;
+    
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    document.body.appendChild(iframe);
+    
+    const doc = iframe.contentWindow?.document;
+    if (!doc) return;
+    
+    doc.write(`
+      <html>
+        <head>
+          <title>In hóa đơn Bàn ${printingTable}</title>
+          <style>
+            @page {
+              size: 80mm auto;
+              margin: 0;
+            }
+            body {
+              margin: 0;
+              padding: 4mm;
+              font-family: monospace;
+              font-size: 11px;
+              line-height: 1.5;
+              color: black;
+              background: white;
+            }
+            .text-center { text-align: center; }
+            .space-y-1 > * { margin-top: 2px; margin-bottom: 2px; }
+            .mb-4 { margin-bottom: 16px; }
+            .mt-1 { margin-top: 4px; }
+            .mt-4 { margin-top: 16px; }
+            .my-2 { margin-top: 8px; margin-bottom: 8px; }
+            .my-3 { margin-top: 12px; margin-bottom: 12px; }
+            .my-4 { margin-top: 16px; margin-bottom: 16px; }
+            .font-bold { font-weight: bold; }
+            .font-black { font-weight: 900; }
+            .uppercase { text-transform: uppercase; }
+            .text-lg { font-size: 16px; }
+            .text-sm { font-size: 13px; }
+            .text-xs { font-size: 11px; }
+            .text-primary { color: #f97316; }
+            .text-gray-500 { color: #6b7280; }
+            .text-gray-400 { color: #9ca3af; }
+            .w-full { width: 100%; }
+            .border-collapse { border-collapse: collapse; }
+            .border-b { border-bottom: 1px solid black; }
+            .border-t { border-top: 1px solid black; }
+            .border-dashed { border-style: dashed; }
+            .border-dotted { border-style: dotted; }
+            .py-1 { padding-top: 4px; padding-bottom: 4px; }
+            .pt-1 { padding-top: 4px; }
+            .pt-1.5 { padding-top: 6px; }
+            .text-right { text-align: right; }
+            .text-center { text-align: center; }
+            .flex { display: flex; }
+            .justify-between { justify-content: space-between; }
+            .truncate {
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+            .max-w-[120px] { max-width: 120px; }
+          </style>
+        </head>
+        <body>
+          ${printEl.innerHTML}
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() {
+                window.frameElement.remove();
+              }, 1000);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    doc.close();
   };
 
   const handlePrint = () => {
@@ -151,6 +260,7 @@ export default function AdminTablesPage() {
                   onCheckout={handleCheckout}
                   onConfirmOrder={(id) => confirmOrderMutation.mutate(id)}
                   onConfirmInvoicePayment={(id) => confirmInvoicePaymentMutation.mutate(id)}
+                  onPrintInvoice={setPrintingTable}
                 />
               ))}
             </div>
@@ -212,9 +322,91 @@ export default function AdminTablesPage() {
           </div>
         )}
       </main>
+      {/* Receipt Print Modal */}
+      {printingTable && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:hidden">
+          <div className="bg-white rounded-[2rem] p-6 max-w-sm w-full shadow-2xl relative">
+            <h3 className="font-bold text-gray-800 text-lg mb-4 text-center">Xem trước Hóa đơn</h3>
+            
+            {/* Thermal Receipt Box */}
+            <div className="border border-gray-200 rounded-2xl p-4 max-h-[60vh] overflow-y-auto bg-gray-50/50 mb-6 no-scrollbar">
+              {/* This is the printable area */}
+              <div className="thermal-receipt-print-area font-mono text-[11px] leading-relaxed text-black bg-white p-4 shadow-sm w-full max-w-[80mm] mx-auto border">
+                <div className="text-center space-y-1 mb-4">
+                  <h2 className="text-base font-black uppercase tracking-tight">{storeConfig?.name || "MENU VIỆT"}</h2>
+                  {storeConfig?.description && (
+                    <p className="text-[9px] text-gray-500 font-bold leading-normal">{storeConfig.description}</p>
+                  )}
+                  <p className="text-[9px] text-gray-400 font-medium">Hệ thống Order QR</p>
+                  <div className="border-t border-dashed border-gray-400 my-2"></div>
+                  <h3 className="text-xs font-black uppercase tracking-wider">HÓA ĐƠN TẠM TÍNH</h3>
+                  <p className="text-sm font-black text-primary">BÀN: {printingTable}</p>
+                  <p className="text-[9px] text-gray-500 font-medium mt-1">Giờ vào: {receiptOrders[0] ? new Date(receiptOrders[receiptOrders.length - 1].timestamp).toLocaleTimeString("vi-VN") : ""}</p>
+                  <p className="text-[9px] text-gray-500 font-medium">Giờ in: {new Date().toLocaleTimeString("vi-VN")} {new Date().toLocaleDateString("vi-VN")}</p>
+                </div>
+
+                <table className="w-full text-[10px] border-collapse">
+                  <thead>
+                    <tr className="border-b border-dashed border-black text-left font-black">
+                      <th className="py-1">Món ăn</th>
+                      <th className="py-1 text-center">SL</th>
+                      <th className="py-1 text-right">T.Tiền</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {receiptItems.map((item: any, i: number) => (
+                      <tr key={i} className="border-b border-dotted border-gray-200">
+                        <td className="py-1 max-w-[120px] truncate font-bold text-gray-800">{item.name}</td>
+                        <td className="py-1 text-center font-bold">{item.quantity}</td>
+                        <td className="py-1 text-right font-bold">{(item.price * item.quantity).toLocaleString("vi-VN")}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                <div className="border-t border-dashed border-gray-400 my-3"></div>
+
+                <div className="space-y-1 text-[11px] font-bold">
+                  <div className="flex justify-between">
+                    <span>Tổng tiền món:</span>
+                    <span>{receiptTotal.toLocaleString("vi-VN")} ₫</span>
+                  </div>
+                  <div className="flex justify-between font-black text-xs border-t border-black pt-1.5 mt-1">
+                    <span>TỔNG CỘNG:</span>
+                    <span className="text-primary">{receiptTotal.toLocaleString("vi-VN")} ₫</span>
+                  </div>
+                </div>
+
+                <div className="border-t border-dashed border-gray-400 my-4"></div>
+
+                <div className="text-center text-[9px] font-bold space-y-1">
+                  <p className="text-gray-900 uppercase">CẢM ƠN QUÝ KHÁCH & HẸN GẶP LẠI!</p>
+                  <p className="italic text-gray-400 font-medium">Powered by orderqr.id.vn</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPrintingTable(null)}
+                className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-black rounded-xl text-sm transition-all"
+              >
+                Đóng
+              </button>
+              <button
+                onClick={handlePrintReceipt}
+                className="flex-[2] py-3 bg-primary hover:bg-primary/95 text-white font-black rounded-xl text-sm shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 active:scale-95"
+              >
+                <PrinterIcon size={16} />
+                In Hóa Đơn
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
  
       {/* Print Styles */}
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         @media print {
           @page {
             size: A4 portrait;
@@ -226,7 +418,7 @@ export default function AdminTablesPage() {
             color: black !important;
           }
           
-          .print\:hidden { 
+          .print\\:hidden { 
             display: none !important; 
           }
           
@@ -266,7 +458,7 @@ export default function AdminTablesPage() {
             print-color-adjust: exact !important;
           }
         }
-      `}</style>
+      ` }} />
     </div>
   );
 }

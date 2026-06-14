@@ -36,6 +36,7 @@ interface StoreFormModalProps {
     subscriptionEnd: string;
     subscriptionPrice: number;
     subscriptionNotes: string;
+    description?: string;
   };
   isPending: boolean;
 }
@@ -148,6 +149,15 @@ export function StoreFormModal({
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
                     placeholder="e.g. Quán Ăn Việt"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Mô tả quán</label>
+                  <textarea
+                    value={formData.description || ""}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none h-20 resize-none"
+                    placeholder="e.g. Chào mừng quý khách đến với cửa hàng!"
                   />
                 </div>
                 <div>

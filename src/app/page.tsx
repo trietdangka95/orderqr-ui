@@ -256,7 +256,12 @@ function HomeContent() {
             </span>
             {/* Specific Name of Subdomain Store */}
             <h1 className="text-3xl font-black tracking-tight text-white mt-2">{storeConfig?.name || "Menu Việt"}</h1>
-            <p className="text-gray-400 font-medium text-sm mt-3 max-w-sm italic">
+            {storeConfig?.description && (
+              <p className="text-gray-300 font-bold text-sm mt-2 max-w-md mx-auto leading-relaxed">
+                {storeConfig.description}
+              </p>
+            )}
+            <p className="text-gray-400 font-medium text-xs mt-4 max-w-sm mx-auto italic">
               Vui lòng chọn bàn của bạn để xem thực đơn & gọi món
             </p>
           </div>

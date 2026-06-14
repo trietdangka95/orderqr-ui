@@ -49,13 +49,23 @@ export default function HomeHeader({
           <div className="w-9 h-9 md:w-12 md:h-12 bg-primary rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-primary rotate-3">
             <Soup className="text-white w-5 h-5 md:w-7 md:h-7" />
           </div>
-          <div>
+          <div className="flex flex-col">
             <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-none">
               {storeConfig?.name || "Menu Việt"}
             </h1>
-            <span className="text-[10px] md:text-xs font-bold text-primary tracking-[0.2em] uppercase">
-              Order QR
-            </span>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="text-[10px] md:text-xs font-bold text-primary tracking-[0.2em] uppercase shrink-0">
+                Order QR
+              </span>
+              {storeConfig?.description && (
+                <>
+                  <span className="text-gray-300 text-xs">|</span>
+                  <span className="text-[10px] md:text-xs text-gray-500 font-bold truncate max-w-[150px] sm:max-w-[300px]">
+                    {storeConfig.description}
+                  </span>
+                </>
+              )}
+            </div>
           </div>
         </div>
 

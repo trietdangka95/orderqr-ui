@@ -209,7 +209,7 @@ export default function LandingPage() {
       <section className="relative max-w-7xl mx-auto px-4 md:px-8 pt-16 md:pt-24 pb-20">
         <div className="grid grid-cols-1 gap-12 items-center">
           {/* Left Column: Headlines & CTA */}
-          <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+          <div className="lg:col-span-12 flex flex-col items-center text-center">
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}

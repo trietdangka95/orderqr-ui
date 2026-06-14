@@ -1,7 +1,7 @@
 "use client";
  
 import { motion } from "framer-motion";
-import { CheckCircle2 as CheckIcon, X as XIcon, AlertCircle, Banknote, QrCode } from "lucide-react";
+import { CheckCircle2 as CheckIcon, X as XIcon, AlertCircle, Banknote, QrCode, Printer } from "lucide-react";
 import { Order, useCartStore } from "@/store/cartStore";
  
 interface TableStatusCardProps {
@@ -11,6 +11,7 @@ interface TableStatusCardProps {
   onCheckout: (tableNumber: string) => void;
   onConfirmOrder: (orderId: string) => void;
   onConfirmInvoicePayment: (invoiceId: string) => void;
+  onPrintInvoice: (tableNumber: string) => void;
 }
  
 export default function TableStatusCard({
@@ -20,6 +21,7 @@ export default function TableStatusCard({
   onCheckout,
   onConfirmOrder,
   onConfirmInvoicePayment,
+  onPrintInvoice,
 }: TableStatusCardProps) {
   const totalAmount = tableOrders.reduce((sum, order) => sum + order.totalPrice, 0);
   const hasUnconfirmed = tableOrders.some((o) => !o.isConfirmed);
@@ -63,7 +65,16 @@ export default function TableStatusCard({
             {tableNumber}
           </div>
           <div>
-            <h3 className="font-bold text-gray-800">Bàn {tableNumber}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-gray-800">Bàn {tableNumber}</h3>
+              <button
+                onClick={() => onPrintInvoice(tableNumber)}
+                className="p-1.5 text-gray-400 hover:text-primary transition-colors hover:bg-gray-100 rounded-lg cursor-pointer flex items-center justify-center"
+                title="In hóa đơn tạm tính"
+              >
+                <Printer size={15} />
+              </button>
+            </div>
             {pendingInvoice ? (
               <span className="text-[10px] font-black text-amber-600 uppercase flex items-center gap-1 animate-pulse">
                 {isQrPayment ? (

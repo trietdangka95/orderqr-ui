@@ -2,7 +2,8 @@
 "use client";
 
 import { Order } from "@/store/cartStore";
-import { Check, ArrowRight, Clock } from "lucide-react";
+import { Check, ArrowRight, Clock, CheckCircle2 } from "lucide-react";
+import { useUpdateOrderItemStatus } from "@/hooks/useOrders";
 
 interface OrderTicketProps {
   order: Order;
@@ -10,6 +11,8 @@ interface OrderTicketProps {
 }
 
 export default function OrderTicket({ order, onAdvance }: OrderTicketProps) {
+  const updateItemStatusMutation = useUpdateOrderItemStatus();
+
   return (
     <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden group hover:border-primary/30 transition-all">
       <div className="p-5 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
@@ -32,18 +35,37 @@ export default function OrderTicket({ order, onAdvance }: OrderTicketProps) {
 
       <div className="p-5">
         <ul className="space-y-3 mb-6">
-          {order.items.map((item) => (
+          {order.items.map((item: any) => (
             <li key={item.id} className="flex flex-col gap-1.5">
-              <div className="flex justify-between items-start gap-4">
-                <div className="flex gap-3">
+              <div className="flex justify-between items-center gap-4">
+                <div className="flex items-center gap-3">
+                  <button
+                    disabled={updateItemStatusMutation.isPending}
+                    onClick={() => {
+                      updateItemStatusMutation.mutate({
+                        orderId: order.id,
+                        orderItemId: item.orderItemId,
+                        isCooked: !item.isCooked,
+                      });
+                    }}
+                    className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
+                      item.isCooked
+                        ? "bg-primary border-primary text-white"
+                        : "bg-gray-50 border-gray-200 text-gray-400 hover:text-gray-600"
+                    }`}
+                  >
+                    {item.isCooked ? <Check size={14} strokeWidth={3} /> : null}
+                  </button>
                   <span className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center text-[10px] font-black text-gray-900 shrink-0">
                     {item.quantity}
                   </span>
-                  <span className="font-bold text-sm text-gray-700 leading-tight">{item.name}</span>
+                  <span className={`font-bold text-sm text-gray-700 leading-tight ${item.isCooked ? "line-through text-gray-400" : ""}`}>
+                    {item.name}
+                  </span>
                 </div>
               </div>
               {item.note && (
-                <div className="ml-10 text-[10px] bg-primary-soft/70 border border-primary/60 text-primary px-2.5 py-1.5 rounded-xl font-bold italic self-start leading-relaxed">
+                <div className="ml-16 text-[10px] bg-primary-soft/70 border border-primary/60 text-primary px-2.5 py-1.5 rounded-xl font-bold italic self-start leading-relaxed">
                   {item.note}
                 </div>
               )}
@@ -54,7 +76,7 @@ export default function OrderTicket({ order, onAdvance }: OrderTicketProps) {
         <div className="pt-4 border-t border-dashed border-gray-100 flex justify-between items-center">
           <div className="flex flex-col">
              <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Tổng cộng</span>
-             <span className="font-black text-gray-900 text-lg">{order.totalPrice.toLocaleString("vi-VN")}₫</span>
+             <span className="font-black text-gray-900 text-lg">{Number(order.totalPrice).toLocaleString("vi-VN")}₫</span>
           </div>
 
           {/* Action buttons */}
