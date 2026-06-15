@@ -32,8 +32,9 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Connected to socket server');
       setIsConnected(true);
 
-      // Join rooms based on store context
+      // Join store room
       socketInstance.emit('join', `store_${storeConfig.id}`);
+      // Join table room if already selected
       if (selectedTable) {
         socketInstance.emit('join', `store_${storeConfig.id}_table_${selectedTable}`);
       }
@@ -44,13 +45,19 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setIsConnected(false);
     });
 
-    const handle = requestAnimationFrame(() => setSocket(socketInstance));
+    setSocket(socketInstance);
 
     return () => {
-      cancelAnimationFrame(handle);
       socketInstance.disconnect();
     };
-  }, [userRole, selectedTable, storeConfig?.id]);
+  }, [storeConfig?.id]);
+
+  // Join table room reactively when table or connection state changes, without disconnecting
+  useEffect(() => {
+    if (socket && isConnected && storeConfig?.id && selectedTable) {
+      socket.emit('join', `store_${storeConfig.id}_table_${selectedTable}`);
+    }
+  }, [socket, isConnected, selectedTable, storeConfig?.id]);
 
   return (
     <SocketContext.Provider value={{ socket, isConnected }}>
