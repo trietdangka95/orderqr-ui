@@ -44,7 +44,7 @@ export default function KitchenPage() {
       status: o.status.toLowerCase() as OrderStatus, // UI expects lowercase
       timestamp: new Date(o.createdAt).getTime(),
       isConfirmed: o.isConfirmed,
-      totalPrice: o.totalAmount || 0,
+      totalPrice: Number(o.totalPrice || o.orderItems.reduce((sum: number, i: any) => sum + (i.product?.price || 0) * i.quantity, 0)),
       items: o.orderItems.map((i) => ({
         ...i,
         id: i.productId, // Use productId as id for CartItem compatibility

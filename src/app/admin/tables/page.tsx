@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Receipt as ReceiptIcon,
   QrCode as QrCodeIcon,
@@ -23,6 +24,10 @@ export default function AdminTablesPage() {
   const isMounted = useIsMounted();
   const queryClient = useQueryClient();
   const { socket } = useSocket();
+
+  // Custom confirmation modal states
+  const [checkoutConfirmTable, setCheckoutConfirmTable] = useState<string | null>(null);
+  const [paymentConfirmInvoice, setPaymentConfirmInvoice] = useState<{ invoiceId: string; tableNumber: string; amount: number } | null>(null);
 
   // Real-time updates
   useEffect(() => {
@@ -61,7 +66,7 @@ export default function AdminTablesPage() {
       categoryId: i.product?.categoryId || 0,
       note: i.note || '',
     })),
-    totalPrice: o.totalAmount || o.orderItems.reduce((sum: number, i) => sum + (i.product?.price || 0) * i.quantity, 0)
+    totalPrice: Number(o.totalPrice || o.orderItems.reduce((sum: number, i) => sum + (i.product?.price || 0) * i.quantity, 0))
   }));
   const [activeTab, setActiveTab] = useState<"status" | "qr">("status");
   const [newTableNum, setNewTableNum] = useState("");
@@ -89,9 +94,7 @@ export default function AdminTablesPage() {
   };
 
   const handleCheckout = (tableNumber: string) => {
-    if (confirm(`Xác nhận thanh toán và giải phóng Bàn ${tableNumber}?`)) {
-      clearTableMutation.mutate(tableNumber);
-    }
+    setCheckoutConfirmTable(tableNumber);
   };
 
   const receiptOrders = printingTable ? (tableStatus[printingTable] || []) : [];
@@ -259,7 +262,7 @@ export default function AdminTablesPage() {
                   formatPrice={formatPrice}
                   onCheckout={handleCheckout}
                   onConfirmOrder={(id) => confirmOrderMutation.mutate(id)}
-                  onConfirmInvoicePayment={(id) => confirmInvoicePaymentMutation.mutate(id)}
+                  onConfirmInvoicePayment={(id, tableNum, amount) => setPaymentConfirmInvoice({ invoiceId: id, tableNumber: tableNum, amount })}
                   onPrintInvoice={setPrintingTable}
                 />
               ))}
@@ -404,6 +407,86 @@ export default function AdminTablesPage() {
           </div>
         </div>
       )}
+
+      {/* Custom Checkout Confirmation Modal */}
+      <AnimatePresence>
+        {checkoutConfirmTable && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:hidden">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white rounded-[2rem] p-6 max-w-sm w-full shadow-2xl relative border border-slate-100"
+            >
+              <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center text-primary mx-auto mb-4 text-2xl font-black">
+                💳
+              </div>
+              <h3 className="font-black text-gray-950 text-lg mb-2 text-center">Xác nhận thanh toán</h3>
+              <p className="text-gray-500 text-xs text-center font-bold leading-relaxed mb-6 px-4">
+                Bạn có chắc chắn muốn thanh toán và giải phóng <span className="text-primary font-black">Bàn {checkoutConfirmTable}</span>? Hành động này sẽ hoàn tất tất cả đơn hàng hiện tại của bàn này.
+              </p>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setCheckoutConfirmTable(null)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer animate-none"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  onClick={() => {
+                    clearTableMutation.mutate(checkoutConfirmTable);
+                    setCheckoutConfirmTable(null);
+                  }}
+                  className="flex-1 py-3 bg-primary hover:opacity-90 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-orange-100 transition-all cursor-pointer"
+                >
+                  Xác nhận
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Custom Payment Confirmation Modal */}
+      <AnimatePresence>
+        {paymentConfirmInvoice && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:hidden">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-white rounded-[2rem] p-6 max-w-sm w-full shadow-2xl relative border border-slate-100"
+            >
+              <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mx-auto mb-4 text-2xl font-black">
+                💰
+              </div>
+              <h3 className="font-black text-gray-950 text-lg mb-2 text-center">Đã nhận đủ tiền?</h3>
+              <p className="text-gray-500 text-xs text-center font-bold leading-relaxed mb-6 px-4">
+                Xác nhận đã nhận số tiền <span className="text-primary font-black">{formatPrice(paymentConfirmInvoice.amount)}</span> từ <span className="text-amber-500 font-black">Bàn {paymentConfirmInvoice.tableNumber}</span>? Trạng thái bàn sẽ được cập nhật.
+              </p>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setPaymentConfirmInvoice(null)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  onClick={() => {
+                    confirmInvoicePaymentMutation.mutate(paymentConfirmInvoice.invoiceId);
+                    setPaymentConfirmInvoice(null);
+                  }}
+                  className="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-amber-100 transition-all cursor-pointer"
+                >
+                  Đồng ý
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
  
       {/* Print Styles */}
       <style dangerouslySetInnerHTML={{ __html: `
