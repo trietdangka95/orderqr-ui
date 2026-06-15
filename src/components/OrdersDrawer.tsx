@@ -323,7 +323,7 @@ export default function OrdersDrawer() {
                     <div key={item.id} className="flex gap-3 items-center">
                       {(userRole === "staff" || userRole === "admin") && order.status !== "completed" && order.status !== "cancelled" && (
                         <button
-                          disabled={updateItemStatusMutation.isPending}
+                          disabled={updateItemStatusMutation.isPending || !item.isCooked}
                           onClick={() => {
                             updateItemStatusMutation.mutate({
                               orderId: order.id,
@@ -333,9 +333,12 @@ export default function OrdersDrawer() {
                           }}
                           className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all shrink-0 ${
                             item.isServed
-                              ? "bg-green-500 border-green-500 text-white"
-                              : "bg-gray-50 border-gray-200 text-gray-400 hover:text-gray-600"
+                              ? "bg-green-500 border-green-500 text-white cursor-pointer"
+                              : !item.isCooked
+                              ? "bg-gray-100 border-gray-100 text-gray-300 cursor-not-allowed"
+                              : "bg-blue-50 border-2 border-blue-500 text-blue-500 hover:bg-blue-100 hover:border-blue-600 shadow-md cursor-pointer transition-all hover:scale-105"
                           }`}
+                          title={!item.isCooked ? "Bếp chưa nấu xong món này" : ""}
                         >
                           {item.isServed ? <Check size={14} strokeWidth={3} /> : null}
                         </button>
@@ -345,7 +348,7 @@ export default function OrdersDrawer() {
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-center">
-                          <h4 className={`font-semibold text-sm text-gray-900 leading-tight pr-4 ${item.isServed ? "line-through text-gray-400" : ""}`}>
+                          <h4 className={`font-semibold text-sm leading-tight pr-4 transition-colors ${item.isServed ? "text-gray-400 font-medium" : "text-gray-900"}`}>
                             {item.name}
                           </h4>
                           
@@ -389,8 +392,26 @@ export default function OrdersDrawer() {
                             <span className="font-bold text-sm">x{item.quantity}</span>
                           )}
                         </div>
+                        
+                        {/* Chi tiết trạng thái món ăn */}
+                        <div className="mt-1.5 flex flex-wrap gap-2 items-center">
+                          {item.isServed ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-green-50 text-green-600 text-[10px] font-black border border-green-100">
+                              <Check size={10} strokeWidth={3} /> Đã phục vụ
+                            </span>
+                          ) : item.isCooked ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black border border-blue-100 animate-pulse">
+                              <ChefHat size={10} strokeWidth={3} /> Chờ phục vụ
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gray-50 text-gray-400 text-[10px] font-bold border border-gray-200">
+                              <Clock size={10} strokeWidth={3} /> Đang chuẩn bị
+                            </span>
+                          )}
+                        </div>
+
                         {item.note && (
-                          <p className="text-xs text-gray-500 italic mt-0.5">Note: {item.note}</p>
+                          <p className="text-xs text-gray-500 italic mt-1">Note: {item.note}</p>
                         )}
                       </div>
                     </div>
