@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
-import { useRenewalRequests, useCreateRenewalRequest, useBankConfig } from "@/hooks/useRenewals";
+import { useRenewalRequests, useCreateRenewalRequest, useBankConfig, useUpdateStoreBankConfig } from "@/hooks/useRenewals";
 import { 
   CreditCard, 
   Sparkles, 
@@ -13,7 +13,9 @@ import {
   Copy, 
   History, 
   X,
-  Plus
+  Plus,
+  QrCode,
+  Building2
 } from "lucide-react";
 import useIsMounted from "@/hooks/useIsMounted";
 
@@ -44,11 +46,25 @@ const sanitizeBankId = (bankId: string | undefined | null): string => {
 };
 
 export default function AdminBillingPage() {
-  const { storeConfig } = useCartStore();
+  const { storeConfig, setStoreConfig } = useCartStore();
   const isMounted = useIsMounted();
   const { data: requests = [], isLoading: requestsLoading } = useRenewalRequests();
   const { data: bankConfig } = useBankConfig();
   const createRequestMutation = useCreateRenewalRequest();
+  const updateStoreBankMutation = useUpdateStoreBankConfig();
+
+  const [bankId, setBankId] = useState(storeConfig?.bankId || "");
+  const [bankAccountNo, setBankAccountNo] = useState(storeConfig?.bankAccountNo || "");
+  const [bankAccountName, setBankAccountName] = useState(storeConfig?.bankAccountName || "");
+
+  // Sync state with storeConfig when it loads
+  useEffect(() => {
+    if (storeConfig) {
+      if (!bankId) setBankId(storeConfig.bankId || "");
+      if (!bankAccountNo) setBankAccountNo(storeConfig.bankAccountNo || "");
+      if (!bankAccountName) setBankAccountName(storeConfig.bankAccountName || "");
+    }
+  }, [storeConfig]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTestMode, setIsTestMode] = useState<boolean>(false);
@@ -215,6 +231,118 @@ export default function AdminBillingPage() {
             </ul>
           </div>
         </div>
+      </div>
+
+      {/* Store Bank Configuration Card */}
+      <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-xl shadow-gray-200/50 space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-50 pb-6 gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-primary flex items-center justify-center shrink-0">
+              <QrCode size={24} />
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-gray-900 tracking-tight">Tài khoản Ngân hàng nhận QR</h3>
+              <p className="text-sm text-gray-500 font-medium">Cấu hình thông tin tài khoản ngân hàng của quán để tự động tạo mã QR VietQR nhận tiền khi khách thanh toán chuyển khoản.</p>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          if (!bankId || !bankAccountNo || !bankAccountName) {
+            alert("Vui lòng điền đầy đủ thông tin ngân hàng!");
+            return;
+          }
+          updateStoreBankMutation.mutate({
+            bankId: bankId.trim(),
+            bankAccountNo: bankAccountNo.trim(),
+            bankAccountName: bankAccountName.trim()
+          }, {
+            onSuccess: (data) => {
+              setStoreConfig({
+                ...storeConfig!,
+                bankId: data.bankId,
+                bankAccountNo: data.bankAccountNo,
+                bankAccountName: data.bankAccountName
+              });
+              alert("Lưu thông tin ngân hàng thành công!");
+            },
+            onError: (err: any) => {
+              alert(err.message || "Không thể cập nhật cấu hình ngân hàng");
+            }
+          });
+        }} className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Ngân hàng</label>
+            <select
+              value={bankId}
+              onChange={(e) => setBankId(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 focus:outline-none focus:border-primary transition-colors"
+              required
+            >
+              <option value="" disabled>Chọn ngân hàng...</option>
+              {[
+                { id: "MB", name: "MB Bank (Ngân hàng Quân đội)" },
+                { id: "VCB", name: "Vietcombank (Ngoại thương)" },
+                { id: "CTG", name: "VietinBank (Công thương)" },
+                { id: "TCB", name: "Techcombank (Kỹ thương)" },
+                { id: "BIDV", name: "BIDV (Đầu tư & Phát triển)" },
+                { id: "ACB", name: "ACB (Á Châu)" },
+                { id: "VPB", name: "VPBank (Việt Nam Thịnh Vượng)" },
+                { id: "TPB", name: "TPBank (Tiên Phong)" },
+                { id: "STB", name: "Sacombank (Sài Gòn Thương Tín)" },
+                { id: "HDB", name: "HDBank (Phát triển TP.HCM)" },
+                { id: "VBA", name: "Agribank (Nông nghiệp)" },
+                { id: "VIB", name: "VIB (Quốc tế)" },
+                { id: "SHB", name: "SHB (Sài Gòn - Hà Nội)" },
+                { id: "OCB", name: "OCB (Phương Đông)" },
+              ].map((b) => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Số tài khoản</label>
+            <input
+              type="text"
+              value={bankAccountNo}
+              onChange={(e) => setBankAccountNo(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 focus:outline-none focus:border-primary transition-colors"
+              placeholder="Nhập số tài khoản"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tên chủ tài khoản (Viết liền không dấu)</label>
+            <input
+              type="text"
+              value={bankAccountName}
+              onChange={(e) => setBankAccountName(e.target.value.toUpperCase())}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 focus:outline-none focus:border-primary transition-colors"
+              placeholder="Ví dụ: NGUYEN VAN A"
+              required
+            />
+          </div>
+
+          <div className="md:col-span-3 flex justify-end pt-2">
+            <button
+              type="submit"
+              disabled={updateStoreBankMutation.isPending}
+              className="bg-primary text-white font-bold px-8 py-3 rounded-xl hover:bg-primary transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 text-sm shadow-lg shadow-primary/20"
+            >
+              {updateStoreBankMutation.isPending ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  <CheckCircle2 size={16} />
+                  Lưu cấu hình
+                </>
+              )}
+            </button>
+          </div>
+        </form>
       </div>
 
       {/* Renewal Packages Grid */}

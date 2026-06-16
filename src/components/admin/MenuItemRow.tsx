@@ -88,7 +88,11 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
     return (
       <motion.div
         layoutId={`menu-item-${item.id}`}
-        className="bg-white rounded-[2rem] p-5 border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-orange-50/50 transition-all group relative overflow-hidden flex flex-col h-full"
+        className={`bg-white rounded-[2rem] p-5 border shadow-sm transition-all group relative overflow-hidden flex flex-col h-full ${
+          item.isAvailable === false
+            ? "bg-gray-50/70 border-gray-200 opacity-65 grayscale-[30%]"
+            : "bg-white border-gray-100 hover:shadow-xl hover:shadow-orange-50/50"
+        }`}
       >
         <motion.div
           layoutId={`image-${item.id}`}
@@ -104,6 +108,13 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
           <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm">
             <span className="text-[10px] font-black text-primary uppercase tracking-wider">{item.category}</span>
           </div>
+          {item.isAvailable === false && (
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
+              <span className="bg-red-500 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-xl shadow-lg shadow-red-500/20">
+                Hết món
+              </span>
+            </div>
+          )}
         </motion.div>
 
         <div className="flex-1 flex flex-col justify-between">
@@ -131,7 +142,11 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
   return (
     <motion.div
       layoutId={`menu-item-${item.id}`}
-      className="bg-white rounded-[2rem] p-4 border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-orange-50/50 transition-all group relative overflow-hidden flex flex-row gap-4"
+      className={`bg-white rounded-[2rem] p-4 border shadow-sm transition-all group relative overflow-hidden flex flex-row gap-4 ${
+        item.isAvailable === false
+          ? "bg-gray-50/70 border-gray-200 opacity-65 grayscale-[30%]"
+          : "bg-white border-gray-100 hover:shadow-xl hover:shadow-orange-50/50"
+      }`}
     >
       <motion.div
         layoutId={`image-${item.id}`}
@@ -147,6 +162,13 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
         <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-white/90 backdrop-blur-sm rounded-md shadow-sm">
           <span className="text-[8px] font-black text-primary uppercase tracking-wider">{item.category}</span>
         </div>
+        {item.isAvailable === false && (
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
+            <span className="bg-red-500 text-white text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg shadow-lg shadow-red-500/20">
+              Hết món
+            </span>
+          </div>
+        )}
       </motion.div>
 
       <div className="flex-1 flex flex-col justify-between py-1">

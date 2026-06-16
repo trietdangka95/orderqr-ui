@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Plus, Loader2 } from "lucide-react";
+import { X, Plus, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { useCreateCategory, useDeleteCategory } from "@/hooks/useProducts";
 import { Category } from "@/types/api";
 import { motion, AnimatePresence } from "framer-motion";
@@ -11,6 +11,7 @@ interface CategoryManagerProps {
 }
 
 export default function CategoryManager({ categories }: CategoryManagerProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const createCategoryMutation = useCreateCategory();
   const deleteCategoryMutation = useDeleteCategory();
@@ -40,59 +41,80 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
   };
 
   return (
-    <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-gray-200/50 border border-gray-100 mb-8">
-      <div className="flex items-center gap-2 mb-6">
-        <div className="w-1.5 h-6 bg-primary rounded-full"></div>
-        <h2 className="text-lg font-black text-gray-900 uppercase tracking-wider">
-          Quản lý Danh mục
-        </h2>
-      </div>
+    <div className="bg-white rounded-[2rem] p-5 shadow-xl shadow-gray-200/50 border border-gray-100 mb-8 transition-all">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between outline-none"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-6 bg-primary rounded-full"></div>
+          <h2 className="text-sm font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
+            Quản lý Danh mục <span className="text-xs font-bold text-gray-400 normal-case bg-gray-50 px-2 py-0.5 rounded-lg">({categories.length} danh mục)</span>
+          </h2>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs font-black text-primary uppercase tracking-widest hover:text-orange-600 transition-colors">
+          <span>{isOpen ? "Thu gọn" : "Chỉnh sửa"}</span>
+          {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </div>
+      </button>
 
-      <div className="flex flex-wrap gap-3 mb-8">
-        <AnimatePresence mode="popLayout">
-          {categories.map((cat) => (
-            <motion.div
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              key={cat.id}
-              className="group flex items-center gap-2 bg-gray-50 border border-gray-100 pl-4 pr-2 py-2 rounded-xl hover:bg-white hover:shadow-md transition-all"
-            >
-              <span className="text-sm font-bold text-gray-700">{cat.name}</span>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden mt-6 pt-6 border-t border-gray-50 space-y-6"
+          >
+            <div className="flex flex-wrap gap-3">
+              <AnimatePresence mode="popLayout">
+                {categories.map((cat) => (
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    key={cat.id}
+                    className="group flex items-center gap-2 bg-gray-50 border border-gray-100 pl-4 pr-2 py-2 rounded-xl hover:bg-white hover:shadow-md transition-all"
+                  >
+                    <span className="text-sm font-bold text-gray-700">{cat.name}</span>
+                    <button
+                      onClick={() => handleRemove(cat.id)}
+                      disabled={deleteCategoryMutation.isPending}
+                      className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
+                    >
+                      <X size={16} />
+                    </button>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            <form onSubmit={handleSubmit} className="flex gap-3">
+              <input
+                type="text"
+                placeholder="Nhập tên danh mục mới..."
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                className="flex-1 px-5 py-3.5 bg-gray-50 border-2 border-transparent rounded-2xl focus:border-orange-500 outline-none transition-all font-bold text-sm text-gray-700"
+              />
               <button
-                onClick={() => handleRemove(cat.id)}
-                disabled={deleteCategoryMutation.isPending}
-                className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
+                type="submit"
+                disabled={createCategoryMutation.isPending || !newCategoryName.trim()}
+                className="px-6 py-3.5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary shadow-lg shadow-primary transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2 shrink-0"
               >
-                <X size={16} />
+                {createCategoryMutation.isPending ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <Plus size={16} />
+                )}
+                <span>Thêm nhanh</span>
               </button>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex gap-3">
-        <input
-          type="text"
-          placeholder="Nhập tên danh mục mới..."
-          value={newCategoryName}
-          onChange={(e) => setNewCategoryName(e.target.value)}
-          className="flex-1 px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:border-orange-500 outline-none transition-all font-medium text-gray-700"
-        />
-        <button
-          type="submit"
-          disabled={createCategoryMutation.isPending || !newCategoryName.trim()}
-          className="px-8 py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-primary shadow-lg shadow-primary transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
-        >
-          {createCategoryMutation.isPending ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <Plus size={16} />
-          )}
-          <span>Thêm nhanh</span>
-        </button>
-      </form>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

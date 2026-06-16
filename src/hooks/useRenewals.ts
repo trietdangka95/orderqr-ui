@@ -55,3 +55,13 @@ export const useSaveBankConfig = () => {
     },
   });
 };
+
+export const useUpdateStoreBankConfig = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: renewalsApi.updateStoreBankConfig,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+  });
+};

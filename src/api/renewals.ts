@@ -46,4 +46,9 @@ export const renewalsApi = {
     const response = await axiosInstance.post<{ bankId: string; bankAccountNo: string; bankAccountName: string; premiumPrice?: number }>('/renewals/bank-config', payload);
     return response.data;
   },
+
+  updateStoreBankConfig: async (payload: { bankId: string; bankAccountNo: string; bankAccountName: string }): Promise<{ bankId: string; bankAccountNo: string; bankAccountName: string }> => {
+    const response = await axiosInstance.put<{ bankId: string; bankAccountNo: string; bankAccountName: string }>('/stores/bank-config', payload);
+    return response.data;
+  },
 };

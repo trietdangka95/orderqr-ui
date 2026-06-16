@@ -30,6 +30,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
     promoTitle: item?.promoTitle || "",
     promoDescription: item?.promoDescription || "",
     discountPercent: item?.discountPercent || 0,
+    isAvailable: item?.isAvailable ?? true,
   });
 
   const [priceInput, setPriceInput] = useState(item?.price?.toString() || "0");
@@ -93,6 +94,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
       bannerUrl: formData.bannerUrl,
       promoTitle: formData.promoTitle,
       promoDescription: formData.promoDescription,
+      isAvailable: formData.isAvailable,
     };
 
     if (item?.id) {
@@ -276,6 +278,26 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all h-24 resize-none font-medium text-gray-600"
                 placeholder="Nhập mô tả món ăn..."
               />
+            </div>
+
+            {/* Trạng thái kinh doanh */}
+            <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-2xl">
+              <div>
+                <label className="block text-xs font-bold text-gray-700">Trạng thái bán món</label>
+                <p className="text-[10px] font-medium text-gray-400 mt-0.5">Cho phép khách hàng chọn và gọi món này</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isAvailable} 
+                  onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
+                  className="sr-only peer" 
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                <span className="ml-3 text-sm font-bold text-gray-800 w-16">
+                  {formData.isAvailable ? "Còn món" : "Hết món"}
+                </span>
+              </label>
             </div>
           </div>
 
