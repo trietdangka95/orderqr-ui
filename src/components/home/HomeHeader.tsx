@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Soup, ChevronDown, ShoppingBag, ClipboardList, LayoutDashboard, LogOut, LayoutGrid, List as ListIcon } from "lucide-react";
 import Link from "next/link";
 import { UserRole, useCartStore } from "@/store/cartStore";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 
 interface HomeHeaderProps {
   userRole: UserRole;
@@ -72,8 +74,9 @@ export default function HomeHeader({
         {/* Table Badge / Selector */}
         <div className="relative flex flex-col items-end">
           {userRole === "staff" ? (
-            <button
+            <Button
               onClick={() => setIsTableSelectorOpen(!isTableSelectorOpen)}
+              unstyled
               className="bg-blue-50 border-2 border-blue-100 px-4 py-2 rounded-xl flex items-center justify-center shadow-sm gap-2 hover:bg-blue-100 transition-colors cursor-pointer"
             >
               <div className="flex flex-col items-start">
@@ -90,7 +93,7 @@ export default function HomeHeader({
                   isTableSelectorOpen ? "rotate-180" : ""
                 }`}
               />
-            </button>
+            </Button>
           ) : (
             <div className="bg-primary-soft border-2 border-primary px-4 md:px-6 py-2 rounded-xl flex items-center justify-center shadow-sm gap-2">
               <span className="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider hidden md:inline-block">
@@ -118,18 +121,19 @@ export default function HomeHeader({
                 </p>
                 <div className="grid grid-cols-3 gap-1 max-h-[300px] overflow-y-auto p-1">
                   {tables.map((t) => (
-                    <button
+                    <Button
                       key={t}
                       onClick={() => {
                         setSelectedTable(t);
                         setIsTableSelectorOpen(false);
                       }}
+                      unstyled
                       className={`py-2 rounded-lg font-bold text-sm transition-colors cursor-pointer ${
                         selectedTable === t ? "bg-primary text-white" : "hover:bg-gray-100 text-gray-600"
                       }`}
                     >
                       {t}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </motion.div>
@@ -139,8 +143,9 @@ export default function HomeHeader({
 
         {/* Desktop Navigation Actions */}
         <div className="hidden md:flex items-center gap-3">
-          <button
+          <Button
             onClick={toggleOrders}
+            unstyled
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-50 text-gray-600 hover:bg-primary/10 hover:text-primary transition-all font-bold text-sm border border-transparent hover:border-primary/20 cursor-pointer"
           >
             <ClipboardList size={18} />
@@ -150,10 +155,11 @@ export default function HomeHeader({
                 {orderCount}
               </span>
             )}
-          </button>
+          </Button>
 
-          <button
+          <Button
             onClick={toggleCart}
+            unstyled
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary transition-all font-bold text-sm shadow-lg shadow-primary cursor-pointer"
           >
             <ShoppingBag size={18} />
@@ -163,7 +169,7 @@ export default function HomeHeader({
                 {getTotalItems()}
               </span>
             )}
-          </button>
+          </Button>
 
           {userRole === "admin" && (
             <Link
@@ -176,13 +182,14 @@ export default function HomeHeader({
           )}
 
           {(userRole === "admin" || userRole === "staff" || userRole === "kitchen") && (
-            <button
+            <Button
               onClick={logout}
+              unstyled
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-all font-bold text-sm border border-red-100 cursor-pointer"
             >
               <LogOut size={18} />
               <span>Đăng xuất</span>
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -191,9 +198,10 @@ export default function HomeHeader({
       <div className="max-w-7xl mx-auto px-4 md:px-6 pb-4 flex items-center gap-3">
         <div className="relative flex-1 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-primary transition-colors" />
-          <input
+          <Input
             type="text"
             placeholder="Tìm món ngon..."
+            unstyled
             className="w-full bg-gray-50 border-none rounded-2xl py-3 md:py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -201,22 +209,24 @@ export default function HomeHeader({
         </div>
 
         <div className="bg-gray-50 p-1.5 rounded-2xl flex items-center gap-1">
-          <button
+          <Button
             onClick={() => setViewMode("grid")}
+            unstyled
             className={`p-2.5 rounded-xl transition-all cursor-pointer ${
               viewMode === "grid" ? "bg-white shadow-sm text-primary" : "text-gray-400"
             }`}
           >
             <LayoutGrid size={20} strokeWidth={2.5} />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setViewMode("list")}
+            unstyled
             className={`p-2.5 rounded-xl transition-all cursor-pointer ${
               viewMode === "list" ? "bg-white shadow-sm text-primary" : "text-gray-400"
             }`}
           >
             <ListIcon size={20} strokeWidth={2.5} />
-          </button>
+          </Button>
         </div>
       </div>
     </header>

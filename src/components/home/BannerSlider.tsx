@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MenuItem } from "@/store/cartStore";
 import { getImageUrl } from "@/utils/image";
@@ -12,162 +11,221 @@ interface BannerSliderProps {
 }
 
 export default function BannerSlider({ banners }: BannerSliderProps) {
-  const [currentBanner, setCurrentBanner] = useState(0);
+  const [current, setCurrent] = useState(0);
+  const [imgFailed, setImgFailed] = useState<Record<number, boolean>>({});
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const resetTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (banners.length > 1) {
+      timerRef.current = setInterval(() => {
+        setCurrent((p) => (p + 1) % banners.length);
+      }, 5000);
+    }
+  };
 
   useEffect(() => {
-    if (banners.length > 1) {
-      const timer = setInterval(() => {
-        setCurrentBanner((prev) => (prev + 1) % banners.length);
-      }, 6000);
-      return () => clearInterval(timer);
-    }
+    resetTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [banners.length]);
 
   if (banners.length === 0) return null;
 
-  const activeItem = banners[currentBanner];
+  const item = banners[current];
+  const title = item.promoTitle || item.name;
+  const desc = item.promoDescription || null;
+  // Only use actual uploaded URL — don't fall back to placeholder
+  const rawUrl = (item.bannerUrl && item.bannerUrl.trim()) || (item.image && item.image.trim()) || "";
+  const imageUrl = rawUrl ? getImageUrl(rawUrl) : "";
+  const hasImg = !!imageUrl && !imgFailed[current];
+  const discountedPrice = Math.round(item.price * (1 - (item.discountPercent || 0) / 100));
+  const hasDiscount = (item.discountPercent || 0) > 0;
 
-  // Auto fallback for promo Title and Description if not specified
-  const displayTitle = activeItem.promoTitle || `Thực đơn Ưu đãi: ${activeItem.name}`;
-  const displayDesc = activeItem.promoDescription || `Thưởng thức hương vị tuyệt vời với giá ưu đãi đặc biệt hôm nay!`;
-  const imageUrl = getImageUrl(activeItem.bannerUrl || activeItem.image || "");
-
-  const handleNext = () => {
-    setCurrentBanner((prev) => (prev + 1) % banners.length);
+  const go = (dir: 1 | -1) => {
+    setCurrent((p) => (p + dir + banners.length) % banners.length);
+    resetTimer();
   };
 
-  const handlePrev = () => {
-    setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
-  };
-
-  // Swipe gesture handler using framer-motion drag offset
-  const handleDragEnd = (event: any, info: any) => {
-    const swipeThreshold = 50;
-    if (info.offset.x < -swipeThreshold) {
-      handleNext();
-    } else if (info.offset.x > swipeThreshold) {
-      handlePrev();
-    }
+  const handleDragEnd = (_: any, info: any) => {
+    if (info.offset.x < -50) go(1);
+    else if (info.offset.x > 50) go(-1);
   };
 
   return (
-    <div className="relative h-60 md:h-72 rounded-[2.5rem] overflow-hidden shadow-xl shadow-orange-950/5 bg-gray-950 border border-white/5 group flex items-center select-none">
-      {/* Ambient background blur using active banner image */}
-      <div className="absolute inset-0 z-0 pointer-events-none select-none">
-        <Image
-          src={imageUrl}
-          alt=""
-          fill
-          unoptimized
-          className="object-cover blur-3xl opacity-20 scale-125 pointer-events-none select-none"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/90 to-gray-950 pointer-events-none select-none"></div>
-      </div>
+    <div className="space-y-2">
+      {/* ── Banner card ── */}
+      <div
+        className="relative overflow-hidden rounded-2xl bg-gray-100 group select-none"
+        style={{ height: "clamp(140px, 36vw, 240px)" }}
+      >
+        {/* Full-bleed background image */}
+        {hasImg && (
+          <img
+            src={imageUrl}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={() => setImgFailed((p) => ({ ...p, [current]: true }))}
+          />
+        )}
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentBanner}
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 0.4 }}
-          drag="x"
-          dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.6}
-          onDragEnd={handleDragEnd}
-          className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing z-10 flex items-center p-6 md:p-10 select-none"
-        >
-          <div className="relative w-full h-full flex items-center justify-between gap-6 select-none">
-            {/* Left Content (Text and price/discount details) */}
-            <div className="flex-1 flex flex-col justify-center text-left space-y-2 md:space-y-4 pr-4 pointer-events-none select-none">
-              <motion.div
-                initial={{ y: -10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="inline-flex items-center gap-1.5 bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] md:text-xs font-black px-3.5 py-1.5 rounded-full w-fit uppercase tracking-widest"
-              >
-                <Sparkles size={12} className="animate-pulse" />
-                Khuyến mãi -{activeItem.discountPercent || 0}%
-              </motion.div>
+        {/* Overlay: only left half fades to readable — right stays clear */}
+        {hasImg && (
+          <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/30 to-transparent pointer-events-none" />
+        )}
 
+        {/* Fallback background when no image — warm brand gradient */}
+        {!hasImg && (
+          <>
+            <div
+              className="absolute inset-0"
+              style={{ background: "linear-gradient(135deg, #c2410c 0%, #ea580c 55%, #f59e0b 100%)" }}
+            />
+            <div className="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-white/10 pointer-events-none" />
+            <div className="absolute right-8 bottom-0 w-32 h-32 rounded-full bg-black/10 pointer-events-none" />
+          </>
+        )}
+
+        {/* ── Slide ── */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.4}
+            onDragEnd={handleDragEnd}
+            className="absolute inset-0 flex items-end pb-5 px-5 sm:px-7 cursor-grab active:cursor-grabbing z-10"
+          >
+            {/* Content anchored to bottom-left */}
+            <div className="flex-1 min-w-0 max-w-[65%] sm:max-w-[55%]">
+              {/* Badge */}
+              {hasDiscount && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.08 }}
+                  className="mb-1.5 inline-flex items-center gap-1 bg-red-500 text-white text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-widest"
+                >
+                  <Sparkles size={8} />
+                  -{item.discountPercent}%
+                </motion.div>
+              )}
+
+              {/* Title */}
               <motion.h2
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="text-white text-xl md:text-3.5xl font-black leading-tight tracking-tight line-clamp-2 drop-shadow-md"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.12 }}
+                className="text-white font-black leading-snug line-clamp-2 mb-1 drop-shadow"
+                style={{ fontSize: "clamp(14px, 3.5vw, 22px)" }}
               >
-                {displayTitle}
+                {title}
               </motion.h2>
 
-              <motion.p
-                initial={{ y: 15, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="text-gray-300 text-xs md:text-sm font-medium line-clamp-2 leading-relaxed"
-              >
-                {displayDesc}
-              </motion.p>
+              {/* Desc */}
+              {desc && (
+                <motion.p
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.18 }}
+                  className="text-white/75 text-[11px] sm:text-xs leading-relaxed line-clamp-2 mb-2 font-medium hidden sm:block"
+                >
+                  {desc}
+                </motion.p>
+              )}
 
+              {/* Price */}
               <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="flex items-center gap-3 pt-1 select-none"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.22 }}
+                className="flex items-baseline gap-2"
               >
-                <span className="text-primary text-xl md:text-2xl font-black">
-                  {(activeItem.price * (1 - (activeItem.discountPercent || 0) / 100)).toLocaleString("vi-VN")}₫
+                <span className="text-white font-black drop-shadow" style={{ fontSize: "clamp(15px, 4vw, 24px)" }}>
+                  {discountedPrice.toLocaleString("vi-VN")}₫
                 </span>
-                <span className="text-gray-500 text-xs md:text-sm line-through font-bold">
-                  {activeItem.price.toLocaleString("vi-VN")}₫
-                </span>
+                {hasDiscount && (
+                  <span className="text-white/55 line-through font-semibold text-xs">
+                    {item.price.toLocaleString("vi-VN")}₫
+                  </span>
+                )}
               </motion.div>
             </div>
+          </motion.div>
+        </AnimatePresence>
 
-            {/* Right Content (Bo-góc product food image card) */}
-            <div className="w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 relative rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl shrink-0 group-hover:scale-[1.03] transition-transform duration-500 z-10 pointer-events-none select-none">
-              <Image
-                src={imageUrl}
-                alt={activeItem.name}
-                fill
-                unoptimized
-                className="object-cover select-none pointer-events-none"
-                sizes="(max-width: 768px) 120px, 200px"
-              />
-            </div>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Navigation Buttons (Desktop arrows) */}
-      {banners.length > 1 && (
-        <>
-          <button
-            onClick={handlePrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/30 hover:bg-black/60 border border-white/10 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-md z-20 active:scale-95 cursor-pointer"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <button
-            onClick={handleNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/30 hover:bg-black/60 border border-white/10 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-md z-20 active:scale-95 cursor-pointer"
-          >
-            <ChevronRight size={20} />
-          </button>
-        </>
-      )}
-
-      {/* Indicators Dots */}
-      {banners.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
-          {banners.map((_, idx) => (
+        {/* ── Arrows ── */}
+        {banners.length > 1 && (
+          <>
             <button
-              key={idx}
-              onClick={() => setCurrentBanner(idx)}
-              className={`h-1 transition-all duration-300 rounded-full cursor-pointer ${
-                idx === currentBanner ? "w-6 bg-white" : "w-1.5 bg-white/40"
-              }`}
-            />
-          ))}
+              onClick={() => go(-1)}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/50 active:scale-90"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              onClick={() => go(1)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/50 active:scale-90"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </>
+        )}
+
+        {/* ── Dots ── */}
+        {banners.length > 1 && (
+          <div className="absolute bottom-3 right-4 z-20 flex items-center gap-1">
+            {banners.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => { setCurrent(i); resetTimer(); }}
+                className={`rounded-full transition-all duration-300 ${
+                  i === current ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Thumbnail strip (only when multiple banners) ── */}
+      {banners.length > 1 && (
+        <div className="flex gap-2">
+          {banners.map((b, i) => {
+            const tUrl = getImageUrl(b.bannerUrl || b.image || "");
+            const failed = imgFailed[i];
+            return (
+              <button
+                key={i}
+                onClick={() => { setCurrent(i); resetTimer(); }}
+                className={`relative flex-shrink-0 w-14 h-10 rounded-xl overflow-hidden transition-all duration-200 ${
+                  i === current
+                    ? "ring-2 ring-primary ring-offset-1 opacity-100"
+                    : "opacity-50 hover:opacity-80"
+                }`}
+              >
+                {tUrl && !failed ? (
+                  <img
+                    src={tUrl}
+                    alt={b.name}
+                    className="w-full h-full object-cover"
+                    onError={() => setImgFailed((p) => ({ ...p, [i]: true }))}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-[8px] text-gray-500 font-bold text-center px-1 leading-tight">
+                      {b.name.slice(0, 8)}
+                    </span>
+                  </div>
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

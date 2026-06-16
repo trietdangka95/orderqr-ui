@@ -9,6 +9,7 @@ import { LayoutDashboard, LogOut, Soup, Sparkles, Store, AlertTriangle } from "l
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
+import Button from "@/components/ui/Button";
 
 import HomeHeader from "@/components/home/HomeHeader";
 import BannerSlider from "@/components/home/BannerSlider";
@@ -80,7 +81,7 @@ function HomeContent() {
   }
 
   const banners = useMemo(() => products
-    .filter(item => (item.discountPercent || 0) > 0)
+    .filter(item => (item.discountPercent || 0) > 0 && !!(item.bannerUrl || item.image))
     .sort((a, b) => (b.discountPercent || 0) - (a.discountPercent || 0))
     .slice(0, 5), [products]);
 
@@ -297,9 +298,11 @@ function HomeContent() {
                 animate={{ opacity: 1, y: 0 }}
                 className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 px-2"
               >
-                {tables.map((t) => (
-                  <motion.button
+                 {tables.map((t) => (
+                  <Button
                     key={t}
+                    as={motion.button}
+                    unstyled
                     whileHover={{ scale: 1.08, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
@@ -311,7 +314,7 @@ function HomeContent() {
                   >
                     <span className="text-[11px] font-bold text-gray-500 tracking-wider group-hover:text-primary-soft uppercase">BÀN</span>
                     <span className="text-3xl font-black text-white group-hover:text-primary">{t}</span>
-                  </motion.button>
+                  </Button>
                 ))}
               </motion.div>
             )}

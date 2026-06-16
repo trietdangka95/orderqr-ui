@@ -82,6 +82,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
             src={getImageUrl(product.image)}
             alt={product.name}
             fill
+            unoptimized
             className="object-cover group-hover:scale-110 transition-transform duration-500"
           />
           {product.isAvailable === false && (
@@ -153,6 +154,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
           src={getImageUrl(product.image)}
           alt={product.name}
           fill
+          unoptimized
           className="object-cover group-hover:scale-110 transition-transform duration-500"
         />
         {product.isAvailable === false && (

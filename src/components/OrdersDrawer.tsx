@@ -344,7 +344,7 @@ export default function OrdersDrawer() {
                         </button>
                       )}
                       <div className="w-12 h-12 rounded-lg bg-gray-50 overflow-hidden relative flex-shrink-0">
-                        <Image src={getImageUrl(item.image)} alt={item.name} fill className="object-cover" />
+                        <Image src={getImageUrl(item.image)} alt={item.name} fill unoptimized className="object-cover" />
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-center">

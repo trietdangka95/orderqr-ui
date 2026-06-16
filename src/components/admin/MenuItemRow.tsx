@@ -98,6 +98,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
             src={getImageUrl(item.image)}
             alt={item.name}
             fill
+            unoptimized
             className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
           />
           <div className="absolute top-2 left-2 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm">
@@ -140,6 +141,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
           src={getImageUrl(item.image)}
           alt={item.name}
           fill
+          unoptimized
           className="object-cover transition-transform group-hover:scale-110 duration-500"
         />
         <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-white/90 backdrop-blur-sm rounded-md shadow-sm">

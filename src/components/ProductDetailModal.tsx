@@ -102,6 +102,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                 src={getImageUrl(product.image)}
                 alt={product.name}
                 fill
+                unoptimized
                 className="object-cover"
               />
             </div>

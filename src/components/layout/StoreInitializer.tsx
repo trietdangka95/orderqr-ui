@@ -151,7 +151,7 @@ export default function StoreInitializer() {
   }, [isMounted, storeError]);
 
   const pathname = typeof window !== "undefined" ? window.location.pathname : "";
-  const isExpired = storeConfig?.subscriptionEnd && new Date() > new Date(storeConfig.subscriptionEnd);
+  const isExpired = storeConfig?.subscriptionEnd != null && new Date() > new Date(storeConfig.subscriptionEnd);
   const isSuspended = storeConfig?.subscriptionStatus === 'EXPIRED' || isExpired;
   const isAdminOrSuperAdminPath = pathname.startsWith("/admin") || pathname.startsWith("/superadmin") || pathname.startsWith("/super-login");
 

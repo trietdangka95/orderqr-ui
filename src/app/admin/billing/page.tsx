@@ -76,7 +76,7 @@ export default function AdminBillingPage() {
 
   // Calculate remaining days
   const getRemainingDays = () => {
-    if (!storeConfig?.subscriptionEnd) return 0;
+    if (!storeConfig?.subscriptionEnd) return Infinity; // null = no expiry set
     const end = new Date(storeConfig.subscriptionEnd).getTime();
     const now = new Date().getTime();
     const diff = end - now;
@@ -84,7 +84,7 @@ export default function AdminBillingPage() {
   };
 
   const daysLeft = getRemainingDays();
-  const isExpired = storeConfig?.subscriptionStatus === "EXPIRED" || daysLeft <= 0;
+  const isExpired = storeConfig?.subscriptionStatus === "EXPIRED" || (storeConfig?.subscriptionEnd != null && daysLeft <= 0);
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -155,11 +155,11 @@ export default function AdminBillingPage() {
                 <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${
                   isExpired 
                     ? "bg-red-500 text-white animate-pulse" 
-                    : daysLeft <= 7 
+                    : (storeConfig?.subscriptionEnd != null && daysLeft <= 7)
                     ? "bg-amber-500 text-white animate-pulse" 
                     : "bg-green-500 text-white"
                 }`}>
-                  {isExpired ? "Hết hạn" : daysLeft <= 7 ? "Sắp hết hạn" : "Hoạt động"}
+                  {isExpired ? "Hết hạn" : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? "Sắp hết hạn" : "Hoạt động"}
                 </span>
               </div>
             </div>
@@ -169,7 +169,7 @@ export default function AdminBillingPage() {
                 <AlertTriangle className="shrink-0 text-red-600" />
                 <span>Cửa hàng đã hết hạn dịch vụ. Vui lòng thanh toán gia hạn để khách tiếp tục gọi món.</span>
               </div>
-            ) : daysLeft <= 7 ? (
+            ) : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? (
               <div className="flex items-center gap-3 bg-amber-100/60 text-amber-800 p-4 rounded-2xl text-sm font-semibold border border-amber-200">
                 <AlertTriangle className="shrink-0 text-amber-600 animate-bounce" />
                 <span>Gói dịch vụ sắp hết hạn trong {daysLeft} ngày nữa. Hãy gia hạn ngay hôm nay.</span>
@@ -191,8 +191,8 @@ export default function AdminBillingPage() {
               </div>
               <div>
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Thời gian còn lại</p>
-                <p className={`text-lg font-bold mt-1 ${isExpired ? "text-red-500" : daysLeft <= 7 ? "text-amber-600" : "text-green-600"}`}>
-                  {isExpired ? "0 ngày" : `${daysLeft} ngày`}
+                <p className={`text-lg font-bold mt-1 ${isExpired ? "text-red-500" : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? "text-amber-600" : "text-green-600"}`}>
+                  {isExpired ? "0 ngày" : storeConfig?.subscriptionEnd == null ? "Không giới hạn" : `${daysLeft} ngày`}
                 </p>
               </div>
             </div>
