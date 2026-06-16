@@ -97,21 +97,30 @@ export default function OrdersDrawer() {
   }, [socket, queryClient, selectedTable]);
 
   // Map API data to UI format if necessary (handle casing or field names)
-  const orders = apiOrders.map(o => ({
-    ...o,
-    status: o.status.toLowerCase() as "pending" | "cooking" | "serving" | "completed" | "cancelled",
-    timestamp: new Date(o.createdAt).getTime(),
-    isConfirmed: o.isConfirmed,
-    items: o.orderItems.map((i): MappedOrderItem => ({
-      ...i,
-      name: i.product?.name || 'Món ăn',
-      image: i.product?.image || '',
-      price: i.product?.price || 0,
-      id: i.productId,
-      orderItemId: i.id,
-    })),
-    totalPrice: Number(o.totalPrice || o.orderItems.reduce((sum: number, i) => sum + (i.product?.price || 0) * i.quantity, 0))
-  }));
+  const orders = apiOrders.map(o => {
+    const orderStatusLower = o.status.toLowerCase();
+    return {
+      ...o,
+      status: orderStatusLower as "pending" | "cooking" | "serving" | "completed" | "cancelled",
+      timestamp: new Date(o.createdAt).getTime(),
+      isConfirmed: o.isConfirmed,
+      items: o.orderItems.map((i): MappedOrderItem => {
+        const isCooked = orderStatusLower === "completed" || orderStatusLower === "serving" ? true : i.isCooked;
+        const isServed = orderStatusLower === "completed" ? true : i.isServed;
+        return {
+          ...i,
+          name: i.product?.name || 'Món ăn',
+          image: i.product?.image || '',
+          price: i.product?.price || 0,
+          id: i.productId,
+          orderItemId: i.id,
+          isCooked,
+          isServed,
+        };
+      }),
+      totalPrice: Number(o.totalPrice || o.orderItems.reduce((sum: number, i) => sum + (i.product?.price || 0) * i.quantity, 0))
+    };
+  });
 
   // Active orders: either not checked out, or waiting for payment approval
   const activeOrders = orders.filter(o => (!o.invoiceId || o.invoice?.paymentStatus === "PENDING") && o.status !== "cancelled");
