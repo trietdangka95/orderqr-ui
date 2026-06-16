@@ -14,9 +14,11 @@ import {
   ShoppingBag,
   Filter,
   Trophy,
+  Printer,
 } from "lucide-react";
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCartStore } from "@/store/cartStore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface OrderItemDetail {
@@ -63,6 +65,142 @@ const toYMD = (ts: number) => {
 };
 
 const payLabel = (m?: string) => (m === "QR_TRANSFER" ? "QR / CK" : "Tiền mặt");
+
+const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any) => {
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.right = "0";
+  iframe.style.bottom = "0";
+  iframe.style.width = "0";
+  iframe.style.height = "0";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
+  
+  const doc = iframe.contentWindow?.document;
+  if (!doc) return;
+  
+  // Group items by name
+  const itemMap: Record<string, { name: string; quantity: number; price: number }> = {};
+  inv.orders.forEach((order) => {
+    order.orderItems.forEach((item) => {
+      const name = item.product?.name || "Món ăn";
+      const price = Number(item.priceAtTime);
+      if (!itemMap[name]) {
+        itemMap[name] = {
+          name,
+          quantity: 0,
+          price
+        };
+      }
+      itemMap[name].quantity += item.quantity;
+    });
+  });
+  const receiptItems = Object.values(itemMap);
+  
+  const storeName = storeConfig?.name || "MENU VIỆT";
+  const storeDesc = storeConfig?.description || "";
+  
+  const itemsHtml = receiptItems.map((item) => `
+    <tr style="border-bottom: 1px dotted #e5e7eb;">
+      <td style="padding: 6px 0; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; color: #1f2937;">${item.name}</td>
+      <td style="padding: 6px 0; text-align: center; font-weight: bold; color: #1f2937;">${item.quantity}</td>
+      <td style="padding: 6px 0; text-align: right; font-weight: bold; color: #1f2937;">${(item.price * item.quantity).toLocaleString("vi-VN")}</td>
+    </tr>
+  `).join("");
+  
+  const dateFormatted = new Date(inv.timestamp).toLocaleString("vi-VN");
+  const printTimeFormatted = new Date().toLocaleString("vi-VN");
+  const paymentLabel = inv.paymentMethod === "QR_TRANSFER" ? "Chuyển khoản VietQR" : "Tiền mặt";
+  
+  doc.write(`
+    <html>
+      <head>
+        <title>In hóa đơn Bàn ${inv.tableNumber}</title>
+        <style>
+          @page {
+            size: 80mm auto;
+            margin: 0;
+          }
+          body {
+            margin: 0;
+            padding: 4mm;
+            font-family: monospace;
+            font-size: 11px;
+            line-height: 1.5;
+            color: black;
+            background: white;
+          }
+          .text-center { text-align: center; }
+          .font-bold { font-weight: bold; }
+          .font-black { font-weight: 900; }
+          .uppercase { text-transform: uppercase; }
+          .text-primary { color: #f97316; }
+          .w-full { width: 100%; }
+          .border-collapse { border-collapse: collapse; }
+        </style>
+      </head>
+      <body>
+        <div style="font-family: monospace; text-align: center;">
+          <h2 style="margin: 0; font-size: 14px; font-weight: 900; text-transform: uppercase;">${storeName}</h2>
+          ${storeDesc ? `<p style="margin: 2px 0; font-size: 9px; font-weight: bold; color: #555;">${storeDesc}</p>` : ''}
+          <p style="margin: 2px 0; font-size: 9px; color: #888;">Hệ thống Order QR</p>
+          <div style="border-top: 1px dashed black; margin: 8px 0;"></div>
+          <h3 style="margin: 0; font-size: 12px; font-weight: 900;">HÓA ĐƠN THANH TOÁN</h3>
+          <p style="margin: 4px 0; font-size: 16px; font-weight: 900; color: #f97316;">BÀN: ${inv.tableNumber}</p>
+          <p style="margin: 2px 0; font-size: 9px; color: #555;">Thời gian: ${dateFormatted}</p>
+          <p style="margin: 2px 0; font-size: 9px; color: #555;">Giờ in: ${printTimeFormatted}</p>
+        </div>
+
+        <table style="width: 100%; font-size: 10px; border-collapse: collapse; margin-top: 8px;">
+          <thead>
+            <tr style="border-bottom: 1px dashed black; text-align: left; font-weight: bold;">
+              <th style="padding: 4px 0;">Món ăn</th>
+              <th style="padding: 4px 0; text-align: center;">SL</th>
+              <th style="padding: 4px 0; text-align: right;">T.Tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+
+        <div style="border-top: 1px dashed black; margin: 12px 0;"></div>
+
+        <div style="font-size: 11px; font-weight: bold;">
+          <div style="display: flex; justify-content: space-between;">
+            <span>Tạm tính:</span>
+            <span>${inv.totalAmount.toLocaleString("vi-VN")} ₫</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+            <span>Thanh toán:</span>
+            <span>${paymentLabel}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 900; border-top: 1px solid black; padding-top: 6px; margin-top: 4px;">
+            <span>TỔNG CỘNG:</span>
+            <span style="color: #f97316;">${inv.totalAmount.toLocaleString("vi-VN")} ₫</span>
+          </div>
+        </div>
+
+        <div style="border-top: 1px dashed black; margin: 16px 0;"></div>
+
+        <div style="text-align: center; font-size: 9px; font-weight: bold;">
+          <p style="margin: 0 0 4px 0;">CẢM ƠN QUÝ KHÁCH & HẸN GẶP LẠI!</p>
+          <p style="margin: 0; font-style: italic; color: #aaa;">Powered by orderqr.id.vn</p>
+        </div>
+
+        <script>
+          window.onload = function() {
+            window.print();
+            setTimeout(function() {
+              window.frameElement.remove();
+            }, 1000);
+          };
+        </script>
+      </body>
+    </html>
+  `);
+  doc.close();
+};
 
 // ─── Build top-selling items ───────────────────────────────────────────────────
 function buildTop(invoices: InvoiceRecord[]) {
@@ -139,6 +277,7 @@ function exportCSV(records: InvoiceRecord[], from: string, to: string) {
 // ─── Invoice Detail Modal ─────────────────────────────────────────────────────
 function InvoiceModal({ inv, onClose }: { inv: InvoiceRecord; onClose: () => void }) {
   const allItems = inv.orders.flatMap((o) => o.orderItems);
+  const storeConfig = useCartStore((state) => state.storeConfig);
   return (
     <div
       className="fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
@@ -171,6 +310,13 @@ function InvoiceModal({ inv, onClose }: { inv: InvoiceRecord; onClose: () => voi
             >
               {payLabel(inv.paymentMethod)}
             </span>
+            <button
+              onClick={() => handlePrintReceipt(inv, storeConfig)}
+              className="p-1.5 hover:bg-white/10 rounded-xl transition-colors text-white"
+              title="In hóa đơn"
+            >
+              <Printer size={20} />
+            </button>
             <button
               onClick={onClose}
               className="p-1.5 hover:bg-white/10 rounded-xl transition-colors"
@@ -305,6 +451,7 @@ function TopItems({ invoices }: { invoices: InvoiceRecord[] }) {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function RevenuePage() {
   const { data: apiInvoices = [], isLoading } = useInvoices();
+  const storeConfig = useCartStore((state) => state.storeConfig);
 
   const [search, setSearch] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -603,6 +750,13 @@ export default function RevenuePage() {
                                     className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-primary hover:text-white transition-all whitespace-nowrap"
                                   >
                                     Xem
+                                  </button>
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handlePrintReceipt(rec, storeConfig); }}
+                                    className="p-1.5 bg-gray-100 text-gray-500 hover:text-primary rounded-lg hover:bg-gray-200 transition-all flex items-center justify-center cursor-pointer"
+                                    title="In hóa đơn"
+                                  >
+                                    <Printer size={14} />
                                   </button>
                                   <button
                                     onClick={(e) => { e.stopPropagation(); toggleRow(rec.id); }}

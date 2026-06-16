@@ -18,6 +18,11 @@ import {
   Building2
 } from "lucide-react";
 import useIsMounted from "@/hooks/useIsMounted";
+import Select from "@/components/ui/Select";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import Textarea from "@/components/ui/Textarea";
+
 
 const sanitizeBankId = (bankId: string | undefined | null): string => {
   if (!bankId) return "";
@@ -274,10 +279,9 @@ export default function AdminBillingPage() {
         }} className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Ngân hàng</label>
-            <select
+            <Select
               value={bankId}
               onChange={(e) => setBankId(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 focus:outline-none focus:border-primary transition-colors"
               required
             >
               <option value="" disabled>Chọn ngân hàng...</option>
@@ -299,16 +303,15 @@ export default function AdminBillingPage() {
               ].map((b) => (
                 <option key={b.id} value={b.id}>{b.name}</option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Số tài khoản</label>
-            <input
+            <Input
               type="text"
               value={bankAccountNo}
               onChange={(e) => setBankAccountNo(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 focus:outline-none focus:border-primary transition-colors"
               placeholder="Nhập số tài khoản"
               required
             />
@@ -316,31 +319,24 @@ export default function AdminBillingPage() {
 
           <div className="space-y-2">
             <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tên chủ tài khoản (Viết liền không dấu)</label>
-            <input
+            <Input
               type="text"
               value={bankAccountName}
               onChange={(e) => setBankAccountName(e.target.value.toUpperCase())}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold text-gray-800 focus:outline-none focus:border-primary transition-colors"
               placeholder="Ví dụ: NGUYEN VAN A"
               required
             />
           </div>
 
           <div className="md:col-span-3 flex justify-end pt-2">
-            <button
+            <Button
               type="submit"
-              disabled={updateStoreBankMutation.isPending}
-              className="bg-primary text-white font-bold px-8 py-3 rounded-xl hover:bg-primary transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 text-sm shadow-lg shadow-primary/20"
+              isLoading={updateStoreBankMutation.isPending}
+              leftIcon={<CheckCircle2 size={16} />}
+              className="px-8 shadow-lg shadow-primary/20"
             >
-              {updateStoreBankMutation.isPending ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <CheckCircle2 size={16} />
-                  Lưu cấu hình
-                </>
-              )}
-            </button>
+              Lưu cấu hình
+            </Button>
           </div>
         </form>
       </div>
@@ -397,16 +393,13 @@ export default function AdminBillingPage() {
                   )}
                 </div>
               </div>
-              <button
+              <Button
                 onClick={() => handleOpenModal(pkg)}
-                className={`w-full mt-6 py-3 rounded-xl font-bold text-sm transition-all active:scale-[0.98] ${
-                  pkg.popular 
-                    ? "bg-primary text-white shadow-lg shadow-primary hover:bg-primary" 
-                    : "bg-gray-50 border border-gray-100 text-gray-700 hover:bg-gray-100"
-                }`}
+                variant={pkg.popular ? "primary" : "secondary"}
+                className={`w-full mt-6 py-3 h-auto ${pkg.popular ? "shadow-lg shadow-primary/20" : ""}`}
               >
                 Gia hạn ngay
-              </button>
+              </Button>
             </div>
           ))}
         </div>
@@ -551,40 +544,34 @@ export default function AdminBillingPage() {
 
               <div className="space-y-2">
                 <label className="text-xs font-black text-gray-500 uppercase block">Ghi chú bổ sung (nếu có)</label>
-                <textarea
+                <Textarea
                   placeholder="Ví dụ: MB Bank, Tên người chuyển..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-orange-500 focus:outline-none transition-colors"
                   rows={2}
                 />
               </div>
             </div>
 
             <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
-              <button
+              <Button
                 onClick={() => {
                   setIsModalOpen(false);
                   setSelectedPkg(null);
                 }}
-                className="flex-1 py-3 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-100 transition-all active:scale-[0.98]"
+                variant="secondary"
+                className="flex-1 py-3 h-auto"
               >
                 Hủy bỏ
-              </button>
-              <button
-                disabled={createRequestMutation.isPending}
+              </Button>
+              <Button
+                isLoading={createRequestMutation.isPending}
                 onClick={handleSubmitRenewal}
-                className="flex-1 py-3 bg-primary text-white rounded-xl font-bold text-sm hover:bg-primary shadow-lg shadow-primary transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                className="flex-1 py-3 h-auto shadow-lg shadow-primary/20"
+                leftIcon={<CheckCircle2 size={16} />}
               >
-                {createRequestMutation.isPending ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <CheckCircle2 size={16} />
-                    Đã chuyển tiền, Gửi yêu cầu
-                  </>
-                )}
-              </button>
+                Đã chuyển tiền, Gửi yêu cầu
+              </Button>
             </div>
           </div>
         </div>

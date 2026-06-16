@@ -435,6 +435,15 @@ export default function AdminTablesPage() {
                 </button>
                 <button
                   onClick={() => {
+                    setPrintingTable(checkoutConfirmTable);
+                  }}
+                  className="flex-1 py-3 bg-gray-900 hover:bg-black text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1"
+                >
+                  <PrinterIcon size={12} />
+                  In HĐ
+                </button>
+                <button
+                  onClick={() => {
                     clearTableMutation.mutate(checkoutConfirmTable);
                     setCheckoutConfirmTable(null);
                   }}
@@ -472,6 +481,15 @@ export default function AdminTablesPage() {
                   className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer"
                 >
                   Hủy bỏ
+                </button>
+                <button
+                  onClick={() => {
+                    setPrintingTable(paymentConfirmInvoice.tableNumber);
+                  }}
+                  className="flex-1 py-3 bg-gray-900 hover:bg-black text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1"
+                >
+                  <PrinterIcon size={12} />
+                  In HĐ
                 </button>
                 <button
                   onClick={() => {
