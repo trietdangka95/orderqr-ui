@@ -16,6 +16,7 @@ interface Product {
   category: string;
   categoryId: number;
   isAvailable?: boolean;
+  discountPercent?: number;
 }
 
 interface ProductDetailModalProps {
@@ -27,6 +28,10 @@ interface ProductDetailModalProps {
 export default function ProductDetailModal({ product, isOpen, onClose }: ProductDetailModalProps) {
   const { addItem, selectedTable } = useCartStore();
   const [note, setNote] = useState("");
+
+  const discountPercent = product?.discountPercent || 0;
+  const hasDiscount = discountPercent > 0;
+  const finalPrice = product ? (hasDiscount ? product.price * (1 - discountPercent / 100) : product.price) : 0;
 
   useEffect(() => {
     if (isOpen) {
@@ -45,7 +50,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
       id: product.id,
       productId: product.id,
       name: product.name,
-      price: product.price,
+      price: finalPrice,
       image: product.image,
       category: product.category,
       categoryId: product.categoryId,
@@ -115,10 +120,20 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                 <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-2 tracking-tight leading-tight">
                   {product.name}
                 </h2>
-                <div className="flex items-center gap-2 mb-4 flex-wrap">
-                  <div className="inline-block px-3 py-1 bg-primary-soft text-primary rounded-full text-xs md:text-sm font-bold">
-                    {product.price.toLocaleString("vi-VN")} ₫
+                <div className="flex items-center gap-2.5 mb-4 flex-wrap">
+                  <div className="inline-block px-3 py-1 bg-primary-soft text-primary rounded-full text-xs md:text-sm font-extrabold">
+                    {finalPrice.toLocaleString("vi-VN")} ₫
                   </div>
+                  {hasDiscount && (
+                    <>
+                      <span className="text-xs md:text-sm text-gray-400 line-through font-semibold">
+                        {product.price.toLocaleString("vi-VN")} ₫
+                      </span>
+                      <span className="bg-red-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1 animate-pulse">
+                        -{discountPercent}%
+                      </span>
+                    </>
+                  )}
                   {product.isAvailable === false && (
                     <div className="inline-block px-3 py-1 bg-red-50 text-red-500 border border-red-200 rounded-full text-xs font-black uppercase tracking-wider">
                       Hết món

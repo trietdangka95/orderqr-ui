@@ -212,21 +212,20 @@ export default function AdminBillingPage() {
       </header>
 
       {/* Current Subscription Status Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="lg:col-span-2">
           {storeConfig?.subscriptionPlan === "PREMIUM" ? (
             /* Premium Plan Card Design */
-            <div className={`relative overflow-hidden rounded-[2rem] border p-8 shadow-md transition-all h-full ${
-              isExpired
-                ? "bg-gradient-to-br from-red-50 to-orange-50/30 border-red-200"
-                : daysLeft <= 7
-                  ? "bg-gradient-to-br from-amber-50 to-orange-50/50 border-amber-200 shadow-amber-100"
-                  : "bg-gradient-to-br from-amber-50/60 via-white to-orange-50/30 border-amber-200/80 shadow-md"
-            }`}>
+            <div className={`relative overflow-hidden rounded-[2rem] border p-8 shadow-md transition-all h-full ${isExpired
+              ? "bg-gradient-to-br from-red-50 to-orange-50/30 border-red-200"
+              : daysLeft <= 7
+                ? "bg-gradient-to-br from-amber-50 to-orange-50/50 border-amber-200 shadow-amber-100"
+                : "bg-gradient-to-br from-amber-50/60 via-white to-orange-50/30 border-amber-200/80 shadow-md"
+              }`}>
               {/* Background decorative elements */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/10 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-orange-200/10 rounded-full blur-3xl pointer-events-none" />
-              
+
               <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch h-full">
                 {/* Left Column: Plan Details */}
                 <div className="flex flex-col justify-between space-y-6">
@@ -246,13 +245,12 @@ export default function AdminBillingPage() {
                     </div>
 
                     <div className="mt-4">
-                      <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${
-                        isExpired
-                          ? "bg-red-500 text-white animate-pulse"
-                          : (storeConfig?.subscriptionEnd != null && daysLeft <= 7)
-                            ? "bg-amber-500 text-white animate-pulse"
-                            : "bg-emerald-500 text-white"
-                      }`}>
+                      <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${isExpired
+                        ? "bg-red-500 text-white animate-pulse"
+                        : (storeConfig?.subscriptionEnd != null && daysLeft <= 7)
+                          ? "bg-amber-500 text-white animate-pulse"
+                          : "bg-emerald-500 text-white"
+                        }`}>
                         {!isExpired && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
                         {isExpired ? "Hết hạn" : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? "Sắp hết hạn" : "Hoạt động"}
                       </span>
@@ -275,7 +273,7 @@ export default function AdminBillingPage() {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-3 bg-gray-50/50 border border-gray-100 p-3.5 rounded-2xl">
                       <Clock className="text-gray-400 shrink-0" size={18} />
                       <div>
@@ -337,8 +335,6 @@ export default function AdminBillingPage() {
             /* Free Plan Card Design */
             <div className="relative overflow-hidden rounded-[2rem] border border-gray-100 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 p-8 shadow-md hover:shadow-lg transition-all duration-300 h-full">
               {/* Background decorative elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-100/10 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-100/10 rounded-full blur-3xl pointer-events-none" />
 
               <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch h-full">
                 {/* Left Column: Plan Details */}
@@ -359,9 +355,16 @@ export default function AdminBillingPage() {
                     </div>
 
                     <div className="mt-4">
-                      <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500 text-white">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
-                        Hoạt động
+                      <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${storeConfig?.subscriptionStatus === "EXPIRED"
+                        ? "bg-red-500 text-white animate-pulse"
+                        : "bg-emerald-500 text-white"
+                        }`}>
+                        {storeConfig?.subscriptionStatus !== "EXPIRED" && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
+                        {storeConfig?.subscriptionStatus === "EXPIRED"
+                          ? "Hết hạn"
+                          : storeConfig?.subscriptionStatus === "ACTIVE"
+                            ? "Hoạt động"
+                            : storeConfig?.subscriptionStatus || "Hoạt động"}
                       </span>
                     </div>
                   </div>
@@ -371,43 +374,32 @@ export default function AdminBillingPage() {
                       <Calendar className="text-gray-400 shrink-0" size={18} />
                       <div>
                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Ngày hết hạn</p>
-                        <p className="text-sm font-extrabold text-gray-800 mt-0.5">Không giới hạn</p>
+                        <p className="text-sm font-extrabold text-gray-800 mt-0.5">
+                          {storeConfig?.subscriptionEnd
+                            ? new Date(storeConfig.subscriptionEnd).toLocaleDateString("vi-VN", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric"
+                            })
+                            : "Không giới hạn"}
+                        </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-3 bg-gray-50/50 border border-gray-100 p-3.5 rounded-2xl">
-                      <ShieldCheck className="text-emerald-500 shrink-0" size={18} />
+                      <ShieldCheck className={`shrink-0 ${storeConfig?.subscriptionStatus === "EXPIRED" ? "text-red-500" : "text-emerald-500"}`} size={18} />
                       <div>
                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Trạng thái gói</p>
-                        <p className="text-sm font-extrabold text-emerald-600 mt-0.5">Trọn đời</p>
+                        <p className={`text-sm font-extrabold mt-0.5 ${storeConfig?.subscriptionStatus === "EXPIRED" ? "text-red-500" : "text-emerald-600"
+                          }`}>
+                          {storeConfig?.subscriptionStatus === "ACTIVE"
+                            ? "Hoạt động"
+                            : storeConfig?.subscriptionStatus === "EXPIRED"
+                              ? "Hết hạn"
+                              : storeConfig?.subscriptionStatus || "Hoạt động"}
+                        </p>
                       </div>
                     </div>
-                  </div>
-                </div>
-
-                {/* Right Column: Upgrade Promo */}
-                <div className="flex flex-col justify-between bg-indigo-50/50 border border-indigo-100/70 p-5 rounded-2xl">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2 text-indigo-950">
-                      <Info className="text-indigo-500 shrink-0" size={18} />
-                      <h4 className="text-xs font-black uppercase tracking-wider">Nâng cấp lên Premium</h4>
-                    </div>
-                    <p className="text-xs font-medium text-indigo-900/90 leading-relaxed mb-4">
-                      Mở khóa tính năng tự động hiển thị mã QR thanh toán theo từng bàn và nhiều tính năng quản lý cao cấp khác để vận hành trơn tru hơn.
-                    </p>
-                  </div>
-                  <div>
-                    <button 
-                      onClick={() => {
-                        const target = document.getElementById('pricing-section');
-                        if (target) {
-                          target.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }}
-                      className="text-xs font-extrabold text-indigo-600 hover:text-indigo-800 transition-colors underline decoration-2 underline-offset-4 flex items-center gap-1 cursor-pointer"
-                    >
-                      Xem các gói bên dưới &rarr;
-                    </button>
                   </div>
                 </div>
               </div>
@@ -415,84 +407,7 @@ export default function AdminBillingPage() {
           )}
         </div>
 
-        {/* Store Bank Configuration Card */}
-        <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-xl shadow-gray-200/50 space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-50 pb-6 gap-4">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-orange-50 text-primary flex items-center justify-center shrink-0">
-                <QrCode size={24} />
-              </div>
-              <div>
-                <h3 className="text-xl font-black text-gray-900 tracking-tight">Tài khoản Ngân hàng nhận QR</h3>
-                <p className="text-sm text-gray-500 font-medium">Cấu hình thông tin tài khoản ngân hàng của quán để tự động tạo mã QR VietQR nhận tiền khi khách thanh toán chuyển khoản.</p>
-              </div>
-            </div>
-          </div>
 
-          <form onSubmit={handleUpdateBank} className="flex flex-col gap-6">
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Ngân hàng</label>
-              <Select
-                value={bankId}
-                onChange={(e) => setBankId(e.target.value)}
-                required
-              >
-                <option value="" disabled>Chọn ngân hàng...</option>
-                {[
-                  { id: "MB", name: "MB Bank (Ngân hàng Quân đội)" },
-                  { id: "VCB", name: "Vietcombank (Ngoại thương)" },
-                  { id: "CTG", name: "VietinBank (Công thương)" },
-                  { id: "TCB", name: "Techcombank (Kỹ thương)" },
-                  { id: "BIDV", name: "BIDV (Đầu tư & Phát triển)" },
-                  { id: "ACB", name: "ACB (Á Châu)" },
-                  { id: "VPB", name: "VPBank (Việt Nam Thịnh Vượng)" },
-                  { id: "TPB", name: "TPBank (Tiên Phong)" },
-                  { id: "STB", name: "Sacombank (Sài Gòn Thương Tín)" },
-                  { id: "HDB", name: "HDBank (Phát triển TP.HCM)" },
-                  { id: "VBA", name: "Agribank (Nông nghiệp)" },
-                  { id: "VIB", name: "VIB (Quốc tế)" },
-                  { id: "SHB", name: "SHB (Sài Gòn - Hà Nội)" },
-                  { id: "OCB", name: "OCB (Phương Đông)" },
-                ].map((b) => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Số tài khoản</label>
-              <Input
-                type="text"
-                value={bankAccountNo}
-                onChange={(e) => setBankAccountNo(e.target.value)}
-                placeholder="Nhập số tài khoản"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tên chủ tài khoản (Viết liền không dấu)</label>
-              <Input
-                type="text"
-                value={bankAccountName}
-                onChange={(e) => setBankAccountName(e.target.value.toUpperCase())}
-                placeholder="Ví dụ: NGUYEN VAN A"
-                required
-              />
-            </div>
-
-            <div className="md:col-span-3 flex justify-end pt-2">
-              <Button
-                type="submit"
-                isLoading={updateStoreBankMutation.isPending}
-                leftIcon={<CheckCircle2 size={16} />}
-                className="px-8 shadow-lg shadow-primary/20"
-              >
-                Lưu cấu hình
-              </Button>
-            </div>
-          </form>
-        </div>
       </div>
 
 
@@ -503,20 +418,6 @@ export default function AdminBillingPage() {
           <h3 className="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
             <Coins className="text-orange-500" /> Chọn gói Gia hạn Premium
           </h3>
-
-          {/* Test Mode Toggle */}
-          <div className="flex items-center gap-3 bg-primary-soft border border-primary px-4 py-2 rounded-2xl shrink-0">
-            <span className="text-xs font-bold text-orange-700">Chế độ test (phút)</span>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isTestMode}
-                onChange={handleToggleTestMode}
-                className="sr-only peer"
-              />
-              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-            </label>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -555,6 +456,84 @@ export default function AdminBillingPage() {
             </div>
           ))}
         </div>
+      </div>
+      {/* Store Bank Configuration Card */}
+      <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-xl shadow-gray-200/50 space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-50 pb-6 gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-primary flex items-center justify-center shrink-0">
+              <QrCode size={24} />
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-gray-900 tracking-tight">Tài khoản Ngân hàng nhận QR</h3>
+              <p className="text-sm text-gray-500 font-medium">Cấu hình thông tin tài khoản ngân hàng của quán để tự động tạo mã QR VietQR nhận tiền khi khách thanh toán chuyển khoản.</p>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleUpdateBank} className="flex flex-col gap-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Ngân hàng</label>
+            <Select
+              value={bankId}
+              onChange={(e) => setBankId(e.target.value)}
+              required
+            >
+              <option value="" disabled>Chọn ngân hàng...</option>
+              {[
+                { id: "MB", name: "MB Bank (Ngân hàng Quân đội)" },
+                { id: "VCB", name: "Vietcombank (Ngoại thương)" },
+                { id: "CTG", name: "VietinBank (Công thương)" },
+                { id: "TCB", name: "Techcombank (Kỹ thương)" },
+                { id: "BIDV", name: "BIDV (Đầu tư & Phát triển)" },
+                { id: "ACB", name: "ACB (Á Châu)" },
+                { id: "VPB", name: "VPBank (Việt Nam Thịnh Vượng)" },
+                { id: "TPB", name: "TPBank (Tiên Phong)" },
+                { id: "STB", name: "Sacombank (Sài Gòn Thương Tín)" },
+                { id: "HDB", name: "HDBank (Phát triển TP.HCM)" },
+                { id: "VBA", name: "Agribank (Nông nghiệp)" },
+                { id: "VIB", name: "VIB (Quốc tế)" },
+                { id: "SHB", name: "SHB (Sài Gòn - Hà Nội)" },
+                { id: "OCB", name: "OCB (Phương Đông)" },
+              ].map((b) => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Số tài khoản</label>
+            <Input
+              type="text"
+              value={bankAccountNo}
+              onChange={(e) => setBankAccountNo(e.target.value)}
+              placeholder="Nhập số tài khoản"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tên chủ tài khoản (Viết liền không dấu)</label>
+            <Input
+              type="text"
+              value={bankAccountName}
+              onChange={(e) => setBankAccountName(e.target.value.toUpperCase())}
+              placeholder="Ví dụ: NGUYEN VAN A"
+              required
+            />
+          </div>
+
+          <div className="md:col-span-3 flex justify-end pt-2">
+            <Button
+              type="submit"
+              isLoading={updateStoreBankMutation.isPending}
+              leftIcon={<CheckCircle2 size={16} />}
+              className="px-8 shadow-lg shadow-primary/20"
+            >
+              Lưu cấu hình
+            </Button>
+          </div>
+        </form>
       </div>
 
       {/* Renewal Request History */}
@@ -731,21 +710,19 @@ export default function AdminBillingPage() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 350, damping: 25 }}
-              className={`flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl border font-bold text-sm text-white pointer-events-auto ${
-                toast.type === "success"
-                  ? "bg-emerald-600/90 border-emerald-500/30 shadow-emerald-900/15"
-                  : "bg-red-600/90 border-red-500/30 shadow-red-900/15"
-              }`}
+              className={`flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl border font-bold text-sm text-white pointer-events-auto ${toast.type === "success"
+                ? "bg-emerald-600/90 border-emerald-500/30 shadow-emerald-900/15"
+                : "bg-red-600/90 border-red-500/30 shadow-red-900/15"
+                }`}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
-                toast.type === "success" ? "bg-emerald-500/20 text-emerald-100" : "bg-red-500/20 text-red-100"
-              }`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${toast.type === "success" ? "bg-emerald-500/20 text-emerald-100" : "bg-red-500/20 text-red-100"
+                }`}>
                 {toast.type === "success" ? "✨" : "⚠️"}
               </div>
               <div className="flex-1 pr-2">
                 <p className="leading-tight">{toast.message}</p>
               </div>
-              <button 
+              <button
                 onClick={() => setToast(null)}
                 className="p-1 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-colors cursor-pointer"
               >
