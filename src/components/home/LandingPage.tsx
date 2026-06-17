@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   Zap,
   Plus,
+  AlertCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { getImageUrl } from "@/utils/image";
@@ -35,6 +36,56 @@ export default function LandingPage() {
     "menu",
   );
   const [monthlyPrice, setMonthlyPrice] = useState<number>(599000);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    note: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState<boolean | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.email.trim()) {
+      setSubmitError("Email không được để trống!");
+      return;
+    }
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      setSubmitError("Email không đúng định dạng!");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitSuccess(null);
+    setSubmitError(null);
+
+    try {
+      await axiosInstance.post("/contacts", formData);
+      setSubmitSuccess(true);
+      setFormData({ name: "", email: "", note: "" });
+      // Clear success message after 5 seconds
+      setTimeout(() => setSubmitSuccess(null), 5000);
+    } catch (err: unknown) {
+      console.error(err);
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      setSubmitError(
+        error.response?.data?.message ||
+          error.message ||
+          "Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại!",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     axiosInstance
@@ -142,7 +193,7 @@ export default function LandingPage() {
           {/* CTAs */}
           <div className="hidden md:flex items-center gap-4">
             <a
-              href="#pricing"
+              href="#contact"
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl text-sm font-black shadow-lg shadow-orange-950/30 hover:scale-102 transition-all flex items-center gap-1"
             >
               Liên Hệ Ngay
@@ -194,7 +245,7 @@ export default function LandingPage() {
             </div>
             <div className="flex flex-col gap-3 pt-2">
               <a
-                href="#pricing"
+                href="#contact"
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full text-center py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-sm font-black shadow-lg"
               >
@@ -1078,7 +1129,7 @@ export default function LandingPage() {
 
             <div className="mt-8">
               <a
-                href="#pricing"
+                href="#contact"
                 className="w-full py-3.5 border border-white/10 hover:border-white/20 rounded-xl text-xs font-black uppercase tracking-wider bg-white/5 hover:bg-white/10 transition-all block text-center"
               >
                 Liên Hệ Đăng Ký
@@ -1145,7 +1196,7 @@ export default function LandingPage() {
 
             <div className="mt-8">
               <a
-                href="#pricing"
+                href="#contact"
                 className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-950/30 hover:scale-102 transition-all block text-center"
               >
                 Liên Hệ Tư Vấn
@@ -1174,14 +1225,128 @@ export default function LandingPage() {
 
           <div className="mt-8 relative z-10 w-full sm:w-auto">
             <a
-              href="#pricing"
+              href="#contact"
               className="w-full sm:w-auto px-8 py-4 bg-white text-primary hover:bg-gray-100 rounded-2xl text-base font-black shadow-xl hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
             >
-              Xem Bảng Giá & Đăng Ký
+              Đăng Ký Ngay
               <ArrowRight size={18} />
             </a>
           </div>
         </div>
+      </section>
+
+      {/* Contact Section */}
+      <section
+        id="contact"
+        className="max-w-4xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10 scroll-mt-20"
+      >
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase animate-pulse">
+            Đăng Ký Mở Quán
+          </span>
+          <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3 bg-clip-text bg-gradient-to-r from-white to-orange-500 text-transparent">
+            Bắt Đầu Số Hóa Cửa Hàng
+          </h2>
+          <p className="text-gray-400 text-sm md:text-base font-medium mt-4">
+            Điền thông tin của bạn vào biểu mẫu bên dưới. Đội ngũ kỹ thuật của chúng tôi sẽ liên hệ hỗ trợ bạn tạo tài khoản trong vòng 24 giờ.
+          </p>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ type: "spring", stiffness: 100 }}
+          className="relative border border-white/10 bg-gray-900/40 rounded-[2.5rem] p-6 md:p-10 backdrop-blur-2xl shadow-3xl shadow-black/80 max-w-2xl mx-auto"
+        >
+          {/* Subtle glowing blob behind card */}
+          <div className="absolute top-[-20%] left-[-20%] w-[120%] h-[140%] rounded-full bg-orange-600/5 blur-[80px] pointer-events-none -z-10"></div>
+
+          <form onSubmit={handleSubmit} className="space-y-6 text-left">
+            <div>
+              <label htmlFor="name" className="text-xs font-black text-gray-400 uppercase tracking-wider block mb-2">
+                Tên quán / Tên liên hệ
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Nhập tên của bạn hoặc tên cửa hàng..."
+                value={formData.name}
+                onChange={handleInputChange}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all font-medium text-sm md:text-base"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="text-xs font-black text-gray-400 uppercase tracking-wider block mb-2">
+                Địa chỉ Email <span className="text-orange-500">*</span>
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                placeholder="Ví dụ: lienhe@quananviet.com..."
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all font-medium text-sm md:text-base"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="note" className="text-xs font-black text-gray-400 uppercase tracking-wider block mb-2">
+                Ghi chú bổ sung
+              </label>
+              <textarea
+                id="note"
+                name="note"
+                rows={4}
+                placeholder="Hãy cho chúng tôi biết về mô hình kinh doanh của bạn (ví dụ: bún bò, quán nhậu, cafe) hoặc số điện thoại..."
+                value={formData.note}
+                onChange={handleInputChange}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all font-medium text-sm md:text-base resize-none"
+              />
+            </div>
+
+            {submitSuccess && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-400 text-xs md:text-sm font-bold flex items-center gap-2"
+              >
+                <CheckCircle2 size={18} className="shrink-0" />
+                <span>Gửi yêu cầu đăng ký thành công! Chúng tôi sẽ phản hồi sớm nhất.</span>
+              </motion.div>
+            )}
+
+            {submitError && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 text-xs md:text-sm font-bold flex items-center gap-2"
+              >
+                <AlertCircle size={18} className="shrink-0" />
+                <span>{submitError}</span>
+              </motion.div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-2xl text-base font-black shadow-xl shadow-orange-950/30 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]"
+            >
+              {isSubmitting ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <>
+                  <span>Gửi Yêu Cầu Đăng Ký</span>
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </button>
+          </form>
+        </motion.div>
       </section>
 
       {/* Footer */}

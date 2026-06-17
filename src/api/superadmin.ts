@@ -43,6 +43,16 @@ export interface PlatformStats {
   totalRevenue: number;
 }
 
+export interface ContactRequest {
+  id: string;
+  name: string;
+  email: string;
+  note: string | null;
+  status: "PENDING" | "CONTACTED" | "COMPLETED";
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const superAdminApi = {
   getStores: async (): Promise<Store[]> => {
     const { data } = await axiosInstance.get("/superadmin/stores");
@@ -77,5 +87,19 @@ export const superAdminApi = {
   getStats: async (): Promise<PlatformStats> => {
     const { data } = await axiosInstance.get("/superadmin/stats");
     return data;
+  },
+
+  getContacts: async (): Promise<ContactRequest[]> => {
+    const { data } = await axiosInstance.get("/superadmin/contacts");
+    return data;
+  },
+
+  updateContactStatus: async (id: string, status: "PENDING" | "CONTACTED" | "COMPLETED"): Promise<ContactRequest> => {
+    const { data } = await axiosInstance.patch(`/superadmin/contacts/${id}`, { status });
+    return data;
+  },
+
+  deleteContact: async (id: string): Promise<void> => {
+    await axiosInstance.delete(`/superadmin/contacts/${id}`);
   },
 };
