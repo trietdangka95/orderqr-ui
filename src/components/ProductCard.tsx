@@ -103,14 +103,14 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
             {product.description}
           </p>
 
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-            <div className="flex flex-col">
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50 gap-2">
+            <div className="flex flex-col min-w-0">
               {hasDiscount && (
-                <span className="text-xs text-gray-300 line-through mb-0.5">
+                <span className="text-xs text-gray-300 line-through mb-0.5 truncate">
                   {formatPrice(product.price)}
                 </span>
               )}
-              <span className="font-black text-primary text-xl">{formatPrice(finalPrice)}</span>
+              <span className="font-black text-primary text-lg sm:text-xl truncate">{formatPrice(finalPrice)}</span>
             </div>
 
             <button
@@ -119,9 +119,9 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
                 handleAddToCart();
               }}
               disabled={product.isAvailable === false}
-              className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-lg active:scale-90 ${product.isAvailable === false ? 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed' : 'bg-primary text-white hover:bg-primary shadow-primary'}`}
+              className={`w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 transition-all shadow-lg active:scale-90 ${product.isAvailable === false ? 'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed' : 'bg-primary text-white hover:bg-primary shadow-primary'}`}
             >
-              <Plus className="w-6 h-6" strokeWidth={3} />
+              <Plus className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={3} />
             </button>
           </div>
         </div>

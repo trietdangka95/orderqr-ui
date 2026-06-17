@@ -163,10 +163,10 @@ export default function KitchenPage() {
   const completedTickets = groupByOrder(allFlatItems.filter(i => i.isServed));
 
   const columns: { key: ColumnType; title: string; color: string; dot: string; tickets: VirtualTicket[] }[] = [
-    { key: "pending",   title: "Chờ chế biến", dot: "bg-red-500",   color: "bg-white border-t-red-500 shadow-red-100",     tickets: pendingTickets   },
-    { key: "cooking",   title: "Đang chế biến", dot: "bg-primary",   color: "bg-white border-t-orange-500 shadow-orange-100", tickets: cookingTickets   },
-    { key: "serving",   title: "Chờ phục vụ",  dot: "bg-blue-500",  color: "bg-white border-t-blue-500 shadow-blue-100",   tickets: servingTickets   },
-    { key: "completed", title: "Hoàn thành",   dot: "bg-green-500", color: "bg-white border-t-green-500 shadow-green-100", tickets: completedTickets },
+    { key: "pending",   title: "Chờ chế biến", dot: "bg-red-500",   color: "bg-white border-t-red-500   shadow-xl shadow-red-100",    tickets: pendingTickets   },
+    { key: "cooking",   title: "Đang chế biến", dot: "bg-primary",   color: "bg-white border-t-orange-500 shadow-xl shadow-orange-100", tickets: cookingTickets   },
+    { key: "serving",   title: "Chờ phục vụ",  dot: "bg-blue-500",  color: "bg-white border-t-blue-500   shadow-xl shadow-blue-100",   tickets: servingTickets   },
+    { key: "completed", title: "Hoàn thành",   dot: "bg-green-500", color: "bg-white border-t-green-500  shadow-xl shadow-green-100",  tickets: completedTickets },
   ];
 
   // Summary view (unchanged)
@@ -228,7 +228,7 @@ export default function KitchenPage() {
           <div className="flex flex-row md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto md:overflow-x-visible pb-4 flex-grow min-h-0 snap-x snap-mandatory">
             {columns.map(col => (
               <section key={col.key} className="flex flex-col h-full min-h-0 w-[85vw] sm:w-[350px] md:w-full shrink-0 snap-center">
-                <div className={`p-4 rounded-2xl border-t-4 mb-4 flex items-center justify-between shadow-xl shadow-gray-200/20 ${col.color} shrink-0`}>
+                <div className={`p-4 rounded-2xl border-t-4 mb-4 flex items-center justify-between ${col.color} shrink-0`}>
                   <div className="flex items-center gap-3">
                     <div className={`w-2.5 h-2.5 rounded-full ${col.dot} animate-pulse shadow-sm`}></div>
                     <h2 className="font-black uppercase tracking-widest text-sm text-gray-900">{col.title}</h2>

@@ -15,6 +15,7 @@ interface Product {
   image?: string;
   category: string;
   categoryId: number;
+  isAvailable?: boolean;
 }
 
 interface ProductDetailModalProps {
@@ -35,6 +36,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
 
   const handleAddToCart = () => {
     if (!product) return;
+    if (product.isAvailable === false) return;
     if (!selectedTable) {
       alert("Vui lòng chọn bàn/nhập mã bàn trước khi chọn món!");
       return;
@@ -113,8 +115,15 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                 <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-2 tracking-tight leading-tight">
                   {product.name}
                 </h2>
-                <div className="inline-block px-3 py-1 bg-primary-soft text-primary rounded-full text-xs md:text-sm font-bold mb-4">
-                  {product.price.toLocaleString("vi-VN")} ₫
+                <div className="flex items-center gap-2 mb-4 flex-wrap">
+                  <div className="inline-block px-3 py-1 bg-primary-soft text-primary rounded-full text-xs md:text-sm font-bold">
+                    {product.price.toLocaleString("vi-VN")} ₫
+                  </div>
+                  {product.isAvailable === false && (
+                    <div className="inline-block px-3 py-1 bg-red-50 text-red-500 border border-red-200 rounded-full text-xs font-black uppercase tracking-wider">
+                      Hết món
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2 mb-4">
                   <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Mô tả món ăn</h4>
@@ -158,13 +167,20 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
               </div>
 
               <div className="mt-6 pt-4 border-t border-gray-100 flex flex-col gap-3">
-                <button
-                  onClick={handleAddToCart}
-                  className="w-full bg-primary text-white py-3 rounded-xl font-black flex items-center justify-center gap-2 shadow-lg shadow-primary hover:bg-primary transition-all active:scale-95 text-xs md:text-sm"
-                >
-                  <Plus size={16} strokeWidth={3} />
-                  Thêm vào giỏ hàng
-                </button>
+                {product.isAvailable === false ? (
+                  <div className="w-full bg-gray-100 text-gray-500 py-3 rounded-xl font-black flex items-center justify-center gap-2 text-xs md:text-sm border border-gray-200">
+                    <span className="text-lg">😔</span>
+                    Tạm thời hết món — Vui lòng chọn món khác
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-full bg-primary text-white py-3 rounded-xl font-black flex items-center justify-center gap-2 shadow-lg shadow-primary hover:bg-primary transition-all active:scale-95 text-xs md:text-sm"
+                  >
+                    <Plus size={16} strokeWidth={3} />
+                    Thêm vào giỏ hàng
+                  </button>
+                )}
                 <p className="text-center text-[10px] text-gray-400 font-medium">
                   Click ra ngoài để quay lại Menu
                 </p>

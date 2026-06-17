@@ -386,8 +386,8 @@ function HomeContent() {
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       key={product.id}
-                      onClick={() => setSelectedProduct(product)}
-                      className="cursor-pointer"
+                      onClick={() => product.isAvailable !== false && setSelectedProduct(product)}
+                      className={product.isAvailable === false ? "cursor-default" : "cursor-pointer"}
                     >
                       <ProductCard product={product} viewMode={viewMode} />
                     </motion.div>

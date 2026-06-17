@@ -24,6 +24,7 @@ import Select from "@/components/ui/Select";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Textarea from "@/components/ui/Textarea";
+import { motion, AnimatePresence } from "framer-motion";
 
 
 const sanitizeBankId = (bankId: string | undefined | null): string => {
@@ -59,6 +60,21 @@ export default function AdminBillingPage() {
   const { data: bankConfig } = useBankConfig();
   const createRequestMutation = useCreateRenewalRequest();
   const updateStoreBankMutation = useUpdateStoreBankConfig();
+
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+
+  const showToast = (message: string, type: "success" | "error" = "success") => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   const [bankId, setBankId] = useState(storeConfig?.bankId || "");
   const [bankAccountNo, setBankAccountNo] = useState(storeConfig?.bankAccountNo || "");
@@ -117,7 +133,7 @@ export default function AdminBillingPage() {
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    alert(`Đã sao chép ${label}!`);
+    showToast(`Đã sao chép ${label}!`, "success");
   };
 
   const handleOpenModal = (pkg: typeof packages[0]) => {
@@ -138,11 +154,11 @@ export default function AdminBillingPage() {
         setIsModalOpen(false);
         setSelectedPkg(null);
         setNotes("");
-        alert("Gửi yêu cầu gia hạn thành công! Vui lòng chờ hệ thống đối soát duyệt.");
+        showToast("Gửi yêu cầu gia hạn thành công! Vui lòng chờ hệ thống đối soát duyệt.", "success");
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
-        alert(err.message || "Gửi yêu cầu gia hạn thất bại. Vui lòng thử lại!");
+        showToast(err.message || "Gửi yêu cầu gia hạn thất bại. Vui lòng thử lại!", "error");
       }
     });
   };
@@ -150,7 +166,7 @@ export default function AdminBillingPage() {
   const handleUpdateBank = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!bankId || !bankAccountNo || !bankAccountName) {
-      alert("Vui lòng điền đầy đủ thông tin ngân hàng!");
+      showToast("Vui lòng điền đầy đủ thông tin ngân hàng!", "error");
       return;
     }
     updateStoreBankMutation.mutate({
@@ -165,11 +181,11 @@ export default function AdminBillingPage() {
           bankAccountNo: data.bankAccountNo,
           bankAccountName: data.bankAccountName
         });
-        alert("Lưu thông tin ngân hàng thành công!");
+        showToast("Lưu thông tin ngân hàng thành công!", "success");
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
-        alert(err.message || "Không thể cập nhật cấu hình ngân hàng");
+        showToast(err.message || "Không thể cập nhật cấu hình ngân hàng", "error");
       }
     });
   };
@@ -705,6 +721,40 @@ export default function AdminBillingPage() {
           </div>
         </div>
       )}
+
+      {/* Global Toast Notification */}
+      <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none select-none">
+        <AnimatePresence>
+          {toast && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 350, damping: 25 }}
+              className={`flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-xl border font-bold text-sm text-white pointer-events-auto ${
+                toast.type === "success"
+                  ? "bg-emerald-600/90 border-emerald-500/30 shadow-emerald-900/15"
+                  : "bg-red-600/90 border-red-500/30 shadow-red-900/15"
+              }`}
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
+                toast.type === "success" ? "bg-emerald-500/20 text-emerald-100" : "bg-red-500/20 text-red-100"
+              }`}>
+                {toast.type === "success" ? "✨" : "⚠️"}
+              </div>
+              <div className="flex-1 pr-2">
+                <p className="leading-tight">{toast.message}</p>
+              </div>
+              <button 
+                onClick={() => setToast(null)}
+                className="p-1 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-colors cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
