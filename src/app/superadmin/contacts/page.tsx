@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useContactRequests, useUpdateContactStatus, useDeleteContact } from "@/hooks/useContacts";
 import {
-  Mail,
   User,
   MessageSquare,
   Clock,
@@ -30,10 +29,10 @@ export default function SuperAdminContactsPage() {
     // 1. Filter by tab status
     const matchesTab = activeTab === "ALL" || contact.status === activeTab;
 
-    // 2. Filter by search query (name or email)
+    // 2. Filter by search query (name or phone)
     const matchesSearch =
       contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      contact.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      contact.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (contact.note && contact.note.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return matchesTab && matchesSearch;
@@ -127,7 +126,7 @@ export default function SuperAdminContactsPage() {
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
-            placeholder="Tìm theo tên, email, ghi chú..."
+            placeholder="Tìm theo tên, số điện thoại, ghi chú..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white border border-gray-200 rounded-2xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:border-blue-600 transition-colors font-medium text-gray-800 placeholder-gray-400"
@@ -159,7 +158,7 @@ export default function SuperAdminContactsPage() {
                         {contact.name || "N/A"}
                       </h4>
                       <p className="text-[10px] text-gray-400 font-mono mt-0.5 flex items-center gap-1">
-                        <Mail size={10} /> {contact.email}
+                        <PhoneCall size={10} /> {contact.phone}
                       </p>
                     </div>
                   </div>
@@ -260,8 +259,8 @@ export default function SuperAdminContactsPage() {
                               {contact.name || "N/A"}
                             </p>
                             <p className="text-[11px] text-gray-500 font-mono mt-1 flex items-center gap-1">
-                              <Mail size={12} className="text-gray-400" />
-                              {contact.email}
+                              <PhoneCall size={12} className="text-gray-400" />
+                              {contact.phone}
                             </p>
                           </div>
                         </div>

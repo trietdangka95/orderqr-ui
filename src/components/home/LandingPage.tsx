@@ -39,7 +39,7 @@ export default function LandingPage() {
 
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
+    phone: "",
     note: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -55,12 +55,12 @@ export default function LandingPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.email.trim()) {
-      setSubmitError("Email không được để trống!");
+    if (!formData.phone.trim()) {
+      setSubmitError("Số điện thoại không được để trống!");
       return;
     }
-    if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setSubmitError("Email không đúng định dạng!");
+    if (!/^(0|\+84)\d{9,10}$/.test(formData.phone)) {
+      setSubmitError("Số điện thoại không đúng định dạng!");
       return;
     }
 
@@ -71,7 +71,7 @@ export default function LandingPage() {
     try {
       await axiosInstance.post("/contacts", formData);
       setSubmitSuccess(true);
-      setFormData({ name: "", email: "", note: "" });
+      setFormData({ name: "", phone: "", note: "" });
       // Clear success message after 5 seconds
       setTimeout(() => setSubmitSuccess(null), 5000);
     } catch (err: unknown) {
@@ -79,8 +79,8 @@ export default function LandingPage() {
       const error = err as { response?: { data?: { message?: string } }; message?: string };
       setSubmitError(
         error.response?.data?.message ||
-          error.message ||
-          "Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại!",
+        error.message ||
+        "Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại!",
       );
     } finally {
       setIsSubmitting(false);
@@ -924,9 +924,6 @@ export default function LandingPage() {
                       <span className="text-[9px] font-black text-gray-800 bg-gray-100 px-2 py-0.5 rounded-full">
                         BÀN SỐ 01
                       </span>
-                      <span className="absolute -bottom-3 -right-3 text-2xl animate-bounce">
-                        📱
-                      </span>
                     </motion.div>
                     <div className="text-center space-y-2">
                       <h4 className="text-lg font-black text-white">
@@ -1283,16 +1280,16 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <label htmlFor="email" className="text-xs font-black text-gray-400 uppercase tracking-wider block mb-2">
-                Địa chỉ Email <span className="text-orange-500">*</span>
+              <label htmlFor="phone" className="text-xs font-black text-gray-400 uppercase tracking-wider block mb-2">
+                Số điện thoại <span className="text-orange-500">*</span>
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="phone"
+                name="phone"
+                type="tel"
                 required
-                placeholder="Ví dụ: lienhe@quananviet.com..."
-                value={formData.email}
+                placeholder="Ví dụ: 0901234567..."
+                value={formData.phone}
                 onChange={handleInputChange}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all font-medium text-sm md:text-base"
               />
@@ -1408,8 +1405,8 @@ export default function LandingPage() {
               Liên Hệ Hỗ Trợ
             </h5>
             <ul className="space-y-2 text-xs font-bold text-gray-500">
-              <li>Hotline: 090 123 4567</li>
-              <li>Email: support@orderqr.id.vn</li>
+              <li>Hotline: 0707.898.849</li>
+              <li>Email: triet.dang.dev@gmail.com</li>
             </ul>
           </div>
 

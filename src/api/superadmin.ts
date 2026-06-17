@@ -46,7 +46,7 @@ export interface PlatformStats {
 export interface ContactRequest {
   id: string;
   name: string;
-  email: string;
+  phone: string;
   note: string | null;
   status: "PENDING" | "CONTACTED" | "COMPLETED";
   createdAt: string;
