@@ -1103,26 +1103,30 @@ export default function LandingPage() {
                 Dùng Thử Miễn Phí
               </h3>
               <p className="text-gray-400 text-xs font-bold mt-2">
-                Không giới hạn thời gian chạy thử
+                Trải nghiệm đầy đủ tính năng trong 2 tháng
               </p>
 
               <div className="flex items-baseline gap-1 mt-6 border-b border-white/5 pb-6">
                 <span className="text-4xl font-black text-white">0đ</span>
-                <span className="text-gray-500 text-sm font-bold">/ tháng</span>
+                <span className="text-gray-500 text-sm font-bold">/ 2 tháng</span>
               </div>
 
               <ul className="space-y-4 mt-6 text-left">
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-300 font-bold">
-                  <CheckCircle2 size={16} className="text-gray-500 shrink-0" />
-                  Hỗ trợ tối đa 5 bàn ăn
+                  <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
+                  Đầy đủ tính năng gói Chuyên Nghiệp
                 </li>
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-300 font-bold">
-                  <CheckCircle2 size={16} className="text-gray-500 shrink-0" />
-                  Đầy đủ menu số & hình ảnh
+                  <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
+                  Không giới hạn số bàn ăn & thực đơn
                 </li>
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-300 font-bold">
-                  <CheckCircle2 size={16} className="text-gray-500 shrink-0" />
-                  Quản lý đơn hàng real-time cơ bản
+                  <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
+                  Tùy chỉnh subdomain theo ý muốn
+                </li>
+                <li className="flex items-center gap-3 text-xs md:text-sm text-gray-300 font-bold">
+                  <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
+                  Báo cáo doanh số & phân tích nâng cao
                 </li>
               </ul>
             </div>
