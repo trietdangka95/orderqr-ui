@@ -47,7 +47,7 @@ export const ordersApi = {
     return response.data;
   },
 
-  updateOrderItemStatus: async (orderId: string, orderItemId: string, payload: { isCooked?: boolean; isServed?: boolean }): Promise<Order> => {
+  updateOrderItemStatus: async (orderId: string, orderItemId: string, payload: { isCooked?: boolean; isCooking?: boolean; isServed?: boolean }): Promise<Order> => {
     const response = await axiosInstance.patch<Order>(`/orders/${orderId}/items/${orderItemId}/status`, payload);
     return response.data;
   },

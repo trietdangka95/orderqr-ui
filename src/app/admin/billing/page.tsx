@@ -3,19 +3,21 @@
 import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useRenewalRequests, useCreateRenewalRequest, useBankConfig, useUpdateStoreBankConfig } from "@/hooks/useRenewals";
-import { 
-  CreditCard, 
-  Sparkles, 
-  Clock, 
-  AlertTriangle, 
-  CheckCircle2, 
-  Coins, 
-  Copy, 
-  History, 
+import {
+  CreditCard,
+  Clock,
+  AlertTriangle,
+  CheckCircle2,
+  Coins,
+  Copy,
+  History,
   X,
-  Plus,
   QrCode,
-  Building2
+  Crown,
+  Calendar,
+  Info,
+  ShieldCheck,
+  Zap
 } from "lucide-react";
 import useIsMounted from "@/hooks/useIsMounted";
 import Select from "@/components/ui/Select";
@@ -65,9 +67,15 @@ export default function AdminBillingPage() {
   // Sync state with storeConfig when it loads
   useEffect(() => {
     if (storeConfig) {
-      if (!bankId) setBankId(storeConfig.bankId || "");
-      if (!bankAccountNo) setBankAccountNo(storeConfig.bankAccountNo || "");
-      if (!bankAccountName) setBankAccountName(storeConfig.bankAccountName || "");
+      const bId = storeConfig.bankId || "";
+      const bAccNo = storeConfig.bankAccountNo || "";
+      const bAccName = storeConfig.bankAccountName || "";
+      const timer = setTimeout(() => {
+        setBankId((prev) => prev || bId);
+        setBankAccountNo((prev) => prev || bAccNo);
+        setBankAccountName((prev) => prev || bAccName);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [storeConfig]);
 
@@ -132,10 +140,48 @@ export default function AdminBillingPage() {
         setNotes("");
         alert("Gửi yêu cầu gia hạn thành công! Vui lòng chờ hệ thống đối soát duyệt.");
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
         alert(err.message || "Gửi yêu cầu gia hạn thất bại. Vui lòng thử lại!");
       }
     });
+  };
+
+  const handleUpdateBank = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!bankId || !bankAccountNo || !bankAccountName) {
+      alert("Vui lòng điền đầy đủ thông tin ngân hàng!");
+      return;
+    }
+    updateStoreBankMutation.mutate({
+      bankId: bankId.trim(),
+      bankAccountNo: bankAccountNo.trim(),
+      bankAccountName: bankAccountName.trim()
+    }, {
+      onSuccess: (data) => {
+        setStoreConfig({
+          ...storeConfig!,
+          bankId: data.bankId,
+          bankAccountNo: data.bankAccountNo,
+          bankAccountName: data.bankAccountName
+        });
+        alert("Lưu thông tin ngân hàng thành công!");
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onError: (err: any) => {
+        alert(err.message || "Không thể cập nhật cấu hình ngân hàng");
+      }
+    });
+  };
+
+  const handleToggleTestMode = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsTestMode(e.target.checked);
+    setSelectedPkg(null);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPkg(null);
   };
 
   const unitLabel = isTestMode ? "phút" : "tháng";
@@ -151,195 +197,289 @@ export default function AdminBillingPage() {
 
       {/* Current Subscription Status Card */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className={`lg:col-span-2 rounded-[2rem] border p-8 shadow-sm flex flex-col justify-between transition-all ${
-          isExpired 
-            ? "bg-red-50/50 border-red-200" 
-            : daysLeft <= 7 
-            ? "bg-amber-50/50 border-amber-200 shadow-amber-50" 
-            : "bg-white border-gray-100"
-        }`}>
-          <div className="space-y-6">
-            <div className="flex justify-between items-start">
-              <div>
-                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                  storeConfig?.subscriptionPlan === "PREMIUM" 
-                    ? "bg-primary-soft text-primary border border-orange-200" 
-                    : "bg-gray-100 text-gray-600 border border-gray-200"
-                }`}>
-                  Gói {storeConfig?.subscriptionPlan || "FREE"}
-                </span>
-                <h2 className="text-3xl font-black tracking-tight text-gray-900 mt-3">
-                  {storeConfig?.subscriptionPlan === "PREMIUM" ? "Tài khoản Premium" : "Tài khoản Miễn phí (FREE)"}
-                </h2>
-              </div>
-              <div className="text-right">
-                <span className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest ${
-                  isExpired 
-                    ? "bg-red-500 text-white animate-pulse" 
-                    : (storeConfig?.subscriptionEnd != null && daysLeft <= 7)
-                    ? "bg-amber-500 text-white animate-pulse" 
-                    : "bg-green-500 text-white"
-                }`}>
-                  {isExpired ? "Hết hạn" : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? "Sắp hết hạn" : "Hoạt động"}
-                </span>
+        <div className="lg:col-span-2">
+          {storeConfig?.subscriptionPlan === "PREMIUM" ? (
+            /* Premium Plan Card Design */
+            <div className={`relative overflow-hidden rounded-[2rem] border p-8 shadow-md transition-all h-full ${
+              isExpired
+                ? "bg-gradient-to-br from-red-50 to-orange-50/30 border-red-200"
+                : daysLeft <= 7
+                  ? "bg-gradient-to-br from-amber-50 to-orange-50/50 border-amber-200 shadow-amber-100"
+                  : "bg-gradient-to-br from-amber-50/60 via-white to-orange-50/30 border-amber-200/80 shadow-md"
+            }`}>
+              {/* Background decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-200/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-orange-200/10 rounded-full blur-3xl pointer-events-none" />
+              
+              <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch h-full">
+                {/* Left Column: Plan Details */}
+                <div className="flex flex-col justify-between space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 bg-gradient-to-tr from-amber-500 to-orange-500 rounded-xl text-white shadow-sm shadow-orange-500/20">
+                        <Crown size={20} className="animate-pulse" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-700 bg-amber-100/60 px-2.5 py-0.5 rounded-full border border-amber-200/50">
+                          PREMIUM PLAN
+                        </span>
+                        <h2 className="text-2xl font-black tracking-tight text-gray-900 mt-1">
+                          Tài khoản Premium
+                        </h2>
+                      </div>
+                    </div>
+
+                    <div className="mt-4">
+                      <span className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${
+                        isExpired
+                          ? "bg-red-500 text-white animate-pulse"
+                          : (storeConfig?.subscriptionEnd != null && daysLeft <= 7)
+                            ? "bg-amber-500 text-white animate-pulse"
+                            : "bg-emerald-500 text-white"
+                      }`}>
+                        {!isExpired && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
+                        {isExpired ? "Hết hạn" : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? "Sắp hết hạn" : "Hoạt động"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-3 bg-gray-50/50 border border-gray-100 p-3.5 rounded-2xl">
+                      <Calendar className="text-gray-400 shrink-0" size={18} />
+                      <div>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Ngày hết hạn</p>
+                        <p className="text-sm font-extrabold text-gray-800 mt-0.5">
+                          {storeConfig?.subscriptionEnd
+                            ? new Date(storeConfig.subscriptionEnd).toLocaleDateString("vi-VN", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric"
+                            })
+                            : "Không có hạn"}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 bg-gray-50/50 border border-gray-100 p-3.5 rounded-2xl">
+                      <Clock className="text-gray-400 shrink-0" size={18} />
+                      <div>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Thời gian còn lại</p>
+                        <p className={`text-sm font-extrabold mt-0.5 ${isExpired ? "text-red-500" : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? "text-amber-600" : "text-emerald-600"}`}>
+                          {isExpired ? "0 ngày (Vui lòng gia hạn)" : storeConfig?.subscriptionEnd == null ? "Không giới hạn" : `${daysLeft} day`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Status Banner / Premium Info */}
+                <div className="flex flex-col justify-center">
+                  {isExpired ? (
+                    <div className="flex items-start gap-3 bg-red-50 border border-red-200/60 text-red-800 p-4 rounded-2xl text-sm font-medium h-full justify-center flex-col">
+                      <div className="flex items-center gap-2 mb-1">
+                        <AlertTriangle className="text-red-500" size={20} />
+                        <p className="font-bold text-red-950">Dịch vụ đã tạm dừng</p>
+                      </div>
+                      <p className="text-xs text-red-700/90 leading-relaxed">Cửa hàng đã hết hạn dịch vụ. Vui lòng thanh toán gia hạn bên dưới để khách hàng của bạn có thể tiếp tục gọi món trực tuyến.</p>
+                    </div>
+                  ) : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? (
+                    <div className="flex items-start gap-3 bg-amber-50 border border-amber-200/60 text-amber-800 p-4 rounded-2xl text-sm font-medium h-full justify-center flex-col">
+                      <div className="flex items-center gap-2 mb-1">
+                        <AlertTriangle className="text-amber-600 animate-bounce" size={20} />
+                        <p className="font-bold text-amber-950">Yêu cầu gia hạn sớm</p>
+                      </div>
+                      <p className="text-xs text-amber-700/90 leading-relaxed">Gói dịch vụ sẽ hết hạn trong {daysLeft} ngày nữa. Hãy gia hạn ngay hôm nay để tránh gián đoạn dịch vụ của bạn.</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col justify-between h-full bg-amber-50/40 border border-amber-100 p-5 rounded-2xl">
+                      <div>
+                        <h4 className="text-xs font-black text-amber-800 uppercase tracking-wider mb-2">Tính năng đang kích hoạt</h4>
+                        <ul className="space-y-2 text-xs font-semibold text-gray-700">
+                          <li className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            Tự động tạo mã QR theo bàn
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            Đồng bộ đặt món thời gian thực
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            Báo cáo doanh thu & Quản lý nâng cao
+                          </li>
+                        </ul>
+                      </div>
+                      <p className="text-[11px] font-bold text-amber-700/85 italic mt-4">
+                        Cảm ơn bạn đã đồng hành cùng Menu Việt!
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+          ) : (
+            /* Free Plan Card Design */
+            <div className="relative overflow-hidden rounded-[2rem] border border-gray-100 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 p-8 shadow-md hover:shadow-lg transition-all duration-300 h-full">
+              {/* Background decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-100/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-100/10 rounded-full blur-3xl pointer-events-none" />
 
-            {isExpired ? (
-              <div className="flex items-center gap-3 bg-red-100/60 text-red-800 p-4 rounded-2xl text-sm font-semibold border border-red-200">
-                <AlertTriangle className="shrink-0 text-red-600" />
-                <span>Cửa hàng đã hết hạn dịch vụ. Vui lòng thanh toán gia hạn để khách tiếp tục gọi món.</span>
-              </div>
-            ) : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? (
-              <div className="flex items-center gap-3 bg-amber-100/60 text-amber-800 p-4 rounded-2xl text-sm font-semibold border border-amber-200">
-                <AlertTriangle className="shrink-0 text-amber-600 animate-bounce" />
-                <span>Gói dịch vụ sắp hết hạn trong {daysLeft} ngày nữa. Hãy gia hạn ngay hôm nay.</span>
-              </div>
-            ) : null}
+              <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch h-full">
+                {/* Left Column: Plan Details */}
+                <div className="flex flex-col justify-between space-y-6">
+                  <div>
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 bg-gradient-to-tr from-slate-500 to-indigo-600 rounded-xl text-white shadow-sm shadow-indigo-500/20">
+                        <Zap size={20} />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200">
+                          FREE PLAN
+                        </span>
+                        <h2 className="text-2xl font-black tracking-tight text-gray-900 mt-1">
+                          Tài khoản Miễn phí
+                        </h2>
+                      </div>
+                    </div>
 
-            <div className="grid grid-cols-2 gap-6 pt-4 border-t border-gray-100 font-medium">
-              <div>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Ngày hết hạn</p>
-                <p className="text-lg font-bold text-gray-800 mt-1">
-                  {storeConfig?.subscriptionEnd 
-                    ? new Date(storeConfig.subscriptionEnd).toLocaleDateString("vi-VN", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric"
-                      })
-                    : "Không có hạn"}
-                </p>
-              </div>
-              <div>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Thời gian còn lại</p>
-                <p className={`text-lg font-bold mt-1 ${isExpired ? "text-red-500" : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? "text-amber-600" : "text-green-600"}`}>
-                  {isExpired ? "0 ngày" : storeConfig?.subscriptionEnd == null ? "Không giới hạn" : `${daysLeft} ngày`}
-                </p>
+                    <div className="mt-4">
+                      <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500 text-white">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
+                        Hoạt động
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-3 bg-gray-50/50 border border-gray-100 p-3.5 rounded-2xl">
+                      <Calendar className="text-gray-400 shrink-0" size={18} />
+                      <div>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Ngày hết hạn</p>
+                        <p className="text-sm font-extrabold text-gray-800 mt-0.5">Không giới hạn</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 bg-gray-50/50 border border-gray-100 p-3.5 rounded-2xl">
+                      <ShieldCheck className="text-emerald-500 shrink-0" size={18} />
+                      <div>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Trạng thái gói</p>
+                        <p className="text-sm font-extrabold text-emerald-600 mt-0.5">Trọn đời</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Upgrade Promo */}
+                <div className="flex flex-col justify-between bg-indigo-50/50 border border-indigo-100/70 p-5 rounded-2xl">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2 text-indigo-950">
+                      <Info className="text-indigo-500 shrink-0" size={18} />
+                      <h4 className="text-xs font-black uppercase tracking-wider">Nâng cấp lên Premium</h4>
+                    </div>
+                    <p className="text-xs font-medium text-indigo-900/90 leading-relaxed mb-4">
+                      Mở khóa tính năng tự động hiển thị mã QR thanh toán theo từng bàn và nhiều tính năng quản lý cao cấp khác để vận hành trơn tru hơn.
+                    </p>
+                  </div>
+                  <div>
+                    <button 
+                      onClick={() => {
+                        const target = document.getElementById('pricing-section');
+                        if (target) {
+                          target.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
+                      className="text-xs font-extrabold text-indigo-600 hover:text-indigo-800 transition-colors underline decoration-2 underline-offset-4 flex items-center gap-1 cursor-pointer"
+                    >
+                      Xem các gói bên dưới &rarr;
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* Support Card */}
-        <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-[2.5rem] p-8 flex flex-col justify-between shadow-xl">
-          <div className="space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-primary-soft">
-              <Sparkles size={24} className="text-orange-400" />
+        {/* Store Bank Configuration Card */}
+        <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-xl shadow-gray-200/50 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-50 pb-6 gap-4">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-orange-50 text-primary flex items-center justify-center shrink-0">
+                <QrCode size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-black text-gray-900 tracking-tight">Tài khoản Ngân hàng nhận QR</h3>
+                <p className="text-sm text-gray-500 font-medium">Cấu hình thông tin tài khoản ngân hàng của quán để tự động tạo mã QR VietQR nhận tiền khi khách thanh toán chuyển khoản.</p>
+              </div>
             </div>
-            <h3 className="text-xl font-black tracking-tight">Quyền lợi Premium</h3>
-            <ul className="space-y-2 text-xs font-bold text-gray-300">
-              <li className="flex items-center gap-2">✨ Chọn màu sắc ngũ hành</li>
-              <li className="flex items-center gap-2">✨ Thay logo quán theo thương hiệu</li>
-              <li className="flex items-center gap-2">✨ Gọi món real-time siêu mượt</li>
-              <li className="flex items-center gap-2">✨ Quản lý bàn ăn và xuất excel doanh thu</li>
-              <li className="flex items-center gap-2">✨ Hỗ trợ kỹ thuật 24/7</li>
-            </ul>
           </div>
+
+          <form onSubmit={handleUpdateBank} className="flex flex-col gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Ngân hàng</label>
+              <Select
+                value={bankId}
+                onChange={(e) => setBankId(e.target.value)}
+                required
+              >
+                <option value="" disabled>Chọn ngân hàng...</option>
+                {[
+                  { id: "MB", name: "MB Bank (Ngân hàng Quân đội)" },
+                  { id: "VCB", name: "Vietcombank (Ngoại thương)" },
+                  { id: "CTG", name: "VietinBank (Công thương)" },
+                  { id: "TCB", name: "Techcombank (Kỹ thương)" },
+                  { id: "BIDV", name: "BIDV (Đầu tư & Phát triển)" },
+                  { id: "ACB", name: "ACB (Á Châu)" },
+                  { id: "VPB", name: "VPBank (Việt Nam Thịnh Vượng)" },
+                  { id: "TPB", name: "TPBank (Tiên Phong)" },
+                  { id: "STB", name: "Sacombank (Sài Gòn Thương Tín)" },
+                  { id: "HDB", name: "HDBank (Phát triển TP.HCM)" },
+                  { id: "VBA", name: "Agribank (Nông nghiệp)" },
+                  { id: "VIB", name: "VIB (Quốc tế)" },
+                  { id: "SHB", name: "SHB (Sài Gòn - Hà Nội)" },
+                  { id: "OCB", name: "OCB (Phương Đông)" },
+                ].map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Số tài khoản</label>
+              <Input
+                type="text"
+                value={bankAccountNo}
+                onChange={(e) => setBankAccountNo(e.target.value)}
+                placeholder="Nhập số tài khoản"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tên chủ tài khoản (Viết liền không dấu)</label>
+              <Input
+                type="text"
+                value={bankAccountName}
+                onChange={(e) => setBankAccountName(e.target.value.toUpperCase())}
+                placeholder="Ví dụ: NGUYEN VAN A"
+                required
+              />
+            </div>
+
+            <div className="md:col-span-3 flex justify-end pt-2">
+              <Button
+                type="submit"
+                isLoading={updateStoreBankMutation.isPending}
+                leftIcon={<CheckCircle2 size={16} />}
+                className="px-8 shadow-lg shadow-primary/20"
+              >
+                Lưu cấu hình
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
 
-      {/* Store Bank Configuration Card */}
-      <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-xl shadow-gray-200/50 space-y-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-50 pb-6 gap-4">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-primary flex items-center justify-center shrink-0">
-              <QrCode size={24} />
-            </div>
-            <div>
-              <h3 className="text-xl font-black text-gray-900 tracking-tight">Tài khoản Ngân hàng nhận QR</h3>
-              <p className="text-sm text-gray-500 font-medium">Cấu hình thông tin tài khoản ngân hàng của quán để tự động tạo mã QR VietQR nhận tiền khi khách thanh toán chuyển khoản.</p>
-            </div>
-          </div>
-        </div>
 
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          if (!bankId || !bankAccountNo || !bankAccountName) {
-            alert("Vui lòng điền đầy đủ thông tin ngân hàng!");
-            return;
-          }
-          updateStoreBankMutation.mutate({
-            bankId: bankId.trim(),
-            bankAccountNo: bankAccountNo.trim(),
-            bankAccountName: bankAccountName.trim()
-          }, {
-            onSuccess: (data) => {
-              setStoreConfig({
-                ...storeConfig!,
-                bankId: data.bankId,
-                bankAccountNo: data.bankAccountNo,
-                bankAccountName: data.bankAccountName
-              });
-              alert("Lưu thông tin ngân hàng thành công!");
-            },
-            onError: (err: any) => {
-              alert(err.message || "Không thể cập nhật cấu hình ngân hàng");
-            }
-          });
-        }} className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Ngân hàng</label>
-            <Select
-              value={bankId}
-              onChange={(e) => setBankId(e.target.value)}
-              required
-            >
-              <option value="" disabled>Chọn ngân hàng...</option>
-              {[
-                { id: "MB", name: "MB Bank (Ngân hàng Quân đội)" },
-                { id: "VCB", name: "Vietcombank (Ngoại thương)" },
-                { id: "CTG", name: "VietinBank (Công thương)" },
-                { id: "TCB", name: "Techcombank (Kỹ thương)" },
-                { id: "BIDV", name: "BIDV (Đầu tư & Phát triển)" },
-                { id: "ACB", name: "ACB (Á Châu)" },
-                { id: "VPB", name: "VPBank (Việt Nam Thịnh Vượng)" },
-                { id: "TPB", name: "TPBank (Tiên Phong)" },
-                { id: "STB", name: "Sacombank (Sài Gòn Thương Tín)" },
-                { id: "HDB", name: "HDBank (Phát triển TP.HCM)" },
-                { id: "VBA", name: "Agribank (Nông nghiệp)" },
-                { id: "VIB", name: "VIB (Quốc tế)" },
-                { id: "SHB", name: "SHB (Sài Gòn - Hà Nội)" },
-                { id: "OCB", name: "OCB (Phương Đông)" },
-              ].map((b) => (
-                <option key={b.id} value={b.id}>{b.name}</option>
-              ))}
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Số tài khoản</label>
-            <Input
-              type="text"
-              value={bankAccountNo}
-              onChange={(e) => setBankAccountNo(e.target.value)}
-              placeholder="Nhập số tài khoản"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tên chủ tài khoản (Viết liền không dấu)</label>
-            <Input
-              type="text"
-              value={bankAccountName}
-              onChange={(e) => setBankAccountName(e.target.value.toUpperCase())}
-              placeholder="Ví dụ: NGUYEN VAN A"
-              required
-            />
-          </div>
-
-          <div className="md:col-span-3 flex justify-end pt-2">
-            <Button
-              type="submit"
-              isLoading={updateStoreBankMutation.isPending}
-              leftIcon={<CheckCircle2 size={16} />}
-              className="px-8 shadow-lg shadow-primary/20"
-            >
-              Lưu cấu hình
-            </Button>
-          </div>
-        </form>
-      </div>
 
       {/* Renewal Packages Grid */}
       <div className="space-y-6">
@@ -352,14 +492,11 @@ export default function AdminBillingPage() {
           <div className="flex items-center gap-3 bg-primary-soft border border-primary px-4 py-2 rounded-2xl shrink-0">
             <span className="text-xs font-bold text-orange-700">Chế độ test (phút)</span>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
-                checked={isTestMode} 
-                onChange={(e) => {
-                  setIsTestMode(e.target.checked);
-                  setSelectedPkg(null);
-                }}
-                className="sr-only peer" 
+              <input
+                type="checkbox"
+                checked={isTestMode}
+                onChange={handleToggleTestMode}
+                className="sr-only peer"
               />
               <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
             </label>
@@ -368,11 +505,10 @@ export default function AdminBillingPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {packages.map((pkg) => (
-            <div 
-              key={pkg.months} 
-              className={`bg-white rounded-3xl border-2 p-6 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:border-primary/40 transition-all ${
-                pkg.popular ? "border-primary shadow-primary/50" : "border-gray-100"
-              }`}
+            <div
+              key={pkg.months}
+              className={`bg-white rounded-3xl border-2 p-6 flex flex-col justify-between shadow-sm relative overflow-hidden group hover:border-primary/40 transition-all ${pkg.popular ? "border-primary shadow-primary/50" : "border-gray-100"
+                }`}
             >
               {pkg.popular && (
                 <div className="absolute top-0 right-0 bg-primary text-white text-[9px] font-black uppercase px-3 py-1 rounded-bl-xl tracking-widest">
@@ -447,13 +583,12 @@ export default function AdminBillingPage() {
                         {new Date(req.createdAt).toLocaleDateString("vi-VN")} {new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-wider ${
-                          req.status === "APPROVED" 
-                            ? "bg-green-100 text-green-700" 
-                            : req.status === "REJECTED" 
-                            ? "bg-red-100 text-red-700" 
+                        <span className={`px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-wider ${req.status === "APPROVED"
+                          ? "bg-green-100 text-green-700"
+                          : req.status === "REJECTED"
+                            ? "bg-red-100 text-red-700"
                             : "bg-amber-100 text-amber-700 animate-pulse"
-                        }`}>
+                          }`}>
                           {req.status === "APPROVED" ? "Đã duyệt" : req.status === "REJECTED" ? "Từ chối" : "Chờ duyệt"}
                         </span>
                       </td>
@@ -480,11 +615,8 @@ export default function AdminBillingPage() {
                   Gia hạn Premium {selectedPkg.months} {unitLabel}
                 </h3>
               </div>
-              <button 
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setSelectedPkg(null);
-                }} 
+              <button
+                onClick={handleCloseModal}
                 className="p-1.5 hover:bg-gray-200 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
               >
                 <X size={20} />
@@ -512,7 +644,7 @@ export default function AdminBillingPage() {
                   <span className="text-gray-400 font-bold">Số tài khoản</span>
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-gray-800">{superAdminBankAcc}</span>
-                    <button 
+                    <button
                       onClick={() => handleCopy(superAdminBankAcc, "Số tài khoản")}
                       className="text-primary hover:text-primary transition-colors"
                     >
@@ -528,7 +660,7 @@ export default function AdminBillingPage() {
                   <span className="text-gray-400 font-bold">Nội dung chuyển khoản</span>
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-primary">GIAHAN {storeConfig?.slug} {selectedPkg.months} {isTestMode ? 'PHUT' : 'THANG'}</span>
-                    <button 
+                    <button
                       onClick={() => handleCopy(`GIAHAN ${storeConfig?.slug} ${selectedPkg.months} ${isTestMode ? 'PHUT' : 'THANG'}`, "Nội dung chuyển khoản")}
                       className="text-primary hover:text-primary transition-colors"
                     >
@@ -555,10 +687,7 @@ export default function AdminBillingPage() {
 
             <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
               <Button
-                onClick={() => {
-                  setIsModalOpen(false);
-                  setSelectedPkg(null);
-                }}
+                onClick={handleCloseModal}
                 variant="secondary"
                 className="flex-1 py-3 h-auto"
               >

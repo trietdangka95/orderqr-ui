@@ -40,6 +40,7 @@ export interface OrderItem {
   note?: string;
   product?: Product;
   isCooked?: boolean;
+  isCooking?: boolean;
   isServed?: boolean;
 }
 

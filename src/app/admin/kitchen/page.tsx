@@ -1,19 +1,85 @@
 "use client";
 
 import { OrderStatus, useCartStore } from "@/store/cartStore";
-import { OrderStatus as ApiOrderStatus } from "@/types/api";
+import { OrderItem } from "@/types/api";
 import { useEffect, useState, useRef } from "react";
 import OrderTicket from "@/components/kitchen/OrderTicket";
 import { LayoutGrid, List, LogOut } from "lucide-react";
-import { useOrders, useUpdateOrderStatus } from "@/hooks/useOrders";
+import { useOrders } from "@/hooks/useOrders";
 import useIsMounted from "@/hooks/useIsMounted";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+export type ColumnType = "pending" | "cooking" | "serving" | "completed";
+
+/** Một nhóm items từ cùng 1 order, dùng để render ticket trong 1 cột */
+export interface VirtualTicket {
+  orderId: string;
+  tableNumber: string;
+  timestamp: number;
+  orderTotalPrice: number;
+  items: ItemWithMeta[];
+}
+
+export interface ItemWithMeta {
+  id: string;
+  orderItemId: string;
+  name: string;
+  quantity: number;
+  price: number;
+  note: string;
+  image: string;
+  description: string;
+  category: string;
+  categoryId: number;
+  isCooked: boolean;
+  isCooking: boolean;
+  isServed: boolean;
+}
+
+// ─── Helper: group flat items → VirtualTicket[] ───────────────────────────────
+
+type FlatItem = ItemWithMeta & { orderId: string; tableNumber: string; timestamp: number; orderTotalPrice: number };
+
+function groupByOrder(items: FlatItem[]): VirtualTicket[] {
+  const map = new Map<string, VirtualTicket>();
+  for (const item of items) {
+    if (!map.has(item.orderId)) {
+      map.set(item.orderId, {
+        orderId: item.orderId,
+        tableNumber: item.tableNumber,
+        timestamp: item.timestamp,
+        orderTotalPrice: item.orderTotalPrice,
+        items: [],
+      });
+    }
+    map.get(item.orderId)!.items.push({
+      id: item.id,
+      orderItemId: item.orderItemId,
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price,
+      note: item.note,
+      image: item.image,
+      description: item.description,
+      category: item.category,
+      categoryId: item.categoryId,
+      isCooked: item.isCooked,
+      isCooking: item.isCooking,
+      isServed: item.isServed,
+    });
+  }
+  // Sort FIFO: cũ nhất lên đầu
+  return Array.from(map.values()).sort((a, b) => a.timestamp - b.timestamp);
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function KitchenPage() {
   const { logout, userRole } = useCartStore();
   const { data: apiOrders = [] } = useOrders();
-  const updateStatusMutation = useUpdateOrderStatus();
   const isMounted = useIsMounted();
   const queryClient = useQueryClient();
   const { socket } = useSocket();
@@ -21,43 +87,43 @@ export default function KitchenPage() {
   // Real-time updates
   useEffect(() => {
     if (!socket) return;
-
-    const refreshOrders = () => {
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
-    };
-
-    socket.on('newOrder', refreshOrders);
-    socket.on('orderUpdate', refreshOrders);
-    socket.on('checkout', refreshOrders);
-
+    const refresh = () => queryClient.invalidateQueries({ queryKey: ["orders"] });
+    socket.on("newOrder", refresh);
+    socket.on("orderUpdate", refresh);
+    socket.on("checkout", refresh);
     return () => {
-      socket.off('newOrder', refreshOrders);
-      socket.off('orderUpdate', refreshOrders);
-      socket.off('checkout', refreshOrders);
+      socket.off("newOrder", refresh);
+      socket.off("orderUpdate", refresh);
+      socket.off("checkout", refresh);
     };
   }, [socket, queryClient]);
 
+  // Normalize orders from API
   const orders = apiOrders
     .filter(o => !o.invoiceId && o.isConfirmed)
     .map(o => ({
       ...o,
-      status: o.status.toLowerCase() as OrderStatus, // UI expects lowercase
+      status: o.status.toLowerCase() as OrderStatus,
       timestamp: new Date(o.createdAt).getTime(),
-      isConfirmed: o.isConfirmed,
-      totalPrice: Number(o.totalPrice || o.orderItems.reduce((sum: number, i: any) => sum + (i.product?.price || 0) * i.quantity, 0)),
-      items: o.orderItems.map((i) => ({
-        ...i,
-        id: i.productId, // Use productId as id for CartItem compatibility
-        orderItemId: i.id, // Database OrderItem ID
-        name: i.product?.name || 'Món ăn',
-        image: i.product?.image || '',
+      totalPrice: Number(o.totalPrice || o.orderItems.reduce((sum: number, i: OrderItem) => sum + (i.product?.price || 0) * i.quantity, 0)),
+      items: o.orderItems.map(i => ({
+        id: i.productId,
+        orderItemId: i.id,
+        name: i.product?.name || "Món ăn",
+        image: i.product?.image || "",
         price: i.product?.price || 0,
-        description: i.product?.description || '',
-        category: i.product?.category || '',
+        description: i.product?.description || "",
+        category: i.product?.category || "",
         categoryId: i.product?.categoryId || 0,
-        note: i.note || '',
-      }))
+        note: i.note || "",
+        isCooked: i.isCooked ?? false,
+        isCooking: i.isCooking ?? false,
+        isServed: i.isServed ?? false,
+        quantity: i.quantity,
+      })),
     }));
+
+  // Audio alert for new pending orders
   const audioRef = useRef<HTMLAudioElement>(null);
   const [view, setView] = useState<"board" | "summary">("board");
 
@@ -68,54 +134,53 @@ export default function KitchenPage() {
   }, []);
 
   const [prevPendingCount, setPrevPendingCount] = useState(0);
-  const pendingCount = orders.filter((o) => o.isConfirmed && o.status === "pending").length;
-
-  // Adjust state during render to avoid cascading renders in useEffect
-  if (pendingCount !== prevPendingCount) {
-    setPrevPendingCount(pendingCount);
-  }
+  const pendingCount = orders.filter(o => o.status === "pending").length;
+  if (pendingCount !== prevPendingCount) setPrevPendingCount(pendingCount);
 
   useEffect(() => {
     if (pendingCount > prevPendingCount && audioRef.current) {
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(() => { });
+      audioRef.current.play().catch(() => {});
     }
   }, [pendingCount, prevPendingCount]);
 
-  const advanceStatus = (orderId: string, current: OrderStatus) => {
-    let next: ApiOrderStatus | null = null;
-    if (current === "pending") next = "COOKING";
-    else if (current === "cooking") next = "SERVING";
-    else if (current === "serving") next = "COMPLETED";
+  // ─── Per-item virtual tickets ─────────────────────────────────────────────
 
-    if (next) {
-      updateStatusMutation.mutate({ id: orderId, status: next });
-    }
-  };
+  /** Flatten tất cả items từ các orders đã xác nhận */
+  const allFlatItems: FlatItem[] = orders.flatMap(o =>
+    o.items.map(item => ({
+      ...item,
+      orderId: o.id,
+      tableNumber: o.tableNumber,
+      timestamp: o.timestamp,
+      orderTotalPrice: o.totalPrice,
+    }))
+  );
 
-  const confirmedOrders = orders
-    .filter(o => o.isConfirmed)
-    .sort((a, b) => a.timestamp - b.timestamp); // FIFO: Cũ nhất làm trước
+  const pendingTickets   = groupByOrder(allFlatItems.filter(i => !i.isCooking && !i.isCooked && !i.isServed));
+  const cookingTickets   = groupByOrder(allFlatItems.filter(i => i.isCooking && !i.isCooked && !i.isServed));
+  const servingTickets   = groupByOrder(allFlatItems.filter(i => i.isCooked && !i.isServed));
+  const completedTickets = groupByOrder(allFlatItems.filter(i => i.isServed));
 
+  const columns: { key: ColumnType; title: string; color: string; dot: string; tickets: VirtualTicket[] }[] = [
+    { key: "pending",   title: "Chờ chế biến", dot: "bg-red-500",   color: "bg-white border-t-red-500 shadow-red-100",     tickets: pendingTickets   },
+    { key: "cooking",   title: "Đang chế biến", dot: "bg-primary",   color: "bg-white border-t-orange-500 shadow-orange-100", tickets: cookingTickets   },
+    { key: "serving",   title: "Chờ phục vụ",  dot: "bg-blue-500",  color: "bg-white border-t-blue-500 shadow-blue-100",   tickets: servingTickets   },
+    { key: "completed", title: "Hoàn thành",   dot: "bg-green-500", color: "bg-white border-t-green-500 shadow-green-100", tickets: completedTickets },
+  ];
+
+  // Summary view (unchanged)
+  const confirmedOrders = orders.sort((a, b) => a.timestamp - b.timestamp);
   const itemSummary = confirmedOrders
     .filter(o => o.status === "pending" || o.status === "cooking")
     .reduce((acc, order) => {
-      order.items.forEach((item: any) => {
-        if (!acc[item.name]) {
-          acc[item.name] = { count: 0, tables: new Set<string>() };
-        }
+      order.items.forEach(item => {
+        if (!acc[item.name]) acc[item.name] = { count: 0, tables: new Set<string>() };
         acc[item.name].count += item.quantity;
         acc[item.name].tables.add(order.tableNumber);
       });
       return acc;
     }, {} as Record<string, { count: number; tables: Set<string> }>);
-
-  const columns: { status: OrderStatus; title: string; color: string; dot: string }[] = [
-    { status: "pending", title: "Chờ chế biến", dot: "bg-red-500", color: "bg-white border-t-red-500 shadow-red-100" },
-    { status: "cooking", title: "Đang chế biến", dot: "bg-primary", color: "bg-white border-t-orange-500 shadow-orange-100" },
-    { status: "serving", title: "Chờ phục vụ", dot: "bg-blue-500", color: "bg-white border-t-blue-500 shadow-blue-100" },
-    { status: "completed", title: "Hoàn thành", dot: "bg-green-500", color: "bg-white border-t-green-500 shadow-green-100" },
-  ];
 
   if (!isMounted) return null;
 
@@ -147,10 +212,7 @@ export default function KitchenPage() {
 
           {userRole === "kitchen" && (
             <button
-              onClick={() => {
-                logout();
-                window.location.href = "/";
-              }}
+              onClick={() => { logout(); window.location.href = "/"; }}
               className="flex items-center gap-2 px-6 py-3 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-black rounded-2xl transition-all shadow-md active:scale-95 text-sm"
             >
               <LogOut size={18} />
@@ -163,41 +225,38 @@ export default function KitchenPage() {
       <main className="flex-grow flex flex-col min-h-0">
 
         {view === "board" ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 flex-grow min-h-0">
-            {columns.map((col) => {
-              const colOrders = orders.filter((o) => o.status === col.status);
-              return (
-                <section key={col.status} className="flex flex-col h-full min-h-0">
-                  <div className={`p-4 rounded-2xl border-t-4 mb-4 flex items-center justify-between shadow-xl shadow-gray-200/20 ${col.color} shrink-0`}>
-                    <div className="flex items-center gap-3">
-                      <div className={`w-2.5 h-2.5 rounded-full ${col.dot} animate-pulse shadow-sm`}></div>
-                      <h2 className="font-black uppercase tracking-widest text-sm text-gray-900">{col.title}</h2>
-                    </div>
-                    <span className="bg-gray-100 text-gray-900 px-3 py-1 rounded-lg text-sm font-black shadow-sm">{colOrders.length}</span>
+          <div className="flex flex-row md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto md:overflow-x-visible pb-4 flex-grow min-h-0 snap-x snap-mandatory">
+            {columns.map(col => (
+              <section key={col.key} className="flex flex-col h-full min-h-0 w-[85vw] sm:w-[350px] md:w-full shrink-0 snap-center">
+                <div className={`p-4 rounded-2xl border-t-4 mb-4 flex items-center justify-between shadow-xl shadow-gray-200/20 ${col.color} shrink-0`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2.5 h-2.5 rounded-full ${col.dot} animate-pulse shadow-sm`}></div>
+                    <h2 className="font-black uppercase tracking-widest text-sm text-gray-900">{col.title}</h2>
                   </div>
-                  <div className="space-y-4 overflow-y-auto flex-grow min-h-0 no-scrollbar pb-6">
-                    {confirmedOrders.filter(o => o.status === col.status).map((order) => (
-                      <OrderTicket
-                        key={order.id}
-                        order={order}
-                        onAdvance={() => advanceStatus(order.id, order.status)}
-                      />
-                    ))}
-                    {colOrders.length === 0 && (
-                      <div className="py-20 text-center text-gray-300 italic text-sm">
-                        Trống
-                      </div>
-                    )}
-                  </div>
-                </section>
-              );
-            })}
+                  <span className="bg-gray-100 text-gray-900 px-3 py-1 rounded-lg text-sm font-black shadow-sm">
+                    {col.tickets.reduce((s, t) => s + t.items.length, 0)}
+                  </span>
+                </div>
+                <div className="space-y-4 overflow-y-auto flex-grow min-h-0 no-scrollbar pb-6">
+                  {col.tickets.map(ticket => (
+                    <OrderTicket
+                      key={`${col.key}-${ticket.orderId}`}
+                      ticket={ticket}
+                      columnType={col.key}
+                    />
+                  ))}
+                  {col.tickets.length === 0 && (
+                    <div className="py-20 text-center text-gray-300 italic text-sm">Trống</div>
+                  )}
+                </div>
+              </section>
+            ))}
           </div>
         ) : (
           <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 flex-grow min-h-0 w-full flex flex-col">
             <div className="p-8 border-b bg-gray-50/50 shrink-0">
               <h2 className="text-xl font-black text-gray-800">Danh sách món cần chuẩn bị</h2>
-              <p className="text-sm text-gray-500">Tổng hợp tất cả món từ các đơn hàng Chờ chế biến & Đang làm</p>
+              <p className="text-sm text-gray-500">Tổng hợp tất cả món từ các đơn hàng Chờ chế biến &amp; Đang làm</p>
             </div>
             <div className="p-8 overflow-y-auto flex-1 min-h-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
