@@ -50,13 +50,15 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
         <ul className="space-y-2 mb-5">
           {ticket.items.map(item => (
             <li key={item.orderItemId} className="flex flex-col gap-1">
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-start justify-between gap-3">
                 {/* Item info */}
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <span className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center text-[10px] font-black text-gray-900 shrink-0">
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <span className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center text-[10px] font-black text-gray-900 shrink-0 mt-0.5">
                     {item.quantity}
                   </span>
-                  <span className="font-bold text-sm text-gray-800 truncate">{item.name}</span>
+                  <span className="font-bold text-sm text-gray-800 leading-snug break-words" title={item.name}>
+                    {item.name}
+                  </span>
                 </div>
 
                 {/* Action button per item */}
