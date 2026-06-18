@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import CartDrawer from "@/components/CartDrawer";
 import OrdersDrawer from "@/components/OrdersDrawer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
+import { useCartStore } from "@/store/cartStore";
 
 export default function CustomerUI() {
   const pathname = usePathname();
@@ -35,7 +36,27 @@ export default function CustomerUI() {
   const isStoreAdmin = pathname?.startsWith("/admin");
   const isAuth = pathname?.startsWith("/auth");
 
+  const { storeConfig, storeError, selectedTable, userRole } = useCartStore();
+
   if (isPlatformAdmin || isStoreAdmin || isAuth || isLanding) {
+    return null;
+  }
+
+  // 1. Hide guest UI if config is loading or has error (e.g. Store Not Found)
+  if (!storeConfig || storeError) {
+    return null;
+  }
+
+  // 2. Hide guest UI if guest has not selected a table yet (on Table Selector page)
+  const isGuest = userRole === "guest";
+  let hasTableParam = false;
+  if (typeof window !== "undefined") {
+    const query = new URLSearchParams(window.location.search);
+    hasTableParam = !!(query.get("table") || query.get("tables"));
+  }
+  const resolvedTable = isGuest && !hasTableParam ? "" : selectedTable;
+
+  if (isGuest && !resolvedTable) {
     return null;
   }
 

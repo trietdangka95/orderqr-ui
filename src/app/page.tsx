@@ -67,9 +67,13 @@ function HomeContent() {
     toastMessage, setToastMessage, storeError
   } = useCartStore();
 
+  const isGuest = userRole === "guest";
+  const urlTable = searchParams.get("table") || searchParams.get("tables");
+  const resolvedTable = isGuest && !urlTable ? "" : selectedTable;
+
   const isStaff = userRole === "staff" || userRole === "admin" || userRole === "kitchen";
   const { data: allOrders = [] } = useOrders(isStaff);
-  const { data: tableOrders = [] } = useTableOrders(selectedTable);
+  const { data: tableOrders = [] } = useTableOrders(resolvedTable);
   const apiOrders = isStaff ? allOrders : tableOrders;
   const activeOrdersCount = apiOrders.filter(o => !o.invoiceId && o.status.toUpperCase() !== "CANCELLED").length;
 
@@ -229,8 +233,7 @@ function HomeContent() {
     );
   }
 
-  const isGuest = userRole === "guest";
-  const showTableSelector = isGuest && !selectedTable && !searchParams.get("table");
+  const showTableSelector = isGuest && !resolvedTable;
 
   if (showTableSelector) {
     return (
@@ -343,7 +346,7 @@ function HomeContent() {
     <div className="min-h-screen bg-gray-50 pb-32">
       <HomeHeader
         userRole={userRole}
-        selectedTable={selectedTable}
+        selectedTable={resolvedTable}
         tables={tables}
         isTableSelectorOpen={isTableSelectorOpen}
         setIsTableSelectorOpen={setIsTableSelectorOpen}

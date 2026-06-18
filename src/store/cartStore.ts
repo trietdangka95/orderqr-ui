@@ -261,8 +261,25 @@ export const useCartStore = create<CartStore>()(
       fetchStoreConfig: async (slug) => {
         try {
           set({ storeError: null });
+          const currentConfig = get().storeConfig;
+          if (currentConfig && currentConfig.slug !== slug) {
+            set({ storeConfig: null });
+          }
+
           const response = await axiosInstance.get(`/stores/config?slug=${slug}`);
           const config = response.data;
+
+          if (currentConfig && config && currentConfig.id !== config.id) {
+            set({
+              selectedTable: "",
+              items: [],
+              userRole: "guest",
+              isLoggedIn: false,
+              userId: null,
+              userStoreId: null,
+            });
+          }
+
           set({ storeConfig: config });
           if (config && config.tables) {
             set({ tables: config.tables });
