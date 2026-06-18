@@ -407,8 +407,8 @@ export default function OrdersDrawer() {
                             </div>
                           </div>
                           
-                          {(userRole === "staff" || userRole === "admin") && order.status !== "completed" && order.status !== "cancelled" ? (
-                            <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-xl px-1.5 py-0.5">
+                          {(userRole === "staff" || userRole === "admin") && order.status !== "completed" && order.status !== "cancelled" && !item.isCooked && !item.isServed ? (
+                            <div className="flex items-center gap-2.5 bg-gray-50 border border-gray-100 rounded-2xl px-2 py-1 shrink-0">
                               <button
                                 disabled={updateOrderItemMutation.isPending}
                                 onClick={async () => {
@@ -420,7 +420,7 @@ export default function OrdersDrawer() {
                                     updateOrderItemMutation.mutate({ orderId: order.id, productId: item.productId, quantity: item.quantity - 1 });
                                   }
                                 }}
-                                className="w-5 h-5 rounded-lg flex items-center justify-center bg-white border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors text-xs font-black disabled:opacity-50"
+                                className="w-7 h-7 rounded-xl flex items-center justify-center bg-white border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors text-sm font-black disabled:opacity-50 cursor-pointer"
                               >
                                 -
                               </button>
@@ -428,9 +428,9 @@ export default function OrdersDrawer() {
                               {updateOrderItemMutation.isPending && 
                                updateOrderItemMutation.variables?.orderId === order.id && 
                                updateOrderItemMutation.variables?.productId === item.productId ? (
-                                <div className="w-3 h-3 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                                <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                               ) : (
-                                <span className="font-bold text-xs w-4 text-center">{item.quantity}</span>
+                                <span className="font-black text-sm w-5 text-center text-gray-800">{item.quantity}</span>
                               )}
                               
                               <button
@@ -438,13 +438,13 @@ export default function OrdersDrawer() {
                                 onClick={() => {
                                   updateOrderItemMutation.mutate({ orderId: order.id, productId: item.productId, quantity: item.quantity + 1 });
                                 }}
-                                className="w-5 h-5 rounded-lg flex items-center justify-center bg-white border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors text-xs font-black disabled:opacity-50"
+                                className="w-7 h-7 rounded-xl flex items-center justify-center bg-white border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors text-sm font-black disabled:opacity-50 cursor-pointer"
                               >
                                 +
                               </button>
                             </div>
                           ) : (
-                            <span className="font-bold text-sm">x{item.quantity}</span>
+                            <span className="font-black text-sm bg-gray-50 text-gray-500 border border-gray-100 px-2.5 py-1 rounded-xl shrink-0">x{item.quantity}</span>
                           )}
                         </div>
                         

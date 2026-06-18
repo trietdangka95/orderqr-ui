@@ -408,7 +408,7 @@ export default function LandingPage() {
                       </div>
 
                       {/* Category tabs */}
-                      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[8px] font-black uppercase tracking-wider">
+                      <div className="flex gap-1.5 overflow-x-auto py-1 scrollbar-none text-[8px] font-black uppercase tracking-wider">
                         <span className="px-2 py-1 bg-primary text-white rounded-full">
                           Món chính
                         </span>

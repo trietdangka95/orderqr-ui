@@ -77,12 +77,12 @@ export default function MobileBottomNav() {
 
   return (
     <motion.div 
-      className="md:hidden fixed bottom-6 left-6 right-6 z-50"
+      className="md:hidden fixed bottom-2.5 left-4 right-4 z-50"
       animate={popCart ? { scale: [1, 1.08, 0.96, 1.02, 1] } : {}}
       transition={{ duration: 0.45, ease: "easeInOut" }}
     >
       <div 
-        className={`bg-white/85 backdrop-blur-xl border flex justify-between items-center relative gap-1 transition-all duration-500 rounded-[2.2rem] px-3 py-2 ${
+        className={`bg-white/85 backdrop-blur-xl border flex justify-between items-center relative gap-1 transition-all duration-500 rounded-[1.8rem] px-3 py-1.5 ${
           totalItems > 0 
             ? "border-primary/30 shadow-[0_8px_32px_rgba(249,115,22,0.22)] shadow-primary/20" 
             : "border-white/50 shadow-2xl"
@@ -94,19 +94,19 @@ export default function MobileBottomNav() {
             <button
               key={tab.id}
               onClick={tab.onClick}
-              className="flex-1 relative py-2 flex flex-col items-center justify-center transition-all duration-300 rounded-2xl active:scale-95 cursor-pointer"
+              className="flex-1 relative py-1 flex flex-col items-center justify-center transition-all duration-300 rounded-xl active:scale-95 cursor-pointer"
             >
               {tab.active && (
                 <motion.div
                   layoutId="activeTabPill"
-                  className={`absolute inset-0 rounded-2xl ${
+                  className={`absolute inset-0 rounded-xl ${
                     tab.id === "orders" ? "bg-blue-50" : "bg-primary-soft"
                   }`}
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
                 />
               )}
               
-              <div className={`relative z-10 p-1 flex flex-col items-center ${
+              <div className={`relative z-10 p-0.5 flex flex-col items-center ${
                 tab.active 
                   ? (tab.id === "orders" ? "text-blue-600" : "text-primary") 
                   : "text-gray-400 hover:text-gray-600"
@@ -126,7 +126,7 @@ export default function MobileBottomNav() {
                   }
                   transition={{ duration: 0.45, ease: "easeInOut" }}
                 >
-                  <Icon size={22} strokeWidth={tab.active ? 2.5 : 2} className="transition-transform duration-300" />
+                  <Icon size={18} strokeWidth={tab.active ? 2.5 : 2} className="transition-transform duration-300" />
                   
                   {tab.badge && tab.badge > 0 ? (
                     <span className={`absolute -top-1.5 -right-2 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[9px] font-black border-2 border-white shadow-sm transition-all ${
@@ -139,7 +139,7 @@ export default function MobileBottomNav() {
                   ) : null}
                 </motion.div>
                 
-                <span className="text-[10px] font-black uppercase tracking-wider mt-1 block">
+                <span className="text-[9px] font-black uppercase tracking-wider mt-0.5 block">
                   {tab.label}
                 </span>
               </div>
