@@ -73,6 +73,17 @@ export default function OrdersDrawer() {
   const [isCheckoutMode, setIsCheckoutMode] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<'CASH' | 'QR_TRANSFER' | null>(null);
 
+  // Auto-switch default tab for staff when drawer is opened
+  useEffect(() => {
+    if (isOrdersOpen && userRole === "staff") {
+      if (!selectedTable) {
+        setActiveTab("all");
+      } else {
+        setActiveTab("current");
+      }
+    }
+  }, [isOrdersOpen, userRole, selectedTable]);
+
   // Real-time updates
   useEffect(() => {
     if (!socket) return;
@@ -217,7 +228,7 @@ export default function OrdersDrawer() {
 
         <div className="flex-1 overflow-y-auto p-4 space-y-6">
           {/* Cumulative Subtotal Banner */}
-          {selectedTable && tableOrders.length > 0 && (
+          {activeTab === "current" && selectedTable && tableOrders.length > 0 && (
             <div className="bg-primary-soft border border-primary rounded-2xl p-4 flex justify-between items-center mb-2 shadow-sm">
               <div>
                 <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Tổng tạm tính (Chưa thanh toán)</p>
