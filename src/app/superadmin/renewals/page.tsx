@@ -1,6 +1,7 @@
 "use client";
  
 import { useState } from "react";
+import { showConfirm, showAlert } from "@/store/dialogStore";
 import { useRenewalRequests, useApproveRenewalRequest, useRejectRenewalRequest, useBankConfig, useSaveBankConfig } from "@/hooks/useRenewals";
 import { 
   Check, 
@@ -39,14 +40,14 @@ export default function SuperAdminRenewalsPage() {
     return req.status === activeTab;
   });
  
-  const handleApprove = (id: string, storeName: string, months: number) => {
-    if (confirm(`Bạn có chắc chắn muốn DUYỆT yêu cầu gia hạn ${months} tháng cho cửa hàng "${storeName}"?`)) {
+  const handleApprove = async (id: string, storeName: string, months: number) => {
+    if (await showConfirm(`Bạn có chắc chắn muốn DUYỆT yêu cầu gia hạn ${months} tháng cho cửa hàng "${storeName}"?`)) {
       approveMutation.mutate(id, {
         onSuccess: () => {
-          alert("Đã phê duyệt yêu cầu gia hạn thành công!");
+          showAlert("Đã phê duyệt yêu cầu gia hạn thành công!");
         },
         onError: (err: any) => {
-          alert(err.message || "Phê duyệt thất bại!");
+          showAlert(err.message || "Phê duyệt thất bại!");
         }
       });
     }
@@ -57,10 +58,10 @@ export default function SuperAdminRenewalsPage() {
     setRejectReason("");
   };
  
-  const submitReject = () => {
+  const submitReject = async () => {
     if (!rejectingId) return;
     if (!rejectReason.trim()) {
-      alert("Vui lòng nhập lý do từ chối!");
+      showAlert("Vui lòng nhập lý do từ chối!");
       return;
     }
  
@@ -71,10 +72,10 @@ export default function SuperAdminRenewalsPage() {
       onSuccess: () => {
         setRejectingId(null);
         setRejectReason("");
-        alert("Đã từ chối yêu cầu gia hạn!");
+        showAlert("Đã từ chối yêu cầu gia hạn!");
       },
       onError: (err: any) => {
-        alert(err.message || "Từ chối yêu cầu thất bại!");
+        showAlert(err.message || "Từ chối yêu cầu thất bại!");
       }
     });
   };
@@ -455,9 +456,9 @@ export default function SuperAdminRenewalsPage() {
               </button>
               <button
                 disabled={saveBankConfigMutation.isPending}
-                onClick={() => {
+                onClick={async () => {
                   if (!bankId.trim() || !bankAccountNo.trim() || !bankAccountName.trim()) {
-                    alert("Vui lòng điền đầy đủ thông tin tài khoản!");
+                    showAlert("Vui lòng điền đầy đủ thông tin tài khoản!");
                     return;
                   }
                   saveBankConfigMutation.mutate({
@@ -468,10 +469,10 @@ export default function SuperAdminRenewalsPage() {
                   }, {
                     onSuccess: () => {
                       setIsBankModalOpen(false);
-                      alert("Đã cập nhật cấu hình hệ thống thành công!");
+                      showAlert("Đã cập nhật cấu hình hệ thống thành công!");
                     },
                     onError: (err: any) => {
-                      alert(err.message || "Cập nhật thất bại!");
+                      showAlert(err.message || "Cập nhật thất bại!");
                     }
                   });
                 }}

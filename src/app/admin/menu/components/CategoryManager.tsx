@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { showConfirm, showAlert } from "@/store/dialogStore";
 import { X, Plus, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { useCreateCategory, useDeleteCategory } from "@/hooks/useProducts";
 import { Category } from "@/types/api";
@@ -24,17 +25,17 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
           setNewCategoryName("");
         },
         onError: (err: any) => {
-          alert("Lỗi khi thêm danh mục: " + (err.message || "Lỗi không xác định"));
+          showAlert("Lỗi khi thêm danh mục: " + (err.message || "Lỗi không xác định"));
         }
       });
     }
   };
 
-  const handleRemove = (id: number) => {
-    if (confirm("Bạn có chắc chắn muốn xóa danh mục này? Các sản phẩm thuộc danh mục này có thể bị ảnh hưởng.")) {
+  const handleRemove = async (id: number) => {
+    if (await showConfirm("Bạn có chắc chắn muốn xóa danh mục này? Các sản phẩm thuộc danh mục này có thể bị ảnh hưởng.")) {
       deleteCategoryMutation.mutate(id, {
         onError: (err: any) => {
-          alert("Lỗi khi xóa danh mục: " + (err.message || "Lỗi không xác định"));
+          showAlert("Lỗi khi xóa danh mục: " + (err.message || "Lỗi không xác định"));
         }
       });
     }

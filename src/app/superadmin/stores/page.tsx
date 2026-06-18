@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { showAlert } from "@/store/dialogStore";
 import { Plus, Store } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useStores, useCreateStore, useUpdateStore, useDeleteStore } from "@/hooks/useSuperAdmin";
@@ -79,7 +80,7 @@ export default function StoreManagementPage() {
           resetForm();
         },
         onError: (err: any) => {
-          alert("Gặp lỗi khi cập nhật cửa hàng: " + (err.message || "Lỗi không xác định"));
+          showAlert("Gặp lỗi khi cập nhật cửa hàng: " + (err.message || "Lỗi không xác định"));
         }
       });
     } else {
@@ -95,7 +96,7 @@ export default function StoreManagementPage() {
           resetForm();
         },
         onError: (err: any) => {
-          alert("Gặp lỗi khi tạo cửa hàng: " + (err.message || "Lỗi không xác định"));
+          showAlert("Gặp lỗi khi tạo cửa hàng: " + (err.message || "Lỗi không xác định"));
         }
       });
     }
@@ -144,7 +145,7 @@ export default function StoreManagementPage() {
   const toggleStoreStatus = (id: string, currentStatus: boolean) => {
     updateStoreMutation.mutate({ id, data: { isActive: !currentStatus } }, {
       onError: (err: any) => {
-        alert("Gặp lỗi khi thay đổi trạng thái hoạt động: " + (err.message || "Lỗi không xác định"));
+        showAlert("Gặp lỗi khi thay đổi trạng thái hoạt động: " + (err.message || "Lỗi không xác định"));
       }
     });
   };
@@ -152,7 +153,7 @@ export default function StoreManagementPage() {
   const handleDelete = (id: string) => {
     deleteStoreMutation.mutate(id, {
       onError: (err: any) => {
-        alert("Gặp lỗi khi xóa cửa hàng: " + (err.message || "Lỗi không xác định"));
+        showAlert("Gặp lỗi khi xóa cửa hàng: " + (err.message || "Lỗi không xác định"));
       }
     });
   };

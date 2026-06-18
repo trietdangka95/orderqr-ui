@@ -5,10 +5,12 @@ export interface User {
 }
 
 export interface AuthResponse {
-  token: string;
-  role: 'ADMIN' | 'STAFF' | 'KITCHEN' | 'PUBLIC' | 'SUPER_ADMIN';
-  id: string;
+  token?: string;
+  role?: 'ADMIN' | 'STAFF' | 'KITCHEN' | 'PUBLIC' | 'SUPER_ADMIN';
+  id?: string;
   storeId?: string;
+  require2FA?: boolean;
+  tempToken?: string;
 }
 
 export interface Category {

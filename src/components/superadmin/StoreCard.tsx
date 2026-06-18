@@ -2,14 +2,15 @@ import { motion } from "framer-motion";
 import { Store, Globe, Layout, ToggleLeft, ToggleRight, Edit, ExternalLink, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Store as StoreData } from "@/api/superadmin";
-
+import { showConfirm } from "@/store/dialogStore";
+ 
 interface StoreCardProps {
   store: StoreData;
   onToggleStatus: (id: string, currentStatus: boolean) => void;
   onEdit: (store: StoreData) => void;
   onDelete: (id: string) => void;
 }
-
+ 
 export function StoreCard({
   store,
   onToggleStatus,
@@ -22,7 +23,7 @@ export function StoreCard({
   const isLocal = cleanMainDomain.includes("localhost") || cleanMainDomain.includes("127.0.0.1");
   const protocol = isLocal ? "http" : "https";
   const storeUrl = `${protocol}://${store.slug}.${cleanMainDomain}${port}`;
-
+ 
   return (
     <motion.div
       layout
@@ -35,7 +36,7 @@ export function StoreCard({
         const daysLeft = store.subscriptionEnd 
           ? Math.ceil((new Date(store.subscriptionEnd).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) 
           : null;
-
+ 
         return (
           <div className="flex items-center gap-6 flex-1 w-full">
             <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center text-gray-300 border border-gray-100 overflow-hidden relative shrink-0">
@@ -82,7 +83,7 @@ export function StoreCard({
                 }`}>
                   Gói: {store.subscriptionPlan || 'FREE'}
                 </div>
-
+ 
                 {store.subscriptionEnd && (
                   <div className={`flex items-center gap-1 px-2.5 py-0.5 border rounded-lg text-[10px] font-black uppercase tracking-wider ${
                     isExpired || store.subscriptionStatus === 'EXPIRED'
@@ -98,7 +99,7 @@ export function StoreCard({
                       : `Hạn: ${daysLeft} ngày`}
                   </div>
                 )}
-
+ 
                 {store.subscriptionPrice !== undefined && Number(store.subscriptionPrice) > 0 && (
                   <div className="flex items-center gap-1 px-2.5 py-0.5 bg-gray-50 text-gray-600 border border-gray-100 rounded-lg text-[10px] font-black uppercase tracking-wider">
                     Giá: {Number(store.subscriptionPrice).toLocaleString('vi-VN')}₫
@@ -109,7 +110,7 @@ export function StoreCard({
           </div>
         );
       })()}
-
+ 
       <div className="flex items-center gap-3 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0">
         <button
           onClick={() => onToggleStatus(store.id, store.isActive)}
@@ -135,8 +136,8 @@ export function StoreCard({
           <ExternalLink size={20} />
         </Link>
         <button
-          onClick={() => {
-            if (confirm("Delete this store?")) {
+          onClick={async () => {
+            if (await showConfirm("Delete this store?")) {
               onDelete(store.id);
             }
           }}

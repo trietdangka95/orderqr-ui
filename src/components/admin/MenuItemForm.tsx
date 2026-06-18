@@ -7,6 +7,7 @@ import Image from "next/image";
 import { X, Upload, Save, Loader2 } from "lucide-react";
 import { useCreateProduct, useUpdateProduct, useCategories, useUploadImage } from "@/hooks/useProducts";
 import { getImageUrl } from "@/utils/image";
+import { showAlert } from "@/store/dialogStore";
 
 interface MenuItemFormProps {
   item?: MenuItem;
@@ -48,7 +49,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
       setFormData({ ...formData, image: result.url });
       setPreviewError(false);
     } catch {
-      alert("Lỗi khi tải ảnh lên!");
+      showAlert("Lỗi khi tải ảnh lên!");
     }
   };
 
@@ -61,7 +62,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
       const result = await uploadImage.mutateAsync(file);
       setFormData((prev) => ({ ...prev, bannerUrl: result.url }));
     } catch {
-      alert("Lỗi khi tải ảnh banner lên!");
+      showAlert("Lỗi khi tải ảnh banner lên!");
     } finally {
       setIsBannerUploading(false);
     }

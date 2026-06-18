@@ -32,5 +32,10 @@ export const authApi = {
 
   updateOtherUserPassword: async (userId: string, newPassword: string): Promise<void> => {
     await axiosInstance.patch(`/auth/users/${userId}/password`, { newPassword });
+  },
+
+  verify2FA: async (tempToken: string, code: string): Promise<AuthResponse> => {
+    const response = await axiosInstance.post<AuthResponse>('/auth/verify-2fa', { tempToken, code });
+    return response.data;
   }
 };

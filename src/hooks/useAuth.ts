@@ -5,7 +5,9 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: authApi.login,
     onSuccess: (data) => {
-      authApi.setToken(data.token);
+      if (data.token) {
+        authApi.setToken(data.token);
+      }
     }
   });
 };
@@ -30,6 +32,18 @@ export const useUpdateUserPassword = () => {
       authApi.updateOtherUserPassword(userId, newPassword),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+};
+
+export const useVerify2FA = () => {
+  return useMutation({
+    mutationFn: ({ tempToken, code }: { tempToken: string; code: string }) =>
+      authApi.verify2FA(tempToken, code),
+    onSuccess: (data) => {
+      if (data.token) {
+        authApi.setToken(data.token);
+      }
     },
   });
 };

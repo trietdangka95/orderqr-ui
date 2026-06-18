@@ -6,6 +6,7 @@ import { X, Minus, Plus, ShoppingBag, FileText } from "lucide-react";
 import Image from "next/image";
 import { useCreateOrder } from "@/hooks/useOrders";
 import { getImageUrl } from "@/utils/image";
+import { showAlert } from "@/store/dialogStore";
 
 export default function CartDrawer() {
   const { items, isOpen, toggleCart, removeItem, updateQuantity, updateNote, getTotalItems, getTotalPrice, clearCart, toggleOrders, selectedTable } = useCartStore();
@@ -14,7 +15,7 @@ export default function CartDrawer() {
 
   const handleCheckout = () => {
     if (!selectedTable) {
-      alert("Vui lòng chọn bàn trước khi gọi món!");
+      showAlert("Vui lòng chọn bàn trước khi gọi món!");
       return;
     }
 
@@ -34,7 +35,7 @@ export default function CartDrawer() {
         toggleOrders();
       },
       onError: (error: Error) => {
-        alert(error.message || "Không thể gửi đơn hàng. Vui lòng thử lại!");
+        showAlert(error.message || "Không thể gửi đơn hàng. Vui lòng thử lại!");
       }
     });
   };

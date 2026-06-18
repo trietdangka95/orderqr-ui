@@ -64,7 +64,7 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
       const normalizedRole = res.role?.toLowerCase();
       
       // Update global store
-      storeLogin(normalizedRole as UserRole, res.id, res.storeId);
+      storeLogin(normalizedRole as UserRole, res.id || "", res.storeId);
       
       // Redirect based on role
       if (normalizedRole === "superadmin" || normalizedRole === "super_admin") {

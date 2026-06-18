@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import { CheckCircle2 as CheckIcon, X as XIcon, AlertCircle, Banknote, QrCode, Printer } from "lucide-react";
 import { Order, useCartStore } from "@/store/cartStore";
- 
+import { showConfirm } from "@/store/dialogStore";
+
 interface TableStatusCardProps {
   tableNumber: string;
   tableOrders: any[];
@@ -13,7 +14,7 @@ interface TableStatusCardProps {
   onConfirmInvoicePayment: (invoiceId: string, tableNumber: string, amount: number) => void;
   onPrintInvoice: (tableNumber: string) => void;
 }
- 
+
 export default function TableStatusCard({
   tableNumber,
   tableOrders,
@@ -25,11 +26,11 @@ export default function TableStatusCard({
 }: TableStatusCardProps) {
   const totalAmount = tableOrders.reduce((sum, order) => sum + order.totalPrice, 0);
   const hasUnconfirmed = tableOrders.some((o) => !o.isConfirmed);
- 
+
   // Find if there is an active invoice waiting for approval
   const pendingInvoice = tableOrders.find((o) => o.invoiceId && o.invoice?.paymentStatus === "PENDING")?.invoice;
   const isQrPayment = pendingInvoice?.paymentMethod === "QR_TRANSFER";
- 
+
   return (
     <motion.div
       layout
@@ -121,8 +122,8 @@ export default function TableStatusCard({
                 </span>
                 {!pendingInvoice && (
                   <button
-                    onClick={() => {
-                      if (confirm("Bạn có chắc chắn muốn xóa đơn hàng này?")) {
+                    onClick={async () => {
+                      if (await showConfirm("Bạn có chắc chắn muốn xóa đơn hàng này?")) {
                         useCartStore.getState().orders = useCartStore.getState().orders.filter(
                           (o) => o.id !== order.id
                         );
@@ -130,7 +131,6 @@ export default function TableStatusCard({
                       }
                     }}
                     className="text-red-400 hover:text-red-600 transition-colors"
-                    title="Xóa đơn hàng"
                   >
                     <XIcon size={14} />
                   </button>

@@ -16,6 +16,7 @@ import Providers from "@/components/Providers";
 import StoreInitializer from "@/components/layout/StoreInitializer";
 import { Suspense } from "react";
 import CustomerUI from "@/components/layout/CustomerUI";
+import GlobalDialog from "@/components/ui/GlobalDialog";
 
 export default function RootLayout({
   children,
@@ -31,6 +32,7 @@ export default function RootLayout({
           </Suspense>
           {children}
           <CustomerUI />
+          <GlobalDialog />
         </Providers>
       </body>
     </html>

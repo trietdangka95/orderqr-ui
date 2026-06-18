@@ -5,6 +5,7 @@ import { Plus, Flame, Star } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { motion } from "framer-motion";
 import { getImageUrl } from "@/utils/image";
+import { showAlert } from "@/store/dialogStore";
 
 type Product = {
   id: string;
@@ -30,7 +31,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
   const handleAddToCart = () => {
     if (product.isAvailable === false) return;
     if (!selectedTable) {
-      alert("Vui lòng chọn bàn/nhập mã bàn trước khi chọn món!");
+      showAlert("Vui lòng chọn bàn/nhập mã bàn trước khi chọn món!");
       return;
     }
     addItem({

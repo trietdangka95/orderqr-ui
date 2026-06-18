@@ -6,6 +6,7 @@ import { X, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
 import { getImageUrl } from "@/utils/image";
+import { showAlert } from "@/store/dialogStore";
 
 interface Product {
   id: string;
@@ -43,7 +44,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
     if (!product) return;
     if (product.isAvailable === false) return;
     if (!selectedTable) {
-      alert("Vui lòng chọn bàn/nhập mã bàn trước khi chọn món!");
+      showAlert("Vui lòng chọn bàn/nhập mã bàn trước khi chọn món!");
       return;
     }
     addItem({

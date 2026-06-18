@@ -47,6 +47,7 @@ export interface ContactRequest {
   id: string;
   name: string;
   phone: string;
+  email: string | null;
   note: string | null;
   status: "PENDING" | "CONTACTED" | "COMPLETED";
   createdAt: string;
@@ -56,6 +57,11 @@ export interface ContactRequest {
 export const superAdminApi = {
   getStores: async (): Promise<Store[]> => {
     const { data } = await axiosInstance.get("/superadmin/stores");
+    return data;
+  },
+  
+  getInfo: async (): Promise<{ id: string; username: string; role: string; twoFactorEnabled: boolean }> => {
+    const { data } = await axiosInstance.get("/superadmin");
     return data;
   },
   
@@ -101,5 +107,20 @@ export const superAdminApi = {
 
   deleteContact: async (id: string): Promise<void> => {
     await axiosInstance.delete(`/superadmin/contacts/${id}`);
+  },
+
+  setup2FA: async (): Promise<{ secret: string; otpauthUrl: string }> => {
+    const { data } = await axiosInstance.get("/superadmin/2fa/setup");
+    return data;
+  },
+
+  enable2FA: async (code: string, secret: string): Promise<{ success: boolean }> => {
+    const { data } = await axiosInstance.post("/superadmin/2fa/enable", { code, secret });
+    return data;
+  },
+
+  disable2FA: async (password: string): Promise<{ success: boolean }> => {
+    const { data } = await axiosInstance.post("/superadmin/2fa/disable", { password });
+    return data;
   },
 };

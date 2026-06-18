@@ -4,6 +4,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { X as XIcon } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { getImageUrl } from "@/utils/image";
+import { showConfirm } from "@/store/dialogStore";
  
 interface QRCodeCardProps {
   tableNum: string;
@@ -21,8 +22,8 @@ export default function QRCodeCard({ tableNum, qrLink, onRemove }: QRCodeCardPro
     <div className="print-qr-card bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100 flex flex-col justify-between items-center text-center group hover:shadow-xl hover:border-orange-200 transition-all duration-500 break-inside-avoid relative overflow-hidden aspect-[2/3] w-full">
       {/* Delete button (only visible on hover and not during print) */}
       <button
-        onClick={() => {
-          if (confirm(`Xóa bàn ${tableNum}?`)) onRemove(tableNum);
+        onClick={async () => {
+          if (await showConfirm(`Xóa bàn ${tableNum}?`)) onRemove(tableNum);
         }}
         className="absolute top-3 right-3 w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all print:hidden z-20 shadow-sm"
       >

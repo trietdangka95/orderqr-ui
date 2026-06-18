@@ -49,3 +49,39 @@ export const usePlatformStats = () => {
     refetchOnWindowFocus: false,
   });
 };
+
+export const useSuperAdminInfo = () => {
+  return useQuery({
+    queryKey: ["superadmin-info"],
+    queryFn: () => superAdminApi.getInfo(),
+    staleTime: 60000,
+    refetchOnWindowFocus: false,
+  });
+};
+
+export const useSetup2FA = () => {
+  return useMutation({
+    mutationFn: () => superAdminApi.setup2FA(),
+  });
+};
+
+export const useEnable2FA = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ code, secret }: { code: string; secret: string }) =>
+      superAdminApi.enable2FA(code, secret),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["superadmin-info"] });
+    },
+  });
+};
+
+export const useDisable2FA = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (password: string) => superAdminApi.disable2FA(password),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["superadmin-info"] });
+    },
+  });
+};

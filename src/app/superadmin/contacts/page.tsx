@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { showConfirm, showAlert } from "@/store/dialogStore";
 import { useContactRequests, useUpdateContactStatus, useDeleteContact } from "@/hooks/useContacts";
 import {
   User,
@@ -10,7 +11,8 @@ import {
   CheckCircle,
   PhoneCall,
   Trash2,
-  Search
+  Search,
+  Mail
 } from "lucide-react";
 import useIsMounted from "@/hooks/useIsMounted";
 
@@ -29,16 +31,17 @@ export default function SuperAdminContactsPage() {
     // 1. Filter by tab status
     const matchesTab = activeTab === "ALL" || contact.status === activeTab;
 
-    // 2. Filter by search query (name or phone)
+    // 2. Filter by search query (name, phone, or email)
     const matchesSearch =
       contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       contact.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (contact.email && contact.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (contact.note && contact.note.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return matchesTab && matchesSearch;
   });
 
-  const handleUpdateStatus = (id: string, name: string, status: "PENDING" | "CONTACTED" | "COMPLETED") => {
+  const handleUpdateStatus = async (id: string, name: string, status: "PENDING" | "CONTACTED" | "COMPLETED") => {
     const statusText =
       status === "PENDING"
         ? "Chờ liên hệ"
@@ -46,31 +49,31 @@ export default function SuperAdminContactsPage() {
         ? "Đã liên hệ"
         : "Hoàn tất";
 
-    if (confirm(`Bạn có chắc muốn đổi trạng thái yêu cầu của "${name}" thành "${statusText}"?`)) {
+    if (await showConfirm(`Bạn có chắc muốn đổi trạng thái yêu cầu của "${name}" thành "${statusText}"?`)) {
       updateStatusMutation.mutate(
         { id, status },
         {
           onSuccess: () => {
-            alert("Đã cập nhật trạng thái thành công!");
+            showAlert("Đã cập nhật trạng thái thành công!");
           },
           onError: (err: unknown) => {
             const error = err as { message?: string };
-            alert(error.message || "Cập nhật trạng thái thất bại!");
+            showAlert(error.message || "Cập nhật trạng thái thất bại!");
           }
         }
       );
     }
   };
 
-  const handleDelete = (id: string, name: string) => {
-    if (confirm(`CẢNH BÁO: Bạn có chắc chắn muốn XÓA yêu cầu đăng ký của "${name}"? Thao tác này không thể hoàn tác.`)) {
+  const handleDelete = async (id: string, name: string) => {
+    if (await showConfirm(`CẢNH BÁO: Bạn có chắc chắn muốn XÓA yêu cầu đăng ký của "${name}"? Thao tác này không thể hoàn tác.`)) {
       deleteMutation.mutate(id, {
         onSuccess: () => {
-          alert("Đã xóa yêu cầu thành công!");
+          showAlert("Đã xóa yêu cầu thành công!");
         },
         onError: (err: unknown) => {
           const error = err as { message?: string };
-          alert(error.message || "Xóa yêu cầu thất bại!");
+          showAlert(error.message || "Xóa yêu cầu thất bại!");
         }
       });
     }
@@ -157,8 +160,14 @@ export default function SuperAdminContactsPage() {
                       <h4 className="font-bold text-gray-900 leading-tight">
                         {contact.name || "N/A"}
                       </h4>
-                      <p className="text-[10px] text-gray-400 font-mono mt-0.5 flex items-center gap-1">
+                      <p className="text-[10px] text-gray-400 font-mono mt-0.5 flex items-center gap-1 flex-wrap">
                         <PhoneCall size={10} /> {contact.phone}
+                        {contact.email && (
+                          <>
+                            <span className="mx-1">•</span>
+                            <Mail size={10} /> {contact.email}
+                          </>
+                        )}
                       </p>
                     </div>
                   </div>
@@ -258,10 +267,18 @@ export default function SuperAdminContactsPage() {
                             <p className="font-bold text-gray-900 leading-tight">
                               {contact.name || "N/A"}
                             </p>
-                            <p className="text-[11px] text-gray-500 font-mono mt-1 flex items-center gap-1">
-                              <PhoneCall size={12} className="text-gray-400" />
-                              {contact.phone}
-                            </p>
+                            <div className="flex flex-col gap-0.5">
+                              <p className="text-[11px] text-gray-500 font-mono mt-1 flex items-center gap-1">
+                                <PhoneCall size={12} className="text-gray-400 shrink-0" />
+                                {contact.phone}
+                              </p>
+                              {contact.email && (
+                                <p className="text-[11px] text-gray-500 font-mono flex items-center gap-1">
+                                  <Mail size={12} className="text-gray-400 shrink-0" />
+                                  {contact.email}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </td>

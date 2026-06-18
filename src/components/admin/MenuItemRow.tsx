@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { useDeleteProduct, useUpdateProduct } from "@/hooks/useProducts";
 import Image from "next/image";
 import { getImageUrl } from "@/utils/image";
+import { showConfirm } from "@/store/dialogStore";
 
 interface MenuItemRowProps {
   item: MenuItem;
@@ -70,9 +71,9 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
     updateProduct.mutate({ id: item.id, data: { isAvailable: !item.isAvailable } });
   };
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm(`Bạn có chắc chắn muốn xóa món "${item.name}"?`)) {
+    if (await showConfirm(`Bạn có chắc chắn muốn xóa món "${item.name}"?`)) {
       deleteProduct.mutate(item.id);
     }
   };

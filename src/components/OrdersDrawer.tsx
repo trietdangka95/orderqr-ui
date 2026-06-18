@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
+import { showConfirm, showAlert } from "@/store/dialogStore";
 import { X, ClipboardList, CheckCircle2, Clock, ChefHat, Copy, Check, CreditCard, Coins, QrCode, Sparkles, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { useOrders, useConfirmOrder, useUpdateOrderStatus, useTableOrders, useUpdateOrderItemQuantity, useRequestCheckout, useUpdateOrderItemStatus } from "@/hooks/useOrders";
@@ -365,9 +366,9 @@ export default function OrdersDrawer() {
                             <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-xl px-1.5 py-0.5">
                               <button
                                 disabled={updateOrderItemMutation.isPending}
-                                onClick={() => {
+                                onClick={async () => {
                                   if (item.quantity === 1) {
-                                    if (confirm(`Bạn có chắc chắn muốn xóa món "${item.name}" khỏi đơn hàng?`)) {
+                                    if (await showConfirm(`Bạn có chắc chắn muốn xóa món "${item.name}" khỏi đơn hàng?`)) {
                                       updateOrderItemMutation.mutate({ orderId: order.id, productId: item.productId, quantity: 0 });
                                     }
                                   } else {
@@ -516,7 +517,7 @@ export default function OrdersDrawer() {
                               <button
                                 onClick={() => {
                                   navigator.clipboard.writeText(storeConfig.bankAccountNo || "");
-                                  alert("Đã sao chép số tài khoản!");
+                                  showAlert("Đã sao chép số tài khoản!");
                                 }}
                                 className="p-1 hover:bg-gray-100 rounded text-primary transition-colors"
                               >
@@ -535,7 +536,7 @@ export default function OrdersDrawer() {
                               <button
                                 onClick={() => {
                                   navigator.clipboard.writeText(`Ban ${selectedTable} Thanh Toan`);
-                                  alert("Đã sao chép nội dung chuyển khoản!");
+                                  showAlert("Đã sao chép nội dung chuyển khoản!");
                                 }}
                                 className="p-1 hover:bg-gray-100 rounded text-primary transition-colors"
                               >
@@ -657,7 +658,7 @@ export default function OrdersDrawer() {
                         setSelectedPayment(null);
                       },
                       onError: (err: any) => {
-                        alert(err.message || "Không thể gửi yêu cầu thanh toán");
+                        showAlert(err.message || "Không thể gửi yêu cầu thanh toán");
                       }
                     });
                   }}

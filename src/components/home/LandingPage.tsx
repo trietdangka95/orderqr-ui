@@ -40,6 +40,7 @@ export default function LandingPage() {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
+    email: "",
     note: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -63,6 +64,10 @@ export default function LandingPage() {
       setSubmitError("Số điện thoại không đúng định dạng!");
       return;
     }
+    if (formData.email.trim() && !/\S+@\S+\.\S+/.test(formData.email)) {
+      setSubmitError("Email không đúng định dạng!");
+      return;
+    }
 
     setIsSubmitting(true);
     setSubmitSuccess(null);
@@ -71,7 +76,7 @@ export default function LandingPage() {
     try {
       await axiosInstance.post("/contacts", formData);
       setSubmitSuccess(true);
-      setFormData({ name: "", phone: "", note: "" });
+      setFormData({ name: "", phone: "", email: "", note: "" });
       // Clear success message after 5 seconds
       setTimeout(() => setSubmitSuccess(null), 5000);
     } catch (err: unknown) {
@@ -1290,6 +1295,21 @@ export default function LandingPage() {
                 required
                 placeholder="Ví dụ: 0901234567..."
                 value={formData.phone}
+                onChange={handleInputChange}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all font-medium text-sm md:text-base"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="text-xs font-black text-gray-400 uppercase tracking-wider block mb-2">
+                Địa chỉ Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Ví dụ: lienhe@quananviet.com..."
+                value={formData.email}
                 onChange={handleInputChange}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all font-medium text-sm md:text-base"
               />

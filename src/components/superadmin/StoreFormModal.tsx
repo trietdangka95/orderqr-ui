@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Plus, Eye, EyeOff, Upload, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Store as StoreData, superAdminApi } from "@/api/superadmin";
+import { showAlert } from "@/store/dialogStore";
 
 export const THEME_PALETTES = [
   { name: "Hỏa - Cam Tiêu Chuẩn", color: "#f97316", bgClass: "bg-primary", element: "Hỏa" },
@@ -71,7 +72,7 @@ export function StoreFormModal({
       const res = await superAdminApi.uploadLogo(file);
       setFormData((prev) => ({ ...prev, logo: res.url }));
     } catch (err: any) {
-      alert("Lỗi khi tải lên logo: " + (err.message || "Không xác định"));
+      showAlert("Lỗi khi tải lên logo: " + (err.message || "Không xác định"));
     } finally {
       setIsUploading(false);
     }

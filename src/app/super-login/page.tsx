@@ -2,18 +2,25 @@
 
 import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
-import { ShieldAlert, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { ShieldAlert, ArrowRight, Eye, EyeOff, KeyRound } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useLogin } from "@/hooks/useAuth";
+import { useLogin, useVerify2FA } from "@/hooks/useAuth";
 
 export default function SuperAdminLogin() {
   const { login: storeLogin } = useCartStore();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(false);
+  
+  // 2FA states
+  const [step, setStep] = useState<"credentials" | "2fa">("credentials");
+  const [tempToken, setTempToken] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+
   const router = useRouter();
   const loginMutation = useLogin();
+  const verify2FAMutation = useVerify2FA();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,18 +33,49 @@ export default function SuperAdminLogin() {
       
       console.log("Login API Response:", res);
 
+      if (res.require2FA && res.tempToken) {
+        setTempToken(res.tempToken);
+        setStep("2fa");
+        setError(false);
+        return;
+      }
+
       if (res.role?.toLowerCase() === "superadmin" || res.role === "SUPER_ADMIN") {
-        storeLogin("superadmin", res.id, res.storeId);
+        storeLogin("superadmin", res.id || "", res.storeId);
         router.push("/superadmin");
       } else {
         console.error("Role mismatch. Expected SUPER_ADMIN, got:", res.role);
         setError(true);
         setTimeout(() => setError(false), 2000);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Login failed with error:", err);
-      const message = err?.message || (err instanceof Error ? err.message : String(err));
-      alert("Đăng nhập thất bại: " + message);
+      setError(true);
+      setTimeout(() => setError(false), 2000);
+    }
+  };
+
+  const handle2FASubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otpCode.length !== 6) return;
+
+    try {
+      const res = await verify2FAMutation.mutateAsync({
+        tempToken,
+        code: otpCode
+      });
+
+      console.log("2FA API Response:", res);
+
+      if (res.role?.toLowerCase() === "superadmin" || res.role === "SUPER_ADMIN") {
+        storeLogin("superadmin", res.id || "", res.storeId);
+        router.push("/superadmin");
+      } else {
+        setError(true);
+        setTimeout(() => setError(false), 2000);
+      }
+    } catch (err: unknown) {
+      console.error("2FA verify failed:", err);
       setError(true);
       setTimeout(() => setError(false), 2000);
     }
@@ -52,62 +90,144 @@ export default function SuperAdminLogin() {
       >
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 bg-blue-600/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mb-4 text-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
-            <ShieldAlert size={32} />
+            {step === "credentials" ? <ShieldAlert size={32} /> : <KeyRound size={32} />}
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-white">Platform Access</h1>
-          <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-2">Authorized Personnel Only</p>
+          <h1 className="text-2xl font-black tracking-tight text-white">
+            {step === "credentials" ? "Platform Access" : "Two-Factor Auth"}
+          </h1>
+          <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mt-2">
+            {step === "credentials" ? "Authorized Personnel Only" : "Scan & Verify Your Token"}
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="relative group">
-            <input
-              autoFocus
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter master password..."
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={`w-full pl-6 pr-14 py-4 bg-gray-900 border border-gray-800 rounded-2xl outline-none transition-all text-center text-white font-mono tracking-widest placeholder:text-gray-700 ${error ? "border-red-500/50 focus:border-red-500 animate-shake" : "focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10"}`}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-gray-300 transition-colors"
+        <AnimatePresence mode="wait">
+          {step === "credentials" ? (
+            <motion.form
+              key="credentials"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+              onSubmit={handleSubmit}
+              className="space-y-4"
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-
-          {/* Reserved height error message space to prevent layout shifting and overlapping */}
-          <div className="h-6 flex items-center justify-center">
-            <AnimatePresence>
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  className="text-center"
+              <div className="relative group">
+                <input
+                  autoFocus
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter master password..."
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`w-full pl-6 pr-14 py-4 bg-gray-900 border border-gray-800 rounded-2xl outline-none transition-all text-center text-white font-mono tracking-widest placeholder:text-gray-700 ${error ? "border-red-500/50 focus:border-red-500 animate-shake" : "focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10"}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-500 hover:text-gray-300 transition-colors"
                 >
-                  <span className="text-red-500 text-[10px] font-black uppercase tracking-wider">Access Denied</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
 
-          <button
-            type="submit"
-            disabled={loginMutation.isPending || password.length === 0}
-            className="w-full py-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all active:scale-95 bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] disabled:opacity-50 disabled:shadow-none mt-2"
-          >
-            {loginMutation.isPending ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              <>
-                <span>AUTHENTICATE</span>
-                <ArrowRight size={18} />
-              </>
-            )}
-          </button>
-        </form>
+              {/* Reserved height error message space */}
+              <div className="h-6 flex items-center justify-center">
+                <AnimatePresence>
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      className="text-center"
+                    >
+                      <span className="text-red-500 text-[10px] font-black uppercase tracking-wider">Access Denied</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loginMutation.isPending || password.length === 0}
+                className="w-full py-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all active:scale-95 bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] disabled:opacity-50 disabled:shadow-none mt-2"
+              >
+                {loginMutation.isPending ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>AUTHENTICATE</span>
+                    <ArrowRight size={18} />
+                  </>
+                )}
+              </button>
+            </motion.form>
+          ) : (
+            <motion.form
+              key="2fa"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+              onSubmit={handle2FASubmit}
+              className="space-y-4"
+            >
+              <div className="relative group">
+                <input
+                  autoFocus
+                  type="text"
+                  maxLength={6}
+                  placeholder="000000"
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                  className={`w-full py-4 bg-gray-900 border border-gray-800 rounded-2xl outline-none transition-all text-center text-white font-mono text-2xl tracking-[0.2em] placeholder:text-gray-800 ${error ? "border-red-500/50 focus:border-red-500 animate-shake" : "focus:border-blue-500/50 focus:ring-4 focus:ring-blue-500/10"}`}
+                />
+              </div>
+
+              {/* Reserved height error message space */}
+              <div className="h-6 flex items-center justify-center">
+                <AnimatePresence>
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      className="text-center"
+                    >
+                      <span className="text-red-500 text-[10px] font-black uppercase tracking-wider">Mã Không Hợp Lệ</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              <button
+                type="submit"
+                disabled={verify2FAMutation.isPending || otpCode.length !== 6}
+                className="w-full py-4 rounded-2xl font-black flex items-center justify-center gap-2 transition-all active:scale-95 bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] disabled:opacity-50 disabled:shadow-none mt-2"
+              >
+                {verify2FAMutation.isPending ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <span>VERIFY & SIGN IN</span>
+                    <ArrowRight size={18} />
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setStep("credentials");
+                  setOtpCode("");
+                  setTempToken("");
+                  setError(false);
+                }}
+                className="text-gray-500 hover:text-gray-300 text-xs font-bold transition-colors uppercase tracking-widest mt-4 block mx-auto"
+              >
+                Quay lại
+              </button>
+            </motion.form>
+          )}
+        </AnimatePresence>
       </motion.div>
     </div>
   );
