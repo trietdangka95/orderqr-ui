@@ -3,6 +3,7 @@ import { Plus, Eye, EyeOff, Upload, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Store as StoreData, superAdminApi } from "@/api/superadmin";
 import { showAlert } from "@/store/dialogStore";
+import { getImageUrl } from "@/utils/image";
 
 export const THEME_PALETTES = [
   { name: "Hỏa - Cam Tiêu Chuẩn", color: "#f97316", bgClass: "bg-primary", element: "Hỏa" },
@@ -119,7 +120,7 @@ export function StoreFormModal({
                 <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-100">
                   <div className="w-16 h-16 bg-white border border-gray-200 rounded-2xl flex flex-col items-center justify-center overflow-hidden relative shrink-0">
                     {formData.logo ? (
-                      <img src={formData.logo} alt="Logo Preview" className="w-full h-full object-cover" />
+                      <img src={getImageUrl(formData.logo)} alt="Logo Preview" className="w-full h-full object-cover" />
                     ) : (
                       <Upload className="text-gray-400" size={24} />
                     )}

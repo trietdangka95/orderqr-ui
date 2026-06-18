@@ -3,6 +3,7 @@ import { Store, Globe, Layout, ToggleLeft, ToggleRight, Edit, ExternalLink, Tras
 import Link from "next/link";
 import { Store as StoreData } from "@/api/superadmin";
 import { showConfirm } from "@/store/dialogStore";
+import { getImageUrl } from "@/utils/image";
  
 interface StoreCardProps {
   store: StoreData;
@@ -41,7 +42,7 @@ export function StoreCard({
           <div className="flex items-center gap-6 flex-1 w-full">
             <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center text-gray-300 border border-gray-100 overflow-hidden relative shrink-0">
               {store.logo ? (
-                <img src={store.logo} alt={store.name} className="w-full h-full object-cover" />
+                <img src={getImageUrl(store.logo)} alt={store.name} className="w-full h-full object-cover" />
               ) : (
                 <Store size={32} />
               )}
