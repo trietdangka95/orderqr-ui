@@ -6,6 +6,7 @@ import Link from "next/link";
 import { UserRole, useCartStore } from "@/store/cartStore";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import { getImageUrl } from "@/utils/image";
 
 interface HomeHeaderProps {
   userRole: UserRole;
@@ -48,9 +49,19 @@ export default function HomeHeader({
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 md:w-12 md:h-12 bg-primary rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-primary rotate-3">
-            <Soup className="text-white w-5 h-5 md:w-7 md:h-7" />
-          </div>
+          {storeConfig?.logo ? (
+            <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-2xl overflow-hidden relative shrink-0 border border-gray-100 shadow-md">
+              <img
+                src={getImageUrl(storeConfig.logo)}
+                alt="Logo"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="w-9 h-9 md:w-12 md:h-12 bg-primary rounded-xl md:rounded-2xl flex items-center justify-center shadow-lg shadow-primary rotate-3 shrink-0">
+              <Soup className="text-white w-5 h-5 md:w-7 md:h-7" />
+            </div>
+          )}
           <div className="flex flex-col">
             <h1 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight leading-none">
               {storeConfig?.name || "Menu Việt"}
