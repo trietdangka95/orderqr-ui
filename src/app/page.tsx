@@ -18,6 +18,7 @@ import { useProducts, useCategories } from "@/hooks/useProducts";
 import { useOrders, useTableOrders } from "@/hooks/useOrders";
 import { Product } from "@/types/api";
 import LandingPage from "@/components/home/LandingPage";
+import { getImageUrl } from "@/utils/image";
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -245,9 +246,17 @@ function HomeContent() {
             initial={{ scale: 0, rotate: -15 }}
             animate={{ scale: 1, rotate: 3 }}
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className="w-16 h-16 md:w-20 md:h-20 bg-primary rounded-2xl md:rounded-3xl flex items-center justify-center shadow-xl shadow-orange-950/50"
+            className="w-16 h-16 md:w-20 md:h-20 bg-primary rounded-2xl md:rounded-3xl flex items-center justify-center shadow-xl shadow-orange-950/50 overflow-hidden relative"
           >
-            <Soup className="text-white w-9 h-9 md:w-11 md:h-11" />
+            {storeConfig?.logo ? (
+              <img
+                src={getImageUrl(storeConfig.logo)}
+                alt="Store Logo"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Soup className="text-white w-9 h-9 md:w-11 md:h-11" />
+            )}
           </motion.div>
 
           <div>

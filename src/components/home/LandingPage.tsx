@@ -223,7 +223,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden fixed top-[73px] left-0 right-0 bg-gray-950 border-b border-white/10 z-40 px-6 py-8 space-y-6 shadow-2xl"
+            className="md:hidden fixed top-[73px] left-0 right-0 bg-gray-950 border-b border-white/10 z-40 px-6 py-4 space-y-6 shadow-2xl"
           >
             <div className="flex flex-col gap-4 text-base font-semibold text-gray-400">
               <a

@@ -205,7 +205,7 @@ export const useCartStore = create<CartStore>()(
       setSelectedTable: (table) => set({ selectedTable: table }),
       setIsTableSelectorOpen: (open) => set({ isTableSelectorOpen: open }),
       
-      tables: ["01", "02", "03", "04", "05"], // Mặc định
+      tables: ["01", "02", "03", "04", "05", "Take-Away"], // Mặc định
       addTable: async (table) => {
         const newTables = [...get().tables, table].sort((a, b) => a.localeCompare(b));
         set({ tables: newTables });
@@ -218,11 +218,14 @@ export const useCartStore = create<CartStore>()(
         }
       },
       addMultipleTables: async (count) => {
-        const lastNum = get().tables.length > 0 ? parseInt(get().tables[get().tables.length - 1] || "0") : 0;
+        const numericTables = get().tables
+          .map(t => parseInt(t, 10))
+          .filter(n => !isNaN(n));
+        const lastNum = numericTables.length > 0 ? Math.max(...numericTables) : 0;
         const newTables = Array.from({ length: count }, (_, i) => 
           (lastNum + i + 1).toString().padStart(2, "0")
         );
-        const updatedTables = [...get().tables, ...newTables];
+        const updatedTables = [...get().tables, ...newTables].sort((a, b) => a.localeCompare(b));
         set({ tables: updatedTables });
         if (get().userRole === "admin") {
           try {

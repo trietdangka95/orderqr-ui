@@ -66,7 +66,7 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mt-6 pt-6 pb-4 border-t border-gray-50 space-y-6"
+            className="overflow-hidden mt-6 pb-4 border-t border-gray-50 space-y-6"
           >
             <div className="flex flex-wrap gap-3">
               <AnimatePresence mode="popLayout">
@@ -98,12 +98,12 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
                 placeholder="Nhập tên danh mục mới..."
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
-                className="flex-1 px-4 py-2.5 bg-gray-50 border-2 border-transparent rounded-xl focus:border-orange-500 outline-none transition-all font-bold text-xs text-gray-700"
+                className="flex-1 px-4 py-4 bg-gray-50 border-2 border-transparent rounded-xl focus:border-orange-500 outline-none transition-all font-bold text-xs text-gray-700"
               />
               <button
                 type="submit"
                 disabled={createCategoryMutation.isPending || !newCategoryName.trim()}
-                className="px-5 py-2.5 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-primary shadow-md shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1.5 shrink-0"
+                className="px-5 py-4 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-primary shadow-md shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1.5 shrink-0"
               >
                 {createCategoryMutation.isPending ? (
                   <Loader2 size={12} className="animate-spin" />
