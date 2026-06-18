@@ -3,7 +3,7 @@ import { Plus, Eye, EyeOff, Upload, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Store as StoreData, superAdminApi } from "@/api/superadmin";
 import { showAlert } from "@/store/dialogStore";
-import { getImageUrl } from "@/utils/image";
+import { getImageUrl, compressImage } from "@/utils/image";
 
 export const THEME_PALETTES = [
   { name: "Hỏa - Cam Tiêu Chuẩn", color: "#f97316", bgClass: "bg-primary", element: "Hỏa" },
@@ -70,7 +70,8 @@ export function StoreFormModal({
 
     try {
       setIsUploading(true);
-      const res = await superAdminApi.uploadLogo(file);
+      const compressedFile = await compressImage(file, 800, 800, 0.8);
+      const res = await superAdminApi.uploadLogo(compressedFile);
       setFormData((prev) => ({ ...prev, logo: res.url }));
     } catch (err: any) {
       showAlert("Lỗi khi tải lên logo: " + (err.message || "Không xác định"));

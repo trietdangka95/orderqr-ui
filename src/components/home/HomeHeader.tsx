@@ -88,19 +88,19 @@ export default function HomeHeader({
             <Button
               onClick={() => setIsTableSelectorOpen(!isTableSelectorOpen)}
               unstyled
-              className="bg-blue-50 border-2 border-blue-100 px-4 py-2 rounded-xl flex items-center justify-center shadow-sm gap-2 hover:bg-blue-100 transition-colors cursor-pointer"
+              className="bg-primary-soft border-2 border-primary/20 px-4 py-2 rounded-xl flex items-center justify-center shadow-sm gap-2 hover:bg-primary-soft/50 transition-colors cursor-pointer"
             >
               <div className="flex flex-col items-start">
-                <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider leading-none">
+                <span className="text-[10px] text-primary font-bold uppercase tracking-wider leading-none">
                   Phục vụ bàn
                 </span>
-                <span className="font-black text-xl text-blue-700 leading-none">
+                <span className="font-black text-xl text-primary leading-none">
                   {selectedTable || "??"}
                 </span>
               </div>
               <ChevronDown
                 size={16}
-                className={`text-blue-600 transition-transform ${
+                className={`text-primary transition-transform ${
                   isTableSelectorOpen ? "rotate-180" : ""
                 }`}
               />

@@ -6,7 +6,7 @@ import { MenuItem } from "@/store/cartStore";
 import Image from "next/image";
 import { X, Upload, Save, Loader2 } from "lucide-react";
 import { useCreateProduct, useUpdateProduct, useCategories, useUploadImage } from "@/hooks/useProducts";
-import { getImageUrl } from "@/utils/image";
+import { getImageUrl, compressImage } from "@/utils/image";
 import { showAlert } from "@/store/dialogStore";
 
 interface MenuItemFormProps {
@@ -43,7 +43,8 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
     if (!file) return;
 
     try {
-      const result = await uploadImage.mutateAsync(file);
+      const compressedFile = await compressImage(file, 1200, 1200, 0.8);
+      const result = await uploadImage.mutateAsync(compressedFile);
       // Backend returns relative path /public/uploads/...
       // We save only the relative path to be environment-independent
       setFormData({ ...formData, image: result.url });
@@ -59,7 +60,8 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
 
     setIsBannerUploading(true);
     try {
-      const result = await uploadImage.mutateAsync(file);
+      const compressedFile = await compressImage(file, 1600, 1600, 0.85);
+      const result = await uploadImage.mutateAsync(compressedFile);
       setFormData((prev) => ({ ...prev, bannerUrl: result.url }));
     } catch {
       showAlert("Lỗi khi tải ảnh banner lên!");
