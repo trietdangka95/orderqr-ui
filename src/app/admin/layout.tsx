@@ -40,8 +40,8 @@ export default function AdminLayout({
   const isExpired = storeConfig?.subscriptionEnd != null && new Date() > new Date(storeConfig.subscriptionEnd);
   const isSuspended = storeConfig?.subscriptionStatus === 'EXPIRED' || isExpired;
   const showWarning = storeConfig?.subscriptionEnd != null && (daysLeft > 0 && daysLeft <= 3);
-  const isBillingOrCredentials = pathname === "/admin/billing" || pathname === "/admin/credentials";
-
+  const isBillingPath = pathname === "/admin/billing";
+ 
   if (userRole === "kitchen") {
     return (
       <AdminGuard>
@@ -52,18 +52,22 @@ export default function AdminLayout({
     );
   }
 
-  const navItems = [
-    { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/tables", label: "Quản lý Bàn", icon: Store },
-    { href: "/admin/kitchen", label: "Quản lý Bếp", icon: Soup },
-    { href: "/admin/revenue", label: "Doanh thu", icon: TrendingUp },
-    { href: "/admin/menu", label: "Thực đơn", icon: Settings },
-    ...(userRole === "admin" ? [
-      { href: "/admin/billing", label: "Gói cước", icon: CreditCard },
-      { href: "/admin/logs", label: "Nhật ký", icon: ClipboardList }
-    ] : []),
-    { href: "/admin/credentials", label: "Tài khoản", icon: Users },
-  ];
+  const navItems = isSuspended
+    ? [
+        { href: "/admin/billing", label: "Gói cước", icon: CreditCard }
+      ]
+    : [
+        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/admin/tables", label: "Quản lý Bàn", icon: Store },
+        { href: "/admin/kitchen", label: "Quản lý Bếp", icon: Soup },
+        { href: "/admin/revenue", label: "Doanh thu", icon: TrendingUp },
+        { href: "/admin/menu", label: "Thực đơn", icon: Settings },
+        ...(userRole === "admin" ? [
+          { href: "/admin/billing", label: "Gói cước", icon: CreditCard },
+          { href: "/admin/logs", label: "Nhật ký", icon: ClipboardList }
+        ] : []),
+        { href: "/admin/credentials", label: "Tài khoản", icon: Users },
+      ];
 
   const isActive = (path: string) => {
     if (path === "/admin") {
@@ -173,7 +177,7 @@ export default function AdminLayout({
           )}
           
           <div className={`print:p-0 ${pathname === "/admin/kitchen" ? "p-6 md:p-8 h-full flex flex-col" : "p-6 md:p-12"} flex-1`}>
-            {isSuspended && !isBillingOrCredentials ? (
+            {isSuspended && !isBillingPath ? (
               <div className="flex-1 flex flex-col items-center justify-center py-20 text-center">
                 <div className="max-w-md w-full bg-white border border-red-200 rounded-[2rem] p-10 shadow-xl flex flex-col items-center">
                   <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-6 border border-red-100">
