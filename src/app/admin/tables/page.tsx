@@ -55,18 +55,33 @@ export default function AdminTablesPage() {
     status: o.status.toLowerCase() as OrderStatus,
     timestamp: new Date(o.createdAt).getTime(),
     isConfirmed: o.isConfirmed,
-    items: o.orderItems.map((i) => ({
-      ...i,
-      id: i.productId,
-      name: i.product?.name || 'Món ăn',
-      image: i.product?.image || '',
-      price: i.product?.price || 0,
-      description: i.product?.description || '',
-      category: i.product?.category || '',
-      categoryId: i.product?.categoryId || 0,
-      note: i.note || '',
-    })),
-    totalPrice: Number(o.totalPrice || o.orderItems.reduce((sum: number, i) => sum + (i.product?.price || 0) * i.quantity, 0))
+    items: o.orderItems.map((i) => {
+      const price = i.priceAtTime !== undefined ? Number(i.priceAtTime) : (i.product?.price || 0);
+      const originalPrice = i.originalPriceAtTime !== null && i.originalPriceAtTime !== undefined
+        ? Number(i.originalPriceAtTime)
+        : (i.product?.price || 0);
+      const discountPercent = i.discountPercentAtTime !== null && i.discountPercentAtTime !== undefined
+        ? i.discountPercentAtTime
+        : (i.product?.discountPercent || 0);
+
+      return {
+        ...i,
+        id: i.productId,
+        name: i.product?.name || 'Món ăn',
+        image: i.product?.image || '',
+        price,
+        originalPrice,
+        discountPercent,
+        description: i.product?.description || '',
+        category: i.product?.category || '',
+        categoryId: i.product?.categoryId || 0,
+        note: i.note || '',
+      };
+    }),
+    totalPrice: Number(o.totalPrice || o.orderItems.reduce((sum: number, i) => {
+      const itemPrice = i.priceAtTime !== undefined ? Number(i.priceAtTime) : (i.product?.price || 0);
+      return sum + itemPrice * i.quantity;
+    }, 0))
   }));
   const [activeTab, setActiveTab] = useState<"status" | "qr">("status");
   const [newTableNum, setNewTableNum] = useState("");
@@ -100,15 +115,30 @@ export default function AdminTablesPage() {
   const receiptOrders = printingTable ? (tableStatus[printingTable] || []) : [];
   const receiptTotal = receiptOrders.reduce((sum, order) => sum + order.totalPrice, 0);
 
+  const receiptOriginalTotal = useMemo(() => {
+    return receiptOrders.reduce((sum, order) => {
+      return sum + order.items.reduce((itemSum: number, item: any) => {
+        const origPrice = Number(item.originalPrice || item.price);
+        return itemSum + origPrice * item.quantity;
+      }, 0);
+    }, 0);
+  }, [receiptOrders]);
+
+  const receiptSavedAmount = useMemo(() => {
+    return receiptOriginalTotal - receiptTotal;
+  }, [receiptOriginalTotal, receiptTotal]);
+
   const receiptItems = useMemo(() => {
-    const itemMap: Record<string, { name: string; quantity: number; price: number }> = {};
+    const itemMap: Record<string, { name: string; quantity: number; price: number; originalPrice: number; discountPercent: number }> = {};
     receiptOrders.forEach((order) => {
       order.items.forEach((item: any) => {
         if (!itemMap[item.productId]) {
           itemMap[item.productId] = {
             name: item.name,
             quantity: 0,
-            price: Number(item.price)
+            price: Number(item.price),
+            originalPrice: Number(item.originalPrice || item.price),
+            discountPercent: Number(item.discountPercent || 0)
           };
         }
         itemMap[item.productId].quantity += item.quantity;
@@ -359,9 +389,23 @@ export default function AdminTablesPage() {
                   <tbody>
                     {receiptItems.map((item: any, i: number) => (
                       <tr key={i} className="border-b border-dotted border-gray-200">
-                        <td className="py-1 max-w-[120px] truncate font-bold text-gray-800">{item.name}</td>
+                        <td className="py-1 max-w-[120px] truncate font-bold text-gray-800">
+                          {item.name}
+                          {item.discountPercent > 0 && (
+                            <span style={{ fontSize: '8px', color: '#dc2626', display: 'block', fontWeight: 'bold' }}>
+                              (KM -{item.discountPercent}%)
+                            </span>
+                          )}
+                        </td>
                         <td className="py-1 text-center font-bold">{item.quantity}</td>
-                        <td className="py-1 text-right font-bold">{(item.price * item.quantity).toLocaleString("vi-VN")}</td>
+                        <td className="py-1 text-right font-bold">
+                          {(item.price * item.quantity).toLocaleString("vi-VN")}
+                          {item.discountPercent > 0 && (
+                            <span style={{ fontSize: '8px', textDecoration: 'line-through', color: '#9ca3af', display: 'block' }}>
+                              {(item.originalPrice * item.quantity).toLocaleString("vi-VN")}
+                            </span>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -371,9 +415,15 @@ export default function AdminTablesPage() {
 
                 <div className="space-y-1 text-[11px] font-bold">
                   <div className="flex justify-between">
-                    <span>Tổng tiền món:</span>
-                    <span>{receiptTotal.toLocaleString("vi-VN")} ₫</span>
+                    <span>Tạm tính:</span>
+                    <span>{receiptOriginalTotal.toLocaleString("vi-VN")} ₫</span>
                   </div>
+                  {receiptSavedAmount > 0 && (
+                    <div className="flex justify-between" style={{ color: '#dc2626' }}>
+                      <span>Giảm giá:</span>
+                      <span>-{receiptSavedAmount.toLocaleString("vi-VN")} ₫</span>
+                    </div>
+                  )}
                   <div className="flex justify-between font-black text-xs border-t border-black pt-1.5 mt-1">
                     <span>TỔNG CỘNG:</span>
                     <span className="text-primary">{receiptTotal.toLocaleString("vi-VN")} ₫</span>

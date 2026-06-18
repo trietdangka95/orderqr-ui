@@ -45,6 +45,8 @@ interface MappedOrderItem {
   name: string;
   image: string;
   price: number;
+  originalPrice: number;
+  discountPercent: number;
   quantity: number;
   note?: string | null;
   isCooked?: boolean;
@@ -120,18 +122,32 @@ export default function OrdersDrawer() {
       items: o.orderItems.map((i): MappedOrderItem => {
         const isCooked = orderStatusLower === "completed" || orderStatusLower === "serving" ? true : i.isCooked;
         const isServed = orderStatusLower === "completed" ? true : i.isServed;
+        
+        const price = i.priceAtTime !== undefined ? Number(i.priceAtTime) : (i.product?.price || 0);
+        const originalPrice = i.originalPriceAtTime !== null && i.originalPriceAtTime !== undefined
+          ? Number(i.originalPriceAtTime)
+          : (i.product?.price || 0);
+        const discountPercent = i.discountPercentAtTime !== null && i.discountPercentAtTime !== undefined
+          ? i.discountPercentAtTime
+          : (i.product?.discountPercent || 0);
+
         return {
           ...i,
           name: i.product?.name || 'Món ăn',
           image: i.product?.image || '',
-          price: i.product?.price || 0,
+          price,
+          originalPrice,
+          discountPercent,
           id: i.productId,
           orderItemId: i.id,
           isCooked,
           isServed,
         };
       }),
-      totalPrice: Number(o.totalPrice || o.orderItems.reduce((sum: number, i) => sum + (i.product?.price || 0) * i.quantity, 0))
+      totalPrice: Number(o.totalPrice || o.orderItems.reduce((sum: number, i) => {
+        const itemPrice = i.priceAtTime !== undefined ? Number(i.priceAtTime) : (i.product?.price || 0);
+        return sum + itemPrice * i.quantity;
+      }, 0))
     };
   });
 
@@ -370,9 +386,26 @@ export default function OrdersDrawer() {
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-center">
-                          <h4 className={`font-semibold text-sm leading-tight pr-4 transition-colors ${item.isServed ? "text-gray-400 font-medium" : "text-gray-900"}`}>
-                            {item.name}
-                          </h4>
+                          <div>
+                            <h4 className={`font-semibold text-sm leading-tight pr-4 transition-colors ${item.isServed ? "text-gray-400 font-medium" : "text-gray-900"}`}>
+                              {item.name}
+                            </h4>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className="text-xs font-bold text-primary">
+                                {item.price.toLocaleString("vi-VN")} ₫
+                              </span>
+                              {item.discountPercent > 0 && (
+                                <>
+                                  <span className="text-[10px] text-gray-400 line-through">
+                                    {item.originalPrice.toLocaleString("vi-VN")} ₫
+                                  </span>
+                                  <span className="bg-red-50 text-red-500 text-[9px] font-black px-1.5 py-0.2 rounded border border-red-100 scale-90 origin-left">
+                                    -{item.discountPercent}%
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
                           
                           {(userRole === "staff" || userRole === "admin") && order.status !== "completed" && order.status !== "cancelled" ? (
                             <div className="flex items-center gap-1.5 bg-gray-50 border border-gray-100 rounded-xl px-1.5 py-0.5">

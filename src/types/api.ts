@@ -44,6 +44,9 @@ export interface OrderItem {
   isCooked?: boolean;
   isCooking?: boolean;
   isServed?: boolean;
+  priceAtTime?: string | number;
+  originalPriceAtTime?: string | number | null;
+  discountPercentAtTime?: number | null;
 }
 
 export interface Order {
