@@ -91,7 +91,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
         layoutId={`menu-item-${item.id}`}
         className={`bg-white rounded-[2rem] p-5 border shadow-sm transition-all group relative overflow-hidden flex flex-col h-full ${
           item.isAvailable === false
-            ? "bg-gray-50/70 border-gray-200 opacity-65 grayscale-[30%]"
+            ? "bg-gray-50/70 border-gray-200 opacity-65"
             : "bg-white border-gray-100 hover:shadow-xl hover:shadow-orange-50/50"
         }`}
       >
@@ -145,7 +145,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
       layoutId={`menu-item-${item.id}`}
       className={`bg-white rounded-[2rem] p-4 border shadow-sm transition-all group relative overflow-hidden flex flex-row gap-4 ${
         item.isAvailable === false
-          ? "bg-gray-50/70 border-gray-200 opacity-65 grayscale-[30%]"
+          ? "bg-gray-50/70 border-gray-200 opacity-65"
           : "bg-white border-gray-100 hover:shadow-xl hover:shadow-orange-50/50"
       }`}
     >

@@ -33,7 +33,8 @@ const sanitizeBankId = (bankId: string | undefined | null): string => {
   const mapping: Record<string, string> = {
     "MBBANK": "MB",
     "VIETCOMBANK": "VCB",
-    "VIETINBANK": "CTG",
+    "VIETINBANK": "ICB",
+    "CTG": "ICB",
     "TECHCOMBANK": "TCB",
     "BIDVBANK": "BIDV",
     "ACBBANK": "ACB",

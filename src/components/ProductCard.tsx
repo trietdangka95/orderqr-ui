@@ -56,7 +56,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
     return (
       <motion.div
         layoutId={`product-${product.id}`}
-        className={`bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex flex-col w-full relative overflow-hidden group hover:shadow-xl transition-all duration-300 h-full ${product.isAvailable === false ? 'opacity-60 grayscale' : 'hover:shadow-primary/50'}`}
+        className={`bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex flex-col w-full relative overflow-hidden group hover:shadow-xl transition-all duration-300 h-full ${product.isAvailable === false ? 'opacity-60' : 'hover:shadow-primary/50'}`}
       >
         {/* Badge Section */}
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
@@ -134,7 +134,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
   return (
     <motion.div
       layoutId={`product-${product.id}`}
-      className={`bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex gap-4 w-full relative overflow-hidden group hover:shadow-lg transition-all duration-300 ${product.isAvailable === false ? 'opacity-60 grayscale' : 'hover:shadow-orange-50/50'}`}
+      className={`bg-white rounded-[2rem] p-4 shadow-sm border border-gray-100 flex gap-4 w-full relative overflow-hidden group hover:shadow-lg transition-all duration-300 ${product.isAvailable === false ? 'opacity-60' : 'hover:shadow-orange-50/50'}`}
     >
       {/* Badges for List mode */}
       <div className="absolute top-2 left-2 z-10 flex flex-col gap-1">

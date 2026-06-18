@@ -1,7 +1,7 @@
 // src/components/kitchen/OrderTicket.tsx
 "use client";
 
-import { Clock, ChefHat, Check, ArrowUp } from "lucide-react";
+import { Clock, ChefHat, Check } from "lucide-react";
 import { useUpdateOrderItemStatus } from "@/hooks/useOrders";
 import { VirtualTicket, ColumnType } from "@/app/admin/kitchen/page";
 
@@ -83,14 +83,10 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
                 )}
 
                 {columnType === "serving" && (
-                  <button
-                    onClick={() => handleItemAction(item.orderItemId, "served")}
-                    disabled={updateItemStatusMutation.isPending}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white hover:bg-blue-700 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 shrink-0 shadow-md shadow-blue-200 disabled:opacity-50"
-                  >
-                    <ArrowUp size={12} strokeWidth={3} />
-                    Đã lên
-                  </button>
+                  <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-xl font-black text-[10px] uppercase tracking-wider shrink-0">
+                    <Clock size={12} />
+                    Chờ phục vụ
+                  </span>
                 )}
 
                 {columnType === "completed" && (
