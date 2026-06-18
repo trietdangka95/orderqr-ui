@@ -390,19 +390,19 @@ export default function OrdersDrawer() {
                             <h4 className={`font-semibold text-sm leading-tight pr-4 transition-colors ${item.isServed ? "text-gray-400 font-medium" : "text-gray-900"}`}>
                               {item.name}
                             </h4>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className="text-xs font-bold text-primary">
-                                {item.price.toLocaleString("vi-VN")} ₫
+                            <div className="flex flex-col mt-0.5">
+                              <span className="text-xs font-bold text-primary whitespace-nowrap">
+                                {item.price.toLocaleString("vi-VN")}&nbsp;₫
                               </span>
                               {item.discountPercent > 0 && (
-                                <>
-                                  <span className="text-[10px] text-gray-400 line-through">
-                                    {item.originalPrice.toLocaleString("vi-VN")} ₫
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  <span className="text-[10px] text-gray-400 line-through whitespace-nowrap">
+                                    {item.originalPrice.toLocaleString("vi-VN")}&nbsp;₫
                                   </span>
-                                  <span className="bg-red-50 text-red-500 text-[9px] font-black px-1.5 py-0.2 rounded border border-red-100 scale-90 origin-left">
+                                  <span className="bg-red-50 text-red-500 text-[9px] font-black px-1.5 py-0.2 rounded border border-red-100 scale-90 origin-left shrink-0">
                                     -{item.discountPercent}%
                                   </span>
-                                </>
+                                </div>
                               )}
                             </div>
                           </div>

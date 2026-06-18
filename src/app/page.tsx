@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import { useCartStore } from "@/store/cartStore";
@@ -119,22 +119,78 @@ function HomeContent() {
     }
   }, [toastMessage, setToastMessage]);
 
+  const isManualScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const scrollToCategory = (categoryName: string) => {
+    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    isManualScrollingRef.current = true;
     setActiveTab(categoryName);
+
     const element = document.getElementById(`category-${categoryName}`);
     if (element) {
-      const headerOffset = 140;
+      const headerOffset = 180; // HomeHeader + CategoryTabs offset on mobile/desktop
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
       window.scrollTo({ top: offsetPosition, behavior: "smooth" });
     }
+
+    scrollTimeoutRef.current = setTimeout(() => {
+      isManualScrollingRef.current = false;
+    }, 800);
   };
 
   const filteredProducts = useMemo(() => products.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = activeTab ? product.category === activeTab : true;
-    return matchesSearch && matchesCategory;
-  }), [products, searchQuery, activeTab]);
+    return matchesSearch;
+  }), [products, searchQuery]);
+
+  // Intersection Observer to update active tab on scroll
+  useEffect(() => {
+    if (storeCategories.length === 0) return;
+
+    const observerOptions = {
+      root: null,
+      rootMargin: "-180px 0px -70% 0px", // triggers when section is in top portion of screen
+      threshold: 0
+    };
+
+    const intersectingMap: { [key: string]: boolean } = {};
+
+    const observer = new IntersectionObserver((entries) => {
+      if (isManualScrollingRef.current) return;
+
+      entries.forEach(entry => {
+        intersectingMap[entry.target.id] = entry.isIntersecting;
+      });
+
+      const intersectingIds = Object.keys(intersectingMap).filter(id => intersectingMap[id]);
+      if (intersectingIds.length > 0) {
+        intersectingIds.sort((a, b) => {
+          const elA = document.getElementById(a);
+          const elB = document.getElementById(b);
+          if (elA && elB) {
+            return elA.getBoundingClientRect().top - elB.getBoundingClientRect().top;
+          }
+          return 0;
+        });
+
+        const targetId = intersectingIds[0];
+        const categoryName = targetId.replace("category-", "");
+        setActiveTab(categoryName);
+      }
+    }, observerOptions);
+
+    storeCategories.forEach(cat => {
+      const el = document.getElementById(`category-${cat}`);
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      observer.disconnect();
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
+  }, [storeCategories, filteredProducts]);
 
   if (isLandingPage) {
     return <LandingPage />;

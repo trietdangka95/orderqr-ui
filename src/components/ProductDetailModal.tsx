@@ -122,15 +122,15 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                   {product.name}
                 </h2>
                 <div className="flex items-center gap-2.5 mb-4 flex-wrap">
-                  <div className="inline-block px-3 py-1 bg-primary-soft text-primary rounded-full text-xs md:text-sm font-extrabold">
-                    {finalPrice.toLocaleString("vi-VN")} ₫
+                  <div className="inline-block px-3 py-1 bg-primary-soft text-primary rounded-full text-xs md:text-sm font-extrabold whitespace-nowrap">
+                    {finalPrice.toLocaleString("vi-VN")}&nbsp;₫
                   </div>
                   {hasDiscount && (
                     <>
-                      <span className="text-xs md:text-sm text-gray-400 line-through font-semibold">
-                        {product.price.toLocaleString("vi-VN")} ₫
+                      <span className="text-xs md:text-sm text-gray-400 line-through font-semibold whitespace-nowrap">
+                        {product.price.toLocaleString("vi-VN")}&nbsp;₫
                       </span>
-                      <span className="bg-red-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1 animate-pulse">
+                      <span className="bg-red-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1 animate-pulse shrink-0">
                         -{discountPercent}%
                       </span>
                     </>

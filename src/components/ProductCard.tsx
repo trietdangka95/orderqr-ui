@@ -49,7 +49,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
   };
 
   const formatPrice = (price: number) => {
-    return price.toLocaleString("vi-VN") + " ₫";
+    return price.toLocaleString("vi-VN") + "\u00A0₫";
   };
 
   if (viewMode === "grid") {
@@ -106,12 +106,12 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
 
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50 gap-2">
             <div className="flex flex-col min-w-0">
+              <span className="font-black text-primary text-lg sm:text-xl truncate whitespace-nowrap">{formatPrice(finalPrice)}</span>
               {hasDiscount && (
-                <span className="text-xs text-gray-300 line-through mb-0.5 truncate">
+                <span className="text-xs text-gray-300 line-through mt-0.5 truncate whitespace-nowrap">
                   {formatPrice(product.price)}
                 </span>
               )}
-              <span className="font-black text-primary text-lg sm:text-xl truncate">{formatPrice(finalPrice)}</span>
             </div>
 
             <button
@@ -180,12 +180,12 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
 
         <div className="flex items-end justify-between mt-3">
           <div className="flex flex-col">
+            <span className="font-black text-primary text-xl leading-none whitespace-nowrap">{formatPrice(finalPrice)}</span>
             {hasDiscount && (
-              <span className="text-[11px] text-gray-300 line-through mb-0.5">
+              <span className="text-[11px] text-gray-300 line-through mt-1.5 whitespace-nowrap">
                 {formatPrice(product.price)}
               </span>
             )}
-            <span className="font-black text-primary text-xl leading-none">{formatPrice(finalPrice)}</span>
           </div>
 
           <button
