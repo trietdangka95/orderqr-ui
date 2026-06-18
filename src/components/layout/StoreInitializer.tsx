@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useSearchParams } from "next/navigation";
 import { useSocket } from "@/providers/SocketProvider";
+import { KeyRound, Phone, AlertTriangle } from "lucide-react";
 
 // Helper function to extract store slug from host or search params
 function getSlug(searchParams: URLSearchParams): string | null {
@@ -157,23 +158,40 @@ export default function StoreInitializer() {
 
   if (isSuspended && !isAdminOrSuperAdminPath) {
     return (
-      <div className="fixed inset-0 z-[9999] bg-gray-950 flex items-center justify-center p-6 text-center select-none">
+      <div className="fixed inset-0 z-[9999] bg-gray-950 flex items-center justify-center p-6 text-center">
         {/* Decorative background blurs */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
         
-        <div className="relative max-w-md w-full bg-white/5 border border-white/10 backdrop-blur-xl p-10 rounded-[3rem] shadow-2xl flex flex-col items-center">
+        <div className="relative max-w-md w-full bg-white/5 border border-white/10 backdrop-blur-xl p-8 md:p-10 rounded-[3rem] shadow-2xl flex flex-col items-center">
           <div className="w-20 h-20 bg-red-500/10 border border-red-500/20 text-red-500 rounded-[2rem] flex items-center justify-center mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 animate-pulse">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-            </svg>
+            <AlertTriangle size={36} className="animate-pulse" />
           </div>
           <h2 className="text-white text-2xl font-black mb-3 tracking-tight">Cửa hàng tạm ngưng dịch vụ</h2>
-          <p className="text-gray-400 text-sm leading-relaxed mb-8">
+          <p className="text-gray-400 text-sm leading-relaxed mb-6 font-semibold">
             Dịch vụ của cửa hàng <span className="text-white font-bold">{storeConfig?.name || "này"}</span> hiện đang tạm thời bị gián đoạn do hết hạn gói thuê.
           </p>
-          <div className="text-[10px] font-black uppercase tracking-widest text-gray-500">
-            Vui lòng liên hệ Quản trị viên để gia hạn
+
+          <div className="flex flex-col w-full gap-3 mt-4">
+            <a
+              href="/admin/billing"
+              className="w-full py-3.5 px-4 bg-primary hover:bg-[#E06C00] text-white font-black rounded-xl shadow-lg shadow-orange-500/10 transition-all active:scale-[0.98] text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <KeyRound size={15} />
+              Quản trị & Gia hạn
+            </a>
+            
+            <a
+              href="tel:0707898849"
+              className="w-full py-3.5 px-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 font-bold rounded-xl transition-all active:scale-[0.98] text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Phone size={15} className="text-orange-500" />
+              Gọi Hotline: 0707.898.849
+            </a>
+          </div>
+
+          <div className="text-[10px] font-bold text-gray-500 mt-6 uppercase tracking-wider">
+            Vui lòng gia hạn hoặc liên hệ hỗ trợ để tiếp tục dịch vụ
           </div>
         </div>
       </div>
