@@ -4,8 +4,8 @@ import { OrderStatus, useCartStore } from "@/store/cartStore";
 import { OrderItem } from "@/types/api";
 import { useEffect, useState, useRef } from "react";
 import OrderTicket from "@/components/kitchen/OrderTicket";
-import { LayoutGrid, List, LogOut } from "lucide-react";
-import { useOrders } from "@/hooks/useOrders";
+import { LayoutGrid, List, LogOut, ChefHat, Check, Clock } from "lucide-react";
+import { useOrders, useUpdateOrderItemStatus } from "@/hooks/useOrders";
 import useIsMounted from "@/hooks/useIsMounted";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
@@ -83,6 +83,31 @@ export default function KitchenPage() {
   const isMounted = useIsMounted();
   const queryClient = useQueryClient();
   const { socket } = useSocket();
+  const updateItemStatusMutation = useUpdateOrderItemStatus();
+  const [isBatchUpdating, setIsBatchUpdating] = useState(false);
+
+  const handleBatchAction = async (
+    items: { orderId: string; orderItemId: string }[],
+    action: "startCooking" | "doneCooking"
+  ) => {
+    if (isBatchUpdating || items.length === 0) return;
+    setIsBatchUpdating(true);
+    try {
+      await Promise.all(
+        items.map(item =>
+          updateItemStatusMutation.mutateAsync({
+            orderId: item.orderId,
+            orderItemId: item.orderItemId,
+            ...(action === "startCooking" ? { isCooking: true } : { isCooked: true }),
+          })
+        )
+      );
+    } catch (error) {
+      console.error("Batch update error:", error);
+    } finally {
+      setIsBatchUpdating(false);
+    }
+  };
 
   // Real-time updates
   useEffect(() => {
@@ -169,18 +194,44 @@ export default function KitchenPage() {
     { key: "completed", title: "Hoàn thành",   dot: "bg-green-500", color: "bg-white border-t-green-500  shadow-xl shadow-green-100",  tickets: completedTickets },
   ];
 
-  // Summary view (unchanged)
+  // Summary view (grouped for batch action)
+  interface SummaryDetail {
+    name: string;
+    pendingItems: { orderId: string; orderItemId: string; tableNumber: string; quantity: number }[];
+    cookingItems: { orderId: string; orderItemId: string; tableNumber: string; quantity: number }[];
+    tables: Set<string>;
+  }
+
   const confirmedOrders = orders.sort((a, b) => a.timestamp - b.timestamp);
-  const itemSummary = confirmedOrders
-    .filter(o => o.status === "pending" || o.status === "cooking")
-    .reduce((acc, order) => {
-      order.items.forEach(item => {
-        if (!acc[item.name]) acc[item.name] = { count: 0, tables: new Set<string>() };
-        acc[item.name].count += item.quantity;
-        acc[item.name].tables.add(order.tableNumber);
-      });
-      return acc;
-    }, {} as Record<string, { count: number; tables: Set<string> }>);
+  const itemSummary = confirmedOrders.reduce((acc, order) => {
+    order.items.forEach(item => {
+      if (item.isServed || item.isCooked) return;
+
+      if (!acc[item.name]) {
+        acc[item.name] = {
+          name: item.name,
+          pendingItems: [],
+          cookingItems: [],
+          tables: new Set<string>(),
+        };
+      }
+
+      const itemInfo = {
+        orderId: order.id,
+        orderItemId: item.orderItemId,
+        tableNumber: order.tableNumber,
+        quantity: item.quantity,
+      };
+
+      if (item.isCooking) {
+        acc[item.name].cookingItems.push(itemInfo);
+      } else {
+        acc[item.name].pendingItems.push(itemInfo);
+      }
+      acc[item.name].tables.add(order.tableNumber);
+    });
+    return acc;
+  }, {} as Record<string, SummaryDetail>);
 
   if (!isMounted) return null;
 
@@ -256,33 +307,80 @@ export default function KitchenPage() {
           <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 flex-grow min-h-0 w-full flex flex-col">
             <div className="p-8 border-b bg-gray-50/50 shrink-0">
               <h2 className="text-xl font-black text-gray-800">Danh sách món cần chuẩn bị</h2>
-              <p className="text-sm text-gray-500">Tổng hợp tất cả món từ các đơn hàng Chờ chế biến &amp; Đang làm</p>
+              <p className="text-sm text-gray-500">Tổng hợp và thao tác chế biến hàng loạt các món đang yêu cầu</p>
             </div>
             <div className="p-8 overflow-y-auto flex-1 min-h-0">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {Object.entries(itemSummary).length > 0 ? (
-                  Object.entries(itemSummary).map(([name, data]) => (
-                    <div key={name} className="flex flex-col p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/30 hover:border-primary/30 transition-all group">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-4">
-                          <div className="w-14 h-14 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-2xl font-black shadow-lg">
-                            {data.count}
-                          </div>
-                          <div>
-                            <h3 className="text-xl font-black text-gray-900 leading-tight">{name}</h3>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Yêu cầu từ {data.tables.size} bàn</p>
+                  Object.entries(itemSummary).map(([name, data]) => {
+                    const totalPending = data.pendingItems.reduce((s, i) => s + i.quantity, 0);
+                    const totalCooking = data.cookingItems.reduce((s, i) => s + i.quantity, 0);
+                    const totalCount = totalPending + totalCooking;
+
+                    return (
+                      <div key={name} className="flex flex-col p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/30 hover:border-primary/30 transition-all group">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-4">
+                            <div className="w-14 h-14 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-2xl font-black shadow-lg">
+                              {totalCount}
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-black text-gray-900 leading-tight">{name}</h3>
+                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Yêu cầu từ {data.tables.size} bàn</p>
+                            </div>
                           </div>
                         </div>
+
+                        {/* Status Details / Sub-quantities */}
+                        <div className="flex gap-4 text-xs font-bold mb-5">
+                          {totalPending > 0 && (
+                            <span className="inline-flex items-center gap-1 text-red-600 bg-red-50 border border-red-100 px-2.5 py-1 rounded-xl">
+                              <Clock size={12} />
+                              Chờ nấu: {totalPending}
+                            </span>
+                          )}
+                          {totalCooking > 0 && (
+                            <span className="inline-flex items-center gap-1 text-primary bg-primary-soft border border-primary/20 px-2.5 py-1 rounded-xl">
+                              <ChefHat size={12} />
+                              Đang nấu: {totalCooking}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Action Buttons for Batch Cooking */}
+                        <div className="flex gap-2.5 mb-5">
+                          {totalPending > 0 && (
+                            <button
+                              onClick={() => handleBatchAction(data.pendingItems, "startCooking")}
+                              disabled={isBatchUpdating}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white hover:border-orange-500 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                            >
+                              <ChefHat size={12} />
+                              {isBatchUpdating ? "Đang xử lý..." : `Nấu ${totalPending} phần`}
+                            </button>
+                          )}
+                          {totalCooking > 0 && (
+                            <button
+                              onClick={() => handleBatchAction(data.cookingItems, "doneCooking")}
+                              disabled={isBatchUpdating}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-primary text-white hover:bg-primary/95 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-md shadow-primary/10"
+                            >
+                              <Check size={12} strokeWidth={3} />
+                              {isBatchUpdating ? "Đang xử lý..." : `Xong ${totalCooking} phần`}
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 pt-4 border-t border-dashed border-gray-100">
+                          {Array.from(data.tables).sort().map(table => (
+                            <span key={table} className="px-3 py-1 bg-gray-50 text-gray-600 rounded-xl text-[10px] font-black border border-gray-100 group-hover:border-gray-200 transition-colors">
+                              Bàn {table}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-2 pt-4 border-t border-dashed border-gray-100">
-                        {Array.from(data.tables).sort().map(table => (
-                          <span key={table} className="px-3 py-1 bg-gray-50 text-gray-600 rounded-xl text-[10px] font-black border border-gray-100 group-hover:border-gray-200 transition-colors">
-                            Bàn {table}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <div className="col-span-full py-20 text-center text-gray-400 italic">
                     Hiện không có món nào đang được yêu cầu.
