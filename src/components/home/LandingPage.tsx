@@ -1076,9 +1076,131 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Registration Process Section */}
+      <section
+        id="registration"
+        className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10 scroll-mt-20"
+      >
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">
+            Triển Khai Nhanh Chóng
+          </span>
+          <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3">
+            Quy Trình Đăng Ký Siêu Đơn Giản
+          </h2>
+          <p className="text-gray-400 text-sm md:text-base font-medium mt-4">
+            Bắt đầu số hóa quán ăn của bạn chỉ với vài thao tác dễ dàng. Chúng tôi đồng hành cùng bạn từ lúc đăng ký đến khi vận hành trơn tru.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+          {/* Step 1 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="bg-gray-900/10 border border-white/5 rounded-[2rem] p-8 backdrop-blur-xl flex flex-col relative overflow-hidden group hover:border-white/10 transition-all duration-300"
+          >
+            <div className="w-12 h-12 bg-orange-500/10 text-orange-500 rounded-2xl flex items-center justify-center mb-6 shrink-0 shadow-sm">
+              <Store size={24} />
+            </div>
+            <h4 className="text-xl font-black text-white group-hover:text-orange-500 transition-colors">
+              1. Cung Cấp Thông Tin & Nhu Cầu
+            </h4>
+            <p className="text-gray-400 text-sm font-medium mt-4 leading-relaxed flex-grow">
+              Chủ quán chỉ cần điền thông tin mô hình kinh doanh (quán ăn, cafe, nhà hàng) và nhu cầu sử dụng thông qua biểu mẫu đăng ký tiện lợi.
+            </p>
+            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+              <Store size={80} />
+            </div>
+          </motion.div>
+
+          {/* Step 2 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="bg-gray-900/10 border border-white/5 rounded-[2rem] p-8 backdrop-blur-xl flex flex-col relative overflow-hidden group hover:border-white/10 transition-all duration-300 lg:col-span-1"
+          >
+            <div className="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center mb-6 shrink-0 shadow-sm">
+              <Layers size={24} />
+            </div>
+            <h4 className="text-xl font-black text-white group-hover:text-blue-400 transition-colors">
+              2. Tạo Hệ Thống 4 Phân Hệ
+            </h4>
+            <p className="text-gray-400 text-sm font-medium mt-4 leading-relaxed mb-6">
+              Sau khi xác thực thông tin thành công, hệ thống tự động khởi tạo ngay lập tức một bộ giải pháp toàn diện gồm 4 trang web chuyên biệt hoạt động đồng bộ:
+            </p>
+            <div className="grid grid-cols-2 gap-3 text-left">
+              <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex flex-col gap-1 hover:bg-white/10 transition-colors">
+                <div className="flex items-center gap-1.5 text-orange-400 font-bold text-xs">
+                  <QrCode size={14} />
+                  <span>1. Cho Khách</span>
+                </div>
+                <span className="text-[10px] text-gray-400 font-medium">Quét QR xem menu & gọi món tại bàn.</span>
+              </div>
+              <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex flex-col gap-1 hover:bg-white/10 transition-colors">
+                <div className="flex items-center gap-1.5 text-green-400 font-bold text-xs">
+                  <ChefHat size={14} />
+                  <span>2. Cho Bếp</span>
+                </div>
+                <span className="text-[10px] text-gray-400 font-medium">Nhận món thời gian thực, chế biến chính xác.</span>
+              </div>
+              <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex flex-col gap-1 hover:bg-white/10 transition-colors">
+                <div className="flex items-center gap-1.5 text-blue-400 font-bold text-xs">
+                  <Smartphone size={14} />
+                  <span>3. Cho Nhân Viên</span>
+                </div>
+                <span className="text-[10px] text-gray-400 font-medium">Theo dõi bàn ăn, phục vụ & gọi thêm món.</span>
+              </div>
+              <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex flex-col gap-1 hover:bg-white/10 transition-colors">
+                <div className="flex items-center gap-1.5 text-purple-400 font-bold text-xs">
+                  <ShieldCheck size={14} />
+                  <span>4. Cho Admin</span>
+                </div>
+                <span className="text-[10px] text-gray-400 font-medium">Xem doanh số, quản lý menu & nhân sự.</span>
+              </div>
+            </div>
+            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+              <Layers size={80} />
+            </div>
+          </motion.div>
+
+          {/* Step 3 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="bg-gray-900/10 border border-white/5 rounded-[2rem] p-8 backdrop-blur-xl flex flex-col relative overflow-hidden group hover:border-white/10 transition-all duration-300"
+          >
+            <div className="w-12 h-12 bg-green-500/10 text-green-400 rounded-2xl flex items-center justify-center mb-6 shrink-0 shadow-sm">
+              <Sparkles size={24} />
+            </div>
+            <h4 className="text-xl font-black text-white group-hover:text-green-400 transition-colors">
+              3. Hỗ Trợ Sử Dụng Tại Quán
+            </h4>
+            <p className="text-gray-400 text-sm font-medium mt-4 leading-relaxed flex-grow">
+              Đội ngũ nhân viên sẽ trực tiếp đến quán của bạn để hỗ trợ dán mã QR, hướng dẫn sử dụng chi tiết cho từng bộ phận (bếp, nhân viên) giúp vận hành trơn tru.
+            </p>
+            <div className="mt-6">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full text-xs font-black uppercase tracking-wider">
+                Hoàn toàn miễn phí
+              </span>
+            </div>
+            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+              <Sparkles size={80} />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Pricing Section */}
       <section
         id="pricing"
+
         className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10 scroll-mt-20"
       >
         <div className="text-center max-w-2xl mx-auto mb-16">
@@ -1158,9 +1280,8 @@ export default function LandingPage() {
                 Premium Partner
               </h3>
               <p className="text-gray-400 text-xs font-bold mt-2">
-                Dành cho nhà hàng lớn, hoạt động tần suất cao
+                Dành cho quán vừa và lớn, phục vụ đông khách, cần hệ thống chuyên nghiệp
               </p>
-
               <div className="flex items-baseline gap-1 mt-6 border-b border-orange-500/20 pb-6">
                 <span className="text-4xl font-black text-white">
                   {monthlyPrice.toLocaleString("vi-VN")}đ
@@ -1323,7 +1444,7 @@ export default function LandingPage() {
                 id="note"
                 name="note"
                 rows={4}
-                placeholder="Hãy cho chúng tôi biết về mô hình kinh doanh của bạn (ví dụ: bún bò, quán nhậu, cafe) hoặc số điện thoại..."
+                placeholder="Hãy cho chúng tôi biết về mô hình kinh doanh của bạn (ví dụ: bún bò, quán nhậu, cafe)..."
                 value={formData.note}
                 onChange={handleInputChange}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all font-medium text-sm md:text-base resize-none"

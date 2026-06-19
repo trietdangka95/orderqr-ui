@@ -65,7 +65,7 @@ export default function SuperAdminDashboard() {
         </div>
         <Link 
           href="/superadmin/stores?new=true"
-          className="flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-2xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 text-sm uppercase tracking-widest"
+          className="flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-2xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 text-sm uppercase tracking-widest w-fit self-start md:self-auto"
         >
           <PlusCircle size={20} />
           <span>Create New Store</span>
@@ -80,14 +80,19 @@ export default function SuperAdminDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col items-start gap-4"
+            className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col items-start gap-4 min-w-0"
           >
             <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center shrink-0 shadow-sm`}>
               <stat.icon size={28} />
             </div>
-            <div>
+            <div className="w-full min-w-0">
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider leading-none mb-2">{stat.label}</p>
-              <p className="text-3xl font-black text-gray-900 leading-none">{stat.value}</p>
+              <p 
+                className="text-xl sm:text-2xl lg:text-xl xl:text-3xl font-black text-gray-900 leading-none truncate"
+                title={stat.value}
+              >
+                {stat.value}
+              </p>
             </div>
           </motion.div>
         ))}

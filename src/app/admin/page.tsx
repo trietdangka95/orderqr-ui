@@ -77,9 +77,6 @@ export default function AdminDashboard() {
           </div>
           <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 relative overflow-hidden group-hover:border-purple-300 transition-all">
             <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="md:col-span-3">
-                <p className="text-[10px] font-bold text-purple-600 uppercase tracking-[0.3em] mb-6 text-center md:text-left">Cập nhật thời gian thực</p>
-              </div>
               <div className="flex justify-between items-center pb-4 md:pb-0 border-b md:border-b-0 md:border-r border-gray-100 px-4">
                 <span className="text-gray-500 font-bold text-sm">Đang chờ xác nhận</span>
                 <span className="font-black text-3xl text-orange-500">{orders.filter(o => o.status === "PENDING").length}</span>

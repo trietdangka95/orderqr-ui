@@ -32,7 +32,7 @@ export function StoreFilters({
         value={statusFilter}
         onChange={(e) => setStatusFilter(e.target.value)}
         unstyled
-        className="px-6 h-12 bg-gray-50 border-none rounded-2xl font-bold text-gray-600 focus:ring-2 focus:ring-blue-500/20 text-sm outline-none cursor-pointer"
+        className="px-6 h-12 bg-gray-50 border-none rounded-2xl font-bold text-gray-600 focus:ring-2 focus:ring-blue-500/20 text-sm outline-none cursor-pointer w-fit min-w-[160px] md:w-48 self-start md:self-auto"
       >
         <option value="all">All Status</option>
         <option value="active">Active Only</option>

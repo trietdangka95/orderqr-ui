@@ -150,7 +150,7 @@ export default function AdminTablesPage() {
   const handlePrintReceipt = () => {
     const printEl = document.querySelector(".thermal-receipt-print-area");
     if (!printEl) return;
-    
+
     const iframe = document.createElement("iframe");
     iframe.style.position = "fixed";
     iframe.style.right = "0";
@@ -159,10 +159,10 @@ export default function AdminTablesPage() {
     iframe.style.height = "0";
     iframe.style.border = "0";
     document.body.appendChild(iframe);
-    
+
     const doc = iframe.contentWindow?.document;
     if (!doc) return;
-    
+
     doc.write(`
       <html>
         <head>
@@ -274,7 +274,7 @@ export default function AdminTablesPage() {
         </div>
       </header>
 
-      <main className="py-8">
+      <main className="py-2">
         {activeTab === "status" ? (
           /* Table Status View */
           Object.keys(tableStatus).length === 0 ? (
@@ -360,7 +360,7 @@ export default function AdminTablesPage() {
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:hidden">
           <div className="bg-white rounded-[2rem] p-6 max-w-sm w-full shadow-2xl relative">
             <h3 className="font-bold text-gray-800 text-lg mb-4 text-center">Xem trước Hóa đơn</h3>
-            
+
             {/* Thermal Receipt Box */}
             <div className="border border-gray-200 rounded-2xl p-4 max-h-[60vh] overflow-y-auto bg-gray-50/50 mb-6 no-scrollbar">
               {/* This is the printable area */}
@@ -475,7 +475,7 @@ export default function AdminTablesPage() {
               <p className="text-gray-500 text-xs text-center font-bold leading-relaxed mb-6 px-4">
                 Bạn có chắc chắn muốn thanh toán và giải phóng <span className="text-primary font-black">Bàn {checkoutConfirmTable}</span>? Hành động này sẽ hoàn tất tất cả đơn hàng hiện tại của bàn này.
               </p>
-              
+
               <div className="flex gap-3">
                 <button
                   onClick={() => setCheckoutConfirmTable(null)}
@@ -524,7 +524,7 @@ export default function AdminTablesPage() {
               <p className="text-gray-500 text-xs text-center font-bold leading-relaxed mb-6 px-4">
                 Xác nhận đã nhận số tiền <span className="text-primary font-black">{formatPrice(paymentConfirmInvoice.amount)}</span> ({paymentConfirmInvoice.paymentMethod === "QR_TRANSFER" ? "Chuyển khoản QR" : "Tiền mặt"}) từ <span className="text-amber-500 font-black">Bàn {paymentConfirmInvoice.tableNumber}</span>? Trạng thái bàn sẽ được cập nhật.
               </p>
-              
+
               <div className="flex gap-3">
                 <button
                   onClick={() => setPaymentConfirmInvoice(null)}
@@ -555,9 +555,10 @@ export default function AdminTablesPage() {
           </div>
         )}
       </AnimatePresence>
- 
+
       {/* Print Styles */}
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @media print {
           @page {
             size: A4 portrait;

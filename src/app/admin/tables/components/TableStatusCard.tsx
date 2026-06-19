@@ -45,7 +45,7 @@ export default function TableStatusCard({
       }`}
     >
       <div
-        className={`p-6 border-b flex items-center justify-between transition-colors ${
+        className={`p-4 border-b flex items-center justify-between gap-2 transition-colors ${
           pendingInvoice
             ? "bg-amber-50/30 border-amber-100"
             : hasUnconfirmed
@@ -53,9 +53,9 @@ export default function TableStatusCard({
             : "bg-slate-50/50 border-slate-100"
         }`}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 min-w-0">
           <div
-            className={`w-12 h-12 text-white rounded-2xl flex items-center justify-center font-bold text-xl shadow-lg transition-all duration-300 ${
+            className={`w-10 h-10 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-lg shrink-0 transition-all duration-300 ${
               pendingInvoice
                 ? "bg-amber-500 shadow-amber-200/50"
                 : hasUnconfirmed
@@ -65,59 +65,59 @@ export default function TableStatusCard({
           >
             {tableNumber}
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-bold text-gray-800">Bàn {tableNumber}</h3>
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-bold text-gray-800 text-sm truncate">Bàn {tableNumber}</h3>
               <button
                 onClick={() => onPrintInvoice(tableNumber)}
-                className="p-1.5 text-gray-400 hover:text-primary transition-colors hover:bg-gray-100 rounded-lg cursor-pointer flex items-center justify-center"
+                className="p-1 text-gray-400 hover:text-primary transition-colors hover:bg-gray-100 rounded-lg cursor-pointer flex items-center justify-center"
                 title="In hóa đơn tạm tính"
               >
-                <Printer size={15} />
+                <Printer size={14} />
               </button>
             </div>
             {pendingInvoice ? (
-              <span className="text-[10px] font-black text-amber-600 uppercase flex items-center gap-1 animate-pulse">
+              <span className="text-[9px] font-black text-amber-600 uppercase flex items-center gap-1 animate-pulse">
                 {isQrPayment ? (
                   <>
-                    <QrCode size={10} /> Chuyển khoản QR
+                    <QrCode size={9} /> Chuyển khoản QR
                   </>
                 ) : (
                   <>
-                    <Banknote size={10} /> Thu Tiền mặt
+                    <Banknote size={9} /> Thu Tiền mặt
                   </>
                 )}
               </span>
             ) : hasUnconfirmed ? (
-              <span className="text-[10px] font-black text-red-600 uppercase animate-pulse">
+              <span className="text-[9px] font-black text-red-600 uppercase animate-pulse">
                 Có đơn mới chờ duyệt!
               </span>
             ) : null}
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-xs text-gray-400 uppercase font-bold tracking-wider">Tổng cộng</div>
-          <div className="text-lg font-black text-primary">{formatPrice(totalAmount)}</div>
+        <div className="text-right shrink-0">
+          <div className="text-[10px] text-gray-400 uppercase font-black tracking-wider leading-none mb-1">Tổng cộng</div>
+          <div className="text-base font-black text-primary leading-none">{formatPrice(totalAmount)}</div>
         </div>
       </div>
  
       {/* Pending Alert banner inside card */}
       {pendingInvoice && (
-        <div className="bg-amber-50 px-6 py-2 border-b border-amber-100 flex items-center gap-2 text-xs text-amber-800 font-bold">
-          <AlertCircle size={14} className="shrink-0 text-amber-600" />
-          <span>
+        <div className="bg-amber-50 px-4 py-2 border-b border-amber-100 flex items-center gap-1.5 text-[10px] text-amber-800 font-bold">
+          <AlertCircle size={12} className="shrink-0 text-amber-600" />
+          <span className="leading-normal">
             Khách đã yêu cầu thanh toán bằng{" "}
             {isQrPayment ? "Chuyển khoản VietQR" : "Tiền mặt"}. Vui lòng đối soát.
           </span>
         </div>
       )}
  
-      <div className="flex-1 p-6 space-y-4 max-h-[400px] overflow-y-auto">
+      <div className="flex-1 p-4 space-y-4 max-h-[400px] overflow-y-auto">
         {tableOrders.map((order) => (
           <div key={order.id} className="pb-4 border-b border-gray-50 last:border-0 last:pb-0">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            <div className="flex items-center justify-between mb-2 gap-1">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider truncate">
                   Đơn #{order.id.slice(-4)}
                 </span>
                 {!pendingInvoice && (
@@ -132,20 +132,20 @@ export default function TableStatusCard({
                     }}
                     className="text-red-400 hover:text-red-600 transition-colors"
                   >
-                    <XIcon size={14} />
+                    <XIcon size={12} />
                   </button>
                 )}
               </div>
               {!order.isConfirmed ? (
                 <button
                   onClick={() => onConfirmOrder(order.id)}
-                  className="bg-red-500 text-white text-[10px] px-2 py-1 rounded-lg font-black uppercase hover:bg-red-600 transition-colors"
+                  className="bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-lg font-black uppercase hover:bg-red-600 transition-colors shrink-0"
                 >
                   Xác nhận ngay
                 </button>
               ) : (
                 <span
-                  className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                  className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase shrink-0 ${
                     pendingInvoice
                       ? "bg-amber-100 text-amber-700"
                       : order.status === "completed"
@@ -171,13 +171,13 @@ export default function TableStatusCard({
         ))}
       </div>
  
-      <div className="p-6 bg-gray-50 border-t mt-auto">
+      <div className="p-4 bg-gray-50 border-t mt-auto">
         {pendingInvoice ? (
           <button
             onClick={() => onConfirmInvoicePayment(pendingInvoice.id, tableNumber, totalAmount, pendingInvoice.paymentMethod || "CASH")}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-amber-200 transition-all active:scale-[0.98] cursor-pointer"
+            className="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 px-2 rounded-xl font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-amber-200 transition-all active:scale-[0.98] cursor-pointer text-xs sm:text-sm"
           >
-            <CheckIcon size={20} />
+            <CheckIcon size={16} />
             Xác nhận Đã nhận tiền
           </button>
         ) : hasUnconfirmed ? (
@@ -186,17 +186,17 @@ export default function TableStatusCard({
               const unconfirmed = tableOrders.filter((o) => !o.isConfirmed);
               unconfirmed.forEach((o) => onConfirmOrder(o.id));
             }}
-            className="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-red-200 transition-all active:scale-95 cursor-pointer"
+            className="w-full bg-red-500 hover:bg-red-600 text-white py-3 px-2 rounded-xl font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-red-200 transition-all active:scale-95 cursor-pointer text-xs sm:text-sm"
           >
-            <CheckIcon size={20} />
+            <CheckIcon size={16} />
             Xác nhận đơn mới
           </button>
         ) : (
           <button
             onClick={() => onCheckout(tableNumber)}
-            className="w-full bg-primary hover:opacity-90 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-orange-100 transition-all active:scale-95 cursor-pointer"
+            className="w-full bg-primary hover:opacity-90 text-white py-3 px-2 rounded-xl font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-orange-100 transition-all active:scale-95 cursor-pointer text-xs sm:text-sm"
           >
-            <CheckIcon size={20} />
+            <CheckIcon size={16} />
             Thanh toán & Trả bàn
           </button>
         )}
