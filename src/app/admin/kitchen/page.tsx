@@ -276,9 +276,9 @@ export default function KitchenPage() {
       <main className="flex-grow flex flex-col min-h-0">
 
         {view === "board" ? (
-          <div className="flex flex-row md:grid md:grid-cols-2 lg:grid-cols-4 gap-6 overflow-x-auto md:overflow-x-visible pb-4 flex-grow min-h-0 snap-x snap-mandatory">
+          <div className="flex flex-row lg:grid lg:grid-cols-2 xl:grid-cols-4 gap-6 overflow-x-auto lg:overflow-x-visible pb-4 flex-grow min-h-0 snap-x snap-mandatory">
             {columns.map(col => (
-              <section key={col.key} className="flex flex-col h-full min-h-0 w-[85vw] sm:w-[350px] md:w-full shrink-0 snap-center">
+              <section key={col.key} className="flex flex-col h-full min-h-0 w-[85vw] sm:w-[350px] lg:w-full shrink-0 snap-center">
                 <div className={`p-4 rounded-2xl border-t-4 mb-4 flex items-center justify-between ${col.color} shrink-0`}>
                   <div className="flex items-center gap-3">
                     <div className={`w-2.5 h-2.5 rounded-full ${col.dot} animate-pulse shadow-sm`}></div>

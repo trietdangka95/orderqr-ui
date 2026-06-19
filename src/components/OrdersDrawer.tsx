@@ -358,7 +358,7 @@ export default function OrdersDrawer() {
 
                 <div className="p-4 space-y-3">
                   {order.items.map((item: MappedOrderItem) => (
-                    <div key={item.id} className="flex gap-3 items-center">
+                    <div key={item.orderItemId} className="flex gap-3 items-center">
                       {(userRole === "staff" || userRole === "admin") && order.status !== "completed" && order.status !== "cancelled" && (
                         <button
                           disabled={updateItemStatusMutation.isPending || !item.isCooked}

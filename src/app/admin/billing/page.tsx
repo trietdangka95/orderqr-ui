@@ -421,7 +421,7 @@ export default function AdminBillingPage() {
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {packages.map((pkg) => (
             <div
               key={pkg.months}
@@ -437,12 +437,12 @@ export default function AdminBillingPage() {
                 <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{pkg.desc}</span>
                 <h4 className="text-2xl font-black text-gray-900">{pkg.label}</h4>
                 <div className="pt-2">
-                  <span className="text-3xl font-black text-primary">
-                    {pkg.price.toLocaleString("vi-VN")} ₫
+                  <span className="text-2xl sm:text-3xl font-black text-primary whitespace-nowrap">
+                    {pkg.price.toLocaleString("vi-VN")}&nbsp;₫
                   </span>
                   {pkg.price < pkg.originalPrice && (
                     <span className="text-xs text-gray-400 line-through block font-medium mt-1">
-                      {pkg.originalPrice.toLocaleString("vi-VN")} ₫
+                      {pkg.originalPrice.toLocaleString("vi-VN")}&nbsp;₫
                     </span>
                   )}
                 </div>

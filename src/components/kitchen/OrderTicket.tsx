@@ -31,7 +31,7 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
       {/* Header */}
       <div className="p-5 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 bg-gray-900 text-white rounded-xl flex items-center justify-center font-black shadow-lg">
+          <div className="min-w-[2.75rem] px-2 h-11 bg-gray-900 text-white rounded-xl flex items-center justify-center font-black shadow-lg">
             {ticket.tableNumber}
           </div>
           <div>
@@ -50,9 +50,9 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
         <ul className="space-y-2 mb-5">
           {ticket.items.map(item => (
             <li key={item.orderItemId} className="flex flex-col gap-1">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-wrap items-start justify-between gap-2.5">
                 {/* Item info */}
-                <div className="flex items-start gap-3 flex-1 min-w-0">
+                <div className="flex items-start gap-3 flex-1 min-w-[140px]">
                   <span className="w-7 h-7 bg-gray-100 rounded-lg flex items-center justify-center text-[10px] font-black text-gray-900 shrink-0 mt-0.5">
                     {item.quantity}
                   </span>
@@ -62,41 +62,43 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
                 </div>
 
                 {/* Action button per item */}
-                {columnType === "pending" && (
-                  <button
-                    onClick={() => handleItemAction(item.orderItemId, "startCooking")}
-                    disabled={updateItemStatusMutation.isPending}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white hover:border-orange-500 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 shrink-0 disabled:opacity-50"
-                  >
-                    <ChefHat size={12} />
-                    Nấu
-                  </button>
-                )}
+                <div className="shrink-0 ml-10 sm:ml-0">
+                  {columnType === "pending" && (
+                    <button
+                      onClick={() => handleItemAction(item.orderItemId, "startCooking")}
+                      disabled={updateItemStatusMutation.isPending}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white hover:border-orange-500 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 shrink-0 disabled:opacity-50"
+                    >
+                      <ChefHat size={12} />
+                      Nấu
+                    </button>
+                  )}
 
-                {columnType === "cooking" && (
-                  <button
-                    onClick={() => handleItemAction(item.orderItemId, "doneCooking")}
-                    disabled={updateItemStatusMutation.isPending}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white hover:bg-primary/90 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 shrink-0 shadow-md shadow-primary/20 disabled:opacity-50"
-                  >
-                    <Check size={12} strokeWidth={3} />
-                    Xong
-                  </button>
-                )}
+                  {columnType === "cooking" && (
+                    <button
+                      onClick={() => handleItemAction(item.orderItemId, "doneCooking")}
+                      disabled={updateItemStatusMutation.isPending}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white hover:bg-primary/90 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 shrink-0 shadow-md shadow-primary/20 disabled:opacity-50"
+                    >
+                      <Check size={12} strokeWidth={3} />
+                      Xong
+                    </button>
+                  )}
 
-                {columnType === "serving" && (
-                  <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-xl font-black text-[10px] uppercase tracking-wider shrink-0">
-                    <Clock size={12} />
-                    Chờ phục vụ
-                  </span>
-                )}
+                  {columnType === "serving" && (
+                    <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-xl font-black text-[10px] uppercase tracking-wider shrink-0">
+                      <Clock size={12} />
+                      Chờ phục vụ
+                    </span>
+                  )}
 
-                {columnType === "completed" && (
-                  <span className="flex items-center gap-1 px-2 py-1 bg-green-50 text-green-600 border border-green-100 rounded-xl text-[10px] font-black uppercase tracking-wider shrink-0">
-                    <Check size={10} strokeWidth={3} />
-                    Xong
-                  </span>
-                )}
+                  {columnType === "completed" && (
+                    <span className="flex items-center gap-1 px-2 py-1 bg-green-50 text-green-600 border border-green-100 rounded-xl text-[10px] font-black uppercase tracking-wider shrink-0">
+                      <Check size={10} strokeWidth={3} />
+                      Xong
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Note */}
