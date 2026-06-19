@@ -185,6 +185,114 @@ export default function OrdersDrawer() {
     return acc;
   }, {} as Record<string, { quantity: number; status: string }>);
 
+  const renderQRTransferDetails = (amount: number, showSubmitPrompt = false) => {
+    if (!storeConfig?.bankId || !storeConfig?.bankAccountNo) {
+      return (
+        <div className="py-6 text-center text-xs text-red-500 font-bold">
+          Quán chưa thiết lập tài khoản ngân hàng. Vui lòng báo nhân viên.
+        </div>
+      );
+    }
+
+    const redirectUrl = `https://dl.vietqr.io/pay?app=${sanitizeBankId(storeConfig.bankId).toLowerCase()}&ba=${storeConfig.bankAccountNo}&am=${amount}&tn=${encodeURIComponent(`Ban ${selectedTable} Thanh Toan`)}&bn=${encodeURIComponent(storeConfig.bankAccountName || "")}`;
+
+    return (
+      <div className="flex flex-col items-center gap-3">
+        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Chuyển khoản VietQR</p>
+        
+        {/* Clickable QR Code */}
+        <a 
+          href={redirectUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-48 h-48 bg-white border border-gray-200/60 rounded-[1.5rem] flex items-center justify-center p-3 relative shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] group cursor-pointer"
+          title="Click để mở App Ngân hàng"
+        >
+          <img
+            src={`https://img.vietqr.io/image/${sanitizeBankId(storeConfig.bankId)}-${storeConfig.bankAccountNo}-compact2.png?amount=${amount}&addInfo=Ban%20${selectedTable}%20Thanh%20Toan&accountName=${encodeURIComponent(storeConfig.bankAccountName || "")}`}
+            alt="VietQR code"
+            className="w-full h-full object-contain"
+          />
+          <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-[1.5rem] flex items-center justify-center">
+            <span className="bg-black/75 text-white text-[10px] font-bold px-2 py-1 rounded-lg">Mở App Ngân Hàng</span>
+          </div>
+        </a>
+
+        {/* Banking App Redirection Button */}
+        <a
+          href={redirectUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-xs"
+        >
+          <QrCode size={16} className="animate-pulse" />
+          Mở App Ngân Hàng Thanh Toán
+        </a>
+
+        {/* Account Details Table */}
+        <div className="w-full text-left bg-white border border-gray-100 rounded-xl p-3 text-xs space-y-2 font-medium shadow-sm mt-1">
+          <div className="flex justify-between border-b border-gray-50 pb-1.5">
+            <span className="text-gray-400">Ngân hàng</span>
+            <span className="font-bold text-gray-800">{storeConfig.bankId}</span>
+          </div>
+          <div className="flex justify-between border-b border-gray-50 pb-1.5 items-center">
+            <span className="text-gray-400">Số tài khoản</span>
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-gray-800">{storeConfig.bankAccountNo}</span>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigator.clipboard.writeText(storeConfig.bankAccountNo || "");
+                  showAlert("Đã sao chép số tài khoản!");
+                }}
+                className="p-1 hover:bg-gray-100 rounded text-primary transition-colors"
+              >
+                <Copy size={12} />
+              </button>
+            </div>
+          </div>
+          <div className="flex justify-between border-b border-gray-50 pb-1.5">
+            <span className="text-gray-400">Tên thụ hưởng</span>
+            <span className="font-bold text-gray-800">{storeConfig.bankAccountName || "N/A"}</span>
+          </div>
+          <div className="flex justify-between border-b border-gray-50 pb-1.5 items-center">
+            <span className="text-gray-400">Nội dung CK</span>
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-primary">Ban {selectedTable} Thanh Toan</span>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigator.clipboard.writeText(`Ban ${selectedTable} Thanh Toan`);
+                  showAlert("Đã sao chép nội dung chuyển khoản!");
+                }}
+                className="p-1 hover:bg-gray-100 rounded text-primary transition-colors"
+              >
+                <Copy size={12} />
+              </button>
+            </div>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-400">Tổng tiền</span>
+            <span className="font-black text-primary text-sm">{amount.toLocaleString("vi-VN")} ₫</span>
+          </div>
+        </div>
+
+        {showSubmitPrompt ? (
+          <p className="text-[10px] text-amber-600 font-bold leading-normal px-2 mt-1 flex items-start gap-1">
+            <Sparkles size={12} className="shrink-0 mt-0.5 animate-pulse" />
+            <span>Sau khi chuyển khoản thành công, vui lòng nhấn nút <b>"Gửi yêu cầu thanh toán"</b> bên dưới để nhân viên xác nhận hóa đơn của bạn.</span>
+          </p>
+        ) : (
+          <p className="text-[10px] text-gray-400 font-bold leading-normal px-2 mt-1">
+            Vui lòng giữ nguyên màn hình này cho đến khi nhân viên xác nhận đã nhận được tiền.
+          </p>
+        )}
+      </div>
+    );
+  };
+
   if (!isOrdersOpen) return null;
 
   return (
@@ -538,71 +646,7 @@ export default function OrdersDrawer() {
 
                 {pendingInvoice.paymentMethod === "QR_TRANSFER" ? (
                   <div className="border border-gray-100 rounded-2xl p-4 bg-gray-50/50 space-y-4 text-center">
-                    <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Quét mã QR để chuyển khoản</p>
-                    
-                    {storeConfig?.bankId && storeConfig?.bankAccountNo ? (
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="w-48 h-48 bg-white border border-gray-200/60 rounded-2xl flex items-center justify-center p-2 relative shadow-md">
-                          <img
-                            src={`https://img.vietqr.io/image/${sanitizeBankId(storeConfig.bankId)}-${storeConfig.bankAccountNo}-compact2.png?amount=${tableTotal}&addInfo=Ban%20${selectedTable}%20Thanh%20Toan&accountName=${encodeURIComponent(storeConfig.bankAccountName || "")}`}
-                            alt="VietQR code"
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
-
-                        <div className="w-full text-left bg-white border border-gray-100 rounded-xl p-3 text-xs space-y-2 font-medium">
-                          <div className="flex justify-between border-b border-gray-50 pb-1.5">
-                            <span className="text-gray-400">Ngân hàng</span>
-                            <span className="font-bold text-gray-800">{storeConfig.bankId}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-gray-50 pb-1.5 items-center">
-                            <span className="text-gray-400">Số tài khoản</span>
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-gray-800">{storeConfig.bankAccountNo}</span>
-                              <button
-                                onClick={() => {
-                                  navigator.clipboard.writeText(storeConfig.bankAccountNo || "");
-                                  showAlert("Đã sao chép số tài khoản!");
-                                }}
-                                className="p-1 hover:bg-gray-100 rounded text-primary transition-colors"
-                              >
-                                <Copy size={12} />
-                              </button>
-                            </div>
-                          </div>
-                          <div className="flex justify-between border-b border-gray-50 pb-1.5">
-                            <span className="text-gray-400">Tên thụ hưởng</span>
-                            <span className="font-bold text-gray-800">{storeConfig.bankAccountName || "N/A"}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-gray-50 pb-1.5 items-center">
-                            <span className="text-gray-400">Nội dung CK</span>
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-primary">Ban {selectedTable} Thanh Toan</span>
-                              <button
-                                onClick={() => {
-                                  navigator.clipboard.writeText(`Ban ${selectedTable} Thanh Toan`);
-                                  showAlert("Đã sao chép nội dung chuyển khoản!");
-                                }}
-                                className="p-1 hover:bg-gray-100 rounded text-primary transition-colors"
-                              >
-                                <Copy size={12} />
-                              </button>
-                            </div>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-400">Tổng tiền</span>
-                            <span className="font-black text-primary text-sm">{tableTotal.toLocaleString("vi-VN")} ₫</span>
-                          </div>
-                        </div>
-                        <p className="text-[10px] text-gray-400 font-bold leading-normal px-2 mt-1">
-                          Vui lòng giữ nguyên màn hình này cho đến khi nhân viên xác nhận đã nhận được tiền.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="py-6 text-center text-xs text-red-500 font-bold">
-                        Quán chưa thiết lập tài khoản ngân hàng. Vui lòng báo nhân viên.
-                      </div>
-                    )}
+                    {renderQRTransferDetails(tableTotal, false)}
                   </div>
                 ) : (
                   <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5 text-center space-y-3 font-medium text-xs text-gray-600">
@@ -681,11 +725,8 @@ export default function OrdersDrawer() {
                 </div>
 
                 {selectedPayment === "QR_TRANSFER" && (
-                  <div className="border border-primary rounded-xl p-3 bg-primary-soft/30 text-[11px] font-medium text-orange-800 leading-normal flex gap-2">
-                    <Sparkles size={16} className="shrink-0 text-orange-500 mt-0.5" />
-                    <span>
-                      Hệ thống tự động tạo mã QR chuyển tiền đến tài khoản của quán.
-                    </span>
+                  <div className="border border-gray-100 rounded-2xl p-4 bg-gray-50/50 space-y-4 text-center mt-2">
+                    {renderQRTransferDetails(tableTotal, true)}
                   </div>
                 )}
 
