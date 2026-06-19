@@ -12,21 +12,20 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
   const { login: storeLogin, storeConfig } = useCartStore();
   const [role, setRole] = useState<UserRole>(initialRole);
 
-  const getAdminUsernamePrefix = () => {
+  const getDefaultUsername = (targetRole: UserRole) => {
+    if (targetRole === "superadmin") return "superadmin";
+    if (!storeConfig?.slug) return targetRole;
+
+    if (targetRole === "staff") return `staff_${storeConfig.slug}`;
+    if (targetRole === "kitchen") return `kitchen_${storeConfig.slug}`;
+
+    // targetRole === "admin"
     const adminUser = storeConfig?.users?.[0]?.username || "";
-    const suffix = `_${storeConfig?.slug}`;
-    if (adminUser && suffix && adminUser.endsWith(suffix)) {
-      return adminUser.slice(0, -suffix.length);
-    }
-    return "admin";
+    if (adminUser) return adminUser;
+    return `admin_${storeConfig.slug}`;
   };
 
-  const [username, setUsername] = useState(() => {
-    if (initialRole === "staff") return "staff";
-    if (initialRole === "kitchen") return "kitchen";
-    if (initialRole === "superadmin") return "superadmin";
-    return getAdminUsernamePrefix();
-  });
+  const [username, setUsername] = useState(() => getDefaultUsername(initialRole));
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(false);
@@ -36,23 +35,13 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
 
   const handleRoleChange = (newRole: UserRole) => {
     setRole(newRole);
-    if (newRole === "staff") {
-      setUsername("staff");
-    } else if (newRole === "kitchen") {
-      setUsername("kitchen");
-    } else if (newRole === "superadmin") {
-      setUsername("superadmin");
-    } else {
-      setUsername(getAdminUsernamePrefix());
-    }
+    setUsername(getDefaultUsername(newRole));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const formattedUsername = (role === "staff" || role === "kitchen" || role === "admin") && storeConfig?.slug
-      ? `${username.trim()}_${storeConfig.slug}`
-      : username.trim();
+    const formattedUsername = username.trim().toLowerCase();
 
     const loginData = {
       username: formattedUsername,
