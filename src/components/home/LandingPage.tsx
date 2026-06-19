@@ -1588,9 +1588,19 @@ export default function LandingPage() {
             <ul className="space-y-2 text-xs font-bold text-gray-500">
               <li>Hotline: 0707.898.849</li>
               <li>Email: triet.dang.dev@gmail.com</li>
+              <li>
+                <a
+                  href="https://zalo.me/0707898849"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors flex items-center gap-1.5 mt-2 text-[#0068FF] font-bold"
+                >
+                  💬 Chat Hỗ Trợ Zalo
+                </a>
+              </li>
             </ul>
           </div>
-
+ 
           <div className="space-y-3">
             <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest">
               Bảo Mật & Tin Cậy
@@ -1605,11 +1615,26 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-
+ 
         <div className="max-w-7xl mx-auto px-4 md:px-8 border-t border-white/5 mt-10 pt-6 text-center text-xs text-gray-600 font-bold uppercase tracking-wider">
           © 2026 Triet Dang. All Rights Reserved.
         </div>
       </footer>
+ 
+      {/* Floating Zalo Button */}
+      <a
+        href="https://zalo.me/0707898849"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-[999] bg-[#0068FF] hover:bg-[#0056d2] w-14 h-14 rounded-full shadow-[0_8px_30px_rgb(0,104,255,0.4)] flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group"
+        title="Liên hệ hỗ trợ qua Zalo"
+      >
+        {/* Ripple Ping effect */}
+        <span className="absolute inset-0 rounded-full bg-[#0068FF] opacity-60 animate-ping group-hover:animate-none"></span>
+        
+        {/* Zalo Text Icon */}
+        <span className="relative text-white font-black text-[15px] select-none tracking-tighter">Zalo</span>
+      </a>
     </div>
   );
 }
