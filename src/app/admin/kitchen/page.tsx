@@ -4,11 +4,12 @@ import { OrderStatus, useCartStore } from "@/store/cartStore";
 import { OrderItem } from "@/types/api";
 import { useEffect, useState, useRef } from "react";
 import OrderTicket from "@/components/kitchen/OrderTicket";
-import { LayoutGrid, List, LogOut, ChefHat, Check, Clock } from "lucide-react";
+import { LayoutGrid, List, LogOut, ChefHat, Check, Clock, Pencil } from "lucide-react";
 import { useOrders, useUpdateOrderItemStatus } from "@/hooks/useOrders";
 import useIsMounted from "@/hooks/useIsMounted";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
+import StaffNameModal from "@/components/admin/StaffNameModal";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -78,7 +79,8 @@ function groupByOrder(items: FlatItem[]): VirtualTicket[] {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function KitchenPage() {
-  const { logout, userRole } = useCartStore();
+  const { logout, userRole, activeStaffName } = useCartStore();
+  const [isNameModalOpen, setIsNameModalOpen] = useState(false);
   const { data: apiOrders = [] } = useOrders();
   const isMounted = useIsMounted();
   const queryClient = useQueryClient();
@@ -271,13 +273,32 @@ export default function KitchenPage() {
           </div>
 
           {userRole === "kitchen" && (
-            <button
-              onClick={() => { logout(); window.location.href = "/"; }}
-              className="flex items-center gap-2 px-6 py-3 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-black rounded-2xl transition-all shadow-md active:scale-95 text-sm"
-            >
-              <LogOut size={18} />
-              <span>Đăng xuất</span>
-            </button>
+            <div className="flex items-center gap-3">
+              {activeStaffName && (
+                <div className="flex items-center gap-3 bg-white shadow-sm border border-gray-150 px-4 py-2.5 rounded-2xl">
+                  <div className="text-right">
+                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Đang trực bếp</p>
+                    <p className="text-sm font-black text-gray-900 leading-none mt-0.5">{activeStaffName}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsNameModalOpen(true)}
+                    title="Đổi ca / Sửa tên"
+                    className="w-8 h-8 rounded-xl bg-gray-50 hover:bg-primary text-gray-400 hover:text-white flex items-center justify-center transition-all shrink-0 cursor-pointer"
+                  >
+                    <Pencil size={14} />
+                  </button>
+                </div>
+              )}
+
+              <button
+                onClick={() => { logout(); window.location.href = "/"; }}
+                className="flex items-center gap-2 px-6 py-3 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-black rounded-2xl transition-all shadow-md active:scale-95 text-sm"
+              >
+                <LogOut size={18} />
+                <span>Đăng xuất</span>
+              </button>
+            </div>
           )}
         </div>
       </header>
@@ -400,6 +421,11 @@ export default function KitchenPage() {
           </div>
         )}
       </main>
+      <StaffNameModal 
+        isOpen={isNameModalOpen} 
+        onClose={() => setIsNameModalOpen(false)} 
+        canClose={true} 
+      />
     </div>
   );
 }

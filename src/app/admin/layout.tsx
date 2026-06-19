@@ -11,12 +11,14 @@ import {
   LogOut,
   Menu,
   ClipboardList,
-  CreditCard
+  CreditCard,
+  Pencil
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import StaffNameModal from "@/components/admin/StaffNameModal";
 
 export default function AdminLayout({
   children,
@@ -25,8 +27,18 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout, userRole, storeConfig } = useCartStore();
+  const { logout, userRole, storeConfig, activeStaffName } = useCartStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isStaffNameModalOpen, setIsStaffNameModalOpen] = useState(false);
+  const [canCloseModal, setCanCloseModal] = useState(true);
+
+  useEffect(() => {
+    const isManageRole = ["admin", "staff", "kitchen"].includes(userRole);
+    if (isManageRole && !activeStaffName) {
+      setCanCloseModal(false);
+      setIsStaffNameModalOpen(true);
+    }
+  }, [userRole, activeStaffName]);
  
   const getRemainingDays = () => {
     if (!storeConfig?.subscriptionEnd) return Infinity; // null = no expiry set
@@ -47,6 +59,11 @@ export default function AdminLayout({
       <AdminGuard>
         <div className="h-screen overflow-hidden bg-gray-50 p-6 md:p-8 flex flex-col">
           {children}
+          <StaffNameModal 
+            isOpen={isStaffNameModalOpen} 
+            onClose={() => setIsStaffNameModalOpen(false)} 
+            canClose={canCloseModal} 
+          />
         </div>
       </AdminGuard>
     );
@@ -141,9 +158,30 @@ export default function AdminLayout({
             })}
           </nav>
 
+          {/* Active staff info & quick pencil edit */}
+          {activeStaffName && (
+            <div className="mt-auto mb-4 p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-between gap-2">
+              <div className="flex flex-col min-w-0">
+                <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">Đang trực ca</span>
+                <span className="text-sm font-black text-white truncate">{activeStaffName}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setCanCloseModal(true);
+                  setIsStaffNameModalOpen(true);
+                }}
+                title="Đổi ca / Sửa tên"
+                className="w-8 h-8 rounded-xl bg-white/5 hover:bg-primary text-gray-400 hover:text-white flex items-center justify-center transition-all shrink-0 cursor-pointer"
+              >
+                <Pencil size={14} />
+              </button>
+            </div>
+          )}
+
           <button
             onClick={handleLogout}
-            className="mt-auto flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white font-bold transition-all"
+            className={`${activeStaffName ? "" : "mt-auto"} flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white font-bold transition-all`}
           >
             <LogOut size={20} />
             <span>Đăng xuất</span>
@@ -225,6 +263,11 @@ export default function AdminLayout({
           </Link>
         </div>
       )}
+      <StaffNameModal 
+        isOpen={isStaffNameModalOpen} 
+        onClose={() => setIsStaffNameModalOpen(false)} 
+        canClose={canCloseModal} 
+      />
     </AdminGuard>
   );
 }

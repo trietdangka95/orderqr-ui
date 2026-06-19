@@ -78,6 +78,8 @@ interface CartStore {
   userStoreId: string | null;
   login: (role: UserRole, id: string, storeId?: string | null) => void;
   logout: () => void;
+  activeStaffName: string | null;
+  setActiveStaffName: (name: string | null) => void;
   
   // Toast Feedback
   toastMessage: string | null;
@@ -132,6 +134,8 @@ export const useCartStore = create<CartStore>()(
       userRole: "guest",
       userId: null,
       userStoreId: null,
+      activeStaffName: null,
+      setActiveStaffName: (name) => set({ activeStaffName: name }),
       login: (role, id, storeId) => set({ 
         isLoggedIn: true, 
         userRole: role, 
@@ -146,7 +150,8 @@ export const useCartStore = create<CartStore>()(
           userId: null,
           userStoreId: null,
           items: [],
-          selectedTable: ""
+          selectedTable: "",
+          activeStaffName: null
         });
       },
 
@@ -306,6 +311,7 @@ export const useCartStore = create<CartStore>()(
         userStoreId: state.userStoreId,
         selectedTable: state.selectedTable,
         storeConfigId: state.storeConfig?.id,
+        activeStaffName: state.activeStaffName,
       }),
     }
   )

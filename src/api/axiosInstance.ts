@@ -28,6 +28,10 @@ axiosInstance.interceptors.request.use(
           } else if (state?.storeConfigId) {
             config.headers['x-store-id'] = state.storeConfigId;
           }
+
+          if (state?.activeStaffName) {
+            config.headers['x-staff-name'] = encodeURIComponent(state.activeStaffName.trim());
+          }
         } catch (e) {
           console.error('Error parsing cart-storage', e);
         }
