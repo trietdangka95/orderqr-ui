@@ -78,7 +78,7 @@ export default function LogsPage() {
             <div className="w-12 h-12 bg-gray-900 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-gray-200">
               <ClipboardList size={24} />
             </div>
-            <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Tổng số hoạt động</p>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2">Tổng số hoạt động</p>
             <h2 className="text-3xl font-black text-gray-900">{logs.length}</h2>
           </motion.div>
 
@@ -91,7 +91,7 @@ export default function LogsPage() {
             <div className="w-12 h-12 bg-red-500 text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-red-200">
               <AlertCircle size={24} />
             </div>
-            <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Số lần xóa / hủy món</p>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2">Số lần xóa / hủy món</p>
             <h2 className="text-3xl font-black text-gray-900">
               {logs.filter(l => l.action === "DELETE_ITEM" || l.action === "CANCEL_ORDER").length}
             </h2>
@@ -106,7 +106,7 @@ export default function LogsPage() {
             <div className="w-12 h-12 bg-primary text-white rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-primary">
               <Clock size={24} />
             </div>
-            <p className="text-gray-500 font-bold text-xs uppercase tracking-widest mb-1">Sửa đổi số lượng</p>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2">Sửa đổi số lượng</p>
             <h2 className="text-3xl font-black text-gray-900">
               {logs.filter(l => l.action === "UPDATE_ITEM_QUANTITY").length}
             </h2>

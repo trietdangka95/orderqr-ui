@@ -84,14 +84,15 @@ export default function KitchenPage() {
   const queryClient = useQueryClient();
   const { socket } = useSocket();
   const updateItemStatusMutation = useUpdateOrderItemStatus();
-  const [isBatchUpdating, setIsBatchUpdating] = useState(false);
+  const [updatingBatches, setUpdatingBatches] = useState<string[]>([]);
 
   const handleBatchAction = async (
+    batchKey: string,
     items: { orderId: string; orderItemId: string }[],
     action: "startCooking" | "doneCooking"
   ) => {
-    if (isBatchUpdating || items.length === 0) return;
-    setIsBatchUpdating(true);
+    if (updatingBatches.includes(batchKey) || items.length === 0) return;
+    setUpdatingBatches(prev => [...prev, batchKey]);
     try {
       await Promise.all(
         items.map(item =>
@@ -105,7 +106,7 @@ export default function KitchenPage() {
     } catch (error) {
       console.error("Batch update error:", error);
     } finally {
-      setIsBatchUpdating(false);
+      setUpdatingBatches(prev => prev.filter(k => k !== batchKey));
     }
   };
 
@@ -276,9 +277,9 @@ export default function KitchenPage() {
       <main className="flex-grow flex flex-col min-h-0">
 
         {view === "board" ? (
-          <div className="flex flex-row lg:grid lg:grid-cols-2 xl:grid-cols-4 gap-6 overflow-x-auto lg:overflow-x-visible pb-4 flex-grow min-h-0 snap-x snap-mandatory">
+          <div className="flex flex-row gap-6 overflow-x-auto pb-4 flex-grow min-h-0 snap-x snap-mandatory scrollbar-thin">
             {columns.map(col => (
-              <section key={col.key} className="flex flex-col h-full min-h-0 w-[85vw] sm:w-[350px] lg:w-full shrink-0 snap-center">
+              <section key={col.key} className="flex flex-col h-full min-h-0 w-[85vw] sm:w-[350px] shrink-0 snap-center">
                 <div className={`p-4 rounded-2xl border-t-4 mb-4 flex items-center justify-between ${col.color} shrink-0`}>
                   <div className="flex items-center gap-3">
                     <div className={`w-2.5 h-2.5 rounded-full ${col.dot} animate-pulse shadow-sm`}></div>
@@ -351,22 +352,22 @@ export default function KitchenPage() {
                         <div className="flex gap-2.5 mb-5">
                           {totalPending > 0 && (
                             <button
-                              onClick={() => handleBatchAction(data.pendingItems, "startCooking")}
-                              disabled={isBatchUpdating}
+                              onClick={() => handleBatchAction(`${name}-startCooking`, data.pendingItems, "startCooking")}
+                              disabled={updatingBatches.length > 0}
                               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white hover:border-orange-500 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
                             >
                               <ChefHat size={12} />
-                              {isBatchUpdating ? "Đang xử lý..." : `Nấu ${totalPending} phần`}
+                              {updatingBatches.includes(`${name}-startCooking`) ? "Đang xử lý..." : `Nấu ${totalPending} phần`}
                             </button>
                           )}
                           {totalCooking > 0 && (
                             <button
-                              onClick={() => handleBatchAction(data.cookingItems, "doneCooking")}
-                              disabled={isBatchUpdating}
+                              onClick={() => handleBatchAction(`${name}-doneCooking`, data.cookingItems, "doneCooking")}
+                              disabled={updatingBatches.length > 0}
                               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-primary text-white hover:bg-primary/95 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-md shadow-primary/10"
                             >
                               <Check size={12} strokeWidth={3} />
-                              {isBatchUpdating ? "Đang xử lý..." : `Xong ${totalCooking} phần`}
+                              {updatingBatches.includes(`${name}-doneCooking`) ? "Đang xử lý..." : `Xong ${totalCooking} phần`}
                             </button>
                           )}
                         </div>

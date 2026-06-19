@@ -27,7 +27,7 @@ export default function AdminTablesPage() {
 
   // Custom confirmation modal states
   const [checkoutConfirmTable, setCheckoutConfirmTable] = useState<string | null>(null);
-  const [paymentConfirmInvoice, setPaymentConfirmInvoice] = useState<{ invoiceId: string; tableNumber: string; amount: number } | null>(null);
+  const [paymentConfirmInvoice, setPaymentConfirmInvoice] = useState<{ invoiceId: string; tableNumber: string; amount: number; paymentMethod: string } | null>(null);
 
   // Real-time updates
   useEffect(() => {
@@ -292,7 +292,7 @@ export default function AdminTablesPage() {
                   formatPrice={formatPrice}
                   onCheckout={handleCheckout}
                   onConfirmOrder={(id) => confirmOrderMutation.mutate(id)}
-                  onConfirmInvoicePayment={(id, tableNum, amount) => setPaymentConfirmInvoice({ invoiceId: id, tableNumber: tableNum, amount })}
+                  onConfirmInvoicePayment={(id, tableNum, amount, method) => setPaymentConfirmInvoice({ invoiceId: id, tableNumber: tableNum, amount, paymentMethod: method })}
                   onPrintInvoice={setPrintingTable}
                 />
               ))}
@@ -357,7 +357,7 @@ export default function AdminTablesPage() {
       </main>
       {/* Receipt Print Modal */}
       {printingTable && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:hidden">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:hidden">
           <div className="bg-white rounded-[2rem] p-6 max-w-sm w-full shadow-2xl relative">
             <h3 className="font-bold text-gray-800 text-lg mb-4 text-center">Xem trước Hóa đơn</h3>
             
@@ -522,7 +522,7 @@ export default function AdminTablesPage() {
               </div>
               <h3 className="font-black text-gray-950 text-lg mb-2 text-center">Đã nhận đủ tiền?</h3>
               <p className="text-gray-500 text-xs text-center font-bold leading-relaxed mb-6 px-4">
-                Xác nhận đã nhận số tiền <span className="text-primary font-black">{formatPrice(paymentConfirmInvoice.amount)}</span> từ <span className="text-amber-500 font-black">Bàn {paymentConfirmInvoice.tableNumber}</span>? Trạng thái bàn sẽ được cập nhật.
+                Xác nhận đã nhận số tiền <span className="text-primary font-black">{formatPrice(paymentConfirmInvoice.amount)}</span> ({paymentConfirmInvoice.paymentMethod === "QR_TRANSFER" ? "Chuyển khoản QR" : "Tiền mặt"}) từ <span className="text-amber-500 font-black">Bàn {paymentConfirmInvoice.tableNumber}</span>? Trạng thái bàn sẽ được cập nhật.
               </p>
               
               <div className="flex gap-3">

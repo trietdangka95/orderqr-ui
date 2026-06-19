@@ -104,9 +104,6 @@ export function StoreFormModal({
           >
             {/* Modal Header */}
             <div className="flex items-center gap-3.5 mb-5">
-              <div className="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
-                <Plus size={20} />
-              </div>
               <div>
                 <h2 className="text-xl font-black text-gray-900">{editingStoreId ? "Cập Nhật Cửa Hàng" : "Thêm Cửa Hàng Mới"}</h2>
                 <p className="text-gray-400 text-[9px] font-black uppercase tracking-wider mt-0.5">

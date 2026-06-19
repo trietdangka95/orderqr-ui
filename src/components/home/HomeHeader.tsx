@@ -182,15 +182,6 @@ export default function HomeHeader({
             )}
           </Button>
 
-          {userRole === "admin" && (
-            <Link
-              href="/admin"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all font-bold text-sm border border-blue-100 cursor-pointer"
-            >
-              <LayoutDashboard size={18} />
-              <span>Quản lý</span>
-            </Link>
-          )}
 
           {(userRole === "admin" || userRole === "staff" || userRole === "kitchen") && (
             <Button

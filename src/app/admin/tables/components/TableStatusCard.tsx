@@ -11,7 +11,7 @@ interface TableStatusCardProps {
   formatPrice: (price: number) => string;
   onCheckout: (tableNumber: string) => void;
   onConfirmOrder: (orderId: string) => void;
-  onConfirmInvoicePayment: (invoiceId: string, tableNumber: string, amount: number) => void;
+  onConfirmInvoicePayment: (invoiceId: string, tableNumber: string, amount: number, paymentMethod: string) => void;
   onPrintInvoice: (tableNumber: string) => void;
 }
 
@@ -174,7 +174,7 @@ export default function TableStatusCard({
       <div className="p-6 bg-gray-50 border-t mt-auto">
         {pendingInvoice ? (
           <button
-            onClick={() => onConfirmInvoicePayment(pendingInvoice.id, tableNumber, totalAmount)}
+            onClick={() => onConfirmInvoicePayment(pendingInvoice.id, tableNumber, totalAmount, pendingInvoice.paymentMethod || "CASH")}
             className="w-full bg-amber-500 hover:bg-amber-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-amber-200 transition-all active:scale-[0.98] cursor-pointer"
           >
             <CheckIcon size={20} />

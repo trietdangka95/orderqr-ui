@@ -77,14 +77,14 @@ export default function OrdersDrawer() {
 
   // Auto-switch default tab for staff when drawer is opened
   useEffect(() => {
-    if (isOrdersOpen && userRole === "staff") {
+    if (isOrdersOpen && isStaff) {
       if (!selectedTable) {
         setActiveTab("all");
       } else {
         setActiveTab("current");
       }
     }
-  }, [isOrdersOpen, userRole, selectedTable]);
+  }, [isOrdersOpen, isStaff, selectedTable]);
 
   // Real-time updates
   useEffect(() => {
@@ -166,7 +166,7 @@ export default function OrdersDrawer() {
     ? Number(pendingInvoice.totalAmount) 
     : tableOrders.reduce((sum, order) => sum + order.totalPrice, 0);
 
-  const displayOrders = userRole === "staff"
+  const displayOrders = isStaff
     ? activeTab === "all"
       ? activeOrders
       : activeTab === "serving"
@@ -194,40 +194,20 @@ export default function OrdersDrawer() {
       );
     }
 
-    const redirectUrl = `https://dl.vietqr.io/pay?app=${sanitizeBankId(storeConfig.bankId).toLowerCase()}&ba=${storeConfig.bankAccountNo}&am=${amount}&tn=${encodeURIComponent(`Ban ${selectedTable} Thanh Toan`)}&bn=${encodeURIComponent(storeConfig.bankAccountName || "")}`;
-
     return (
       <div className="flex flex-col items-center gap-3">
         <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Chuyển khoản VietQR</p>
         
-        {/* Clickable QR Code */}
-        <a 
-          href={redirectUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-48 h-48 bg-white border border-gray-200/60 rounded-[1.5rem] flex items-center justify-center p-3 relative shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] group cursor-pointer"
-          title="Click để mở App Ngân hàng"
+        {/* QR Code Image Container */}
+        <div 
+          className="w-48 h-48 bg-white border border-gray-200/60 rounded-[1.5rem] flex items-center justify-center p-3 relative shadow-md"
         >
           <img
             src={`https://img.vietqr.io/image/${sanitizeBankId(storeConfig.bankId)}-${storeConfig.bankAccountNo}-compact2.png?amount=${amount}&addInfo=Ban%20${selectedTable}%20Thanh%20Toan&accountName=${encodeURIComponent(storeConfig.bankAccountName || "")}`}
             alt="VietQR code"
             className="w-full h-full object-contain"
           />
-          <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-[1.5rem] flex items-center justify-center">
-            <span className="bg-black/75 text-white text-[10px] font-bold px-2 py-1 rounded-lg">Mở App Ngân Hàng</span>
-          </div>
-        </a>
-
-        {/* Banking App Redirection Button */}
-        <a
-          href={redirectUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-primary/20 hover:bg-primary/95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-xs"
-        >
-          <QrCode size={16} className="animate-pulse" />
-          Mở App Ngân Hàng Thanh Toán
-        </a>
+        </div>
 
         {/* Account Details Table */}
         <div className="w-full text-left bg-white border border-gray-100 rounded-xl p-3 text-xs space-y-2 font-medium shadow-sm mt-1">
@@ -308,7 +288,7 @@ export default function OrdersDrawer() {
             <div className="flex items-center gap-2">
               <ClipboardList className="w-6 h-6 text-primary" />
               <h2 className="font-bold text-lg text-gray-900">
-                {userRole === "staff"
+                {isStaff
                   ? activeTab === "all"
                     ? "Tất cả đơn hàng"
                     : activeTab === "serving"
@@ -323,7 +303,7 @@ export default function OrdersDrawer() {
           </div>
 
           {/* Tab Selector for Staff */}
-          {userRole === "staff" && (
+          {isStaff && (
             <div className="flex bg-gray-100 p-1 rounded-xl gap-1">
               <button
                 onClick={() => setActiveTab("current")}
@@ -365,7 +345,7 @@ export default function OrdersDrawer() {
           )}
 
           {/* Table Summary for Staff */}
-          {userRole === "staff" && activeTab === "current" && Object.keys(tableSummary).length > 0 && (
+          {isStaff && activeTab === "current" && Object.keys(tableSummary).length > 0 && (
             <div className="bg-blue-50/50 rounded-2xl p-4 border border-blue-100 mb-2">
               <h3 className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-3 flex items-center gap-2">
                 <ChefHat size={14} />
@@ -455,9 +435,9 @@ export default function OrdersDrawer() {
                         (order.status === "serving" || order.status === "completed") ? "text-green-600" : "text-gray-400"
                       }`}>
                         {order.status === "completed" 
-                          ? (userRole === "staff" ? "Đã phục vụ" : "Đã lên món")
+                          ? (isStaff ? "Đã phục vụ" : "Đã lên món")
                           : order.status === "serving"
-                            ? (userRole === "staff" ? "Chờ phục vụ" : "Đang lên món")
+                            ? (isStaff ? "Chờ phục vụ" : "Đang lên món")
                             : "Lên món"}
                       </span>
                     </div>
@@ -588,7 +568,7 @@ export default function OrdersDrawer() {
                   </div>
 
                   {/* Staff Confirmation Button */}
-                  {userRole === "staff" && !order.isConfirmed && (
+                  {(userRole === "staff" || userRole === "admin") && !order.isConfirmed && (
                     <button
                       disabled={confirmOrderMutation.isPending}
                       onClick={() => confirmOrderMutation.mutate(order.id)}
@@ -606,7 +586,7 @@ export default function OrdersDrawer() {
                   )}
 
                   {/* Staff Serving Button */}
-                  {userRole === "staff" && order.status === "serving" && (
+                  {(userRole === "staff" || userRole === "admin") && order.status === "serving" && (
                     <button
                       disabled={updateStatusMutation.isPending}
                       onClick={() => updateStatusMutation.mutate({ id: order.id, status: 'COMPLETED' })}

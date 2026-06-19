@@ -80,14 +80,14 @@ export default function SuperAdminDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 flex items-center gap-4"
+            className="bg-white p-6 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 flex flex-col items-start gap-4"
           >
-            <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center`}>
+            <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center shrink-0 shadow-sm`}>
               <stat.icon size={28} />
             </div>
             <div>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-2">{stat.label}</p>
-              <p className="text-2xl font-black text-gray-900 leading-none">{stat.value}</p>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider leading-none mb-2">{stat.label}</p>
+              <p className="text-3xl font-black text-gray-900 leading-none">{stat.value}</p>
             </div>
           </motion.div>
         ))}

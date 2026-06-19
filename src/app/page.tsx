@@ -472,15 +472,6 @@ function HomeContent() {
         {(userRole === "admin" || userRole === "staff" || userRole === "kitchen") && (
           <div className="flex flex-col items-center gap-4 mb-4 md:hidden">
             <div className="flex items-center gap-6">
-              {userRole === "admin" && (
-                <Link
-                  href="/admin"
-                  className="text-blue-500 hover:text-blue-600 font-bold text-sm flex items-center justify-center gap-2 transition-colors"
-                >
-                  <LayoutDashboard size={16} />
-                  Quản lý
-                </Link>
-              )}
               {userRole === "kitchen" && (
                 <Link
                   href="/admin/kitchen"
