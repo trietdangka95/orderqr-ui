@@ -1108,9 +1108,29 @@ export default function LandingPage() {
             <h4 className="text-xl font-black text-white group-hover:text-orange-500 transition-colors">
               1. Cung Cấp Thông Tin & Nhu Cầu
             </h4>
-            <p className="text-gray-400 text-sm font-medium mt-4 leading-relaxed flex-grow">
+            <p className="text-gray-400 text-sm font-medium mt-4 leading-relaxed">
               Chủ quán chỉ cần điền thông tin mô hình kinh doanh (quán ăn, cafe, nhà hàng) và nhu cầu sử dụng thông qua biểu mẫu đăng ký tiện lợi.
             </p>
+            <div className="space-y-3 mt-6 text-left">
+              <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center gap-3 hover:bg-white/10 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
+                  <Store size={16} />
+                </div>
+                <div>
+                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">Thông tin liên hệ</h6>
+                  <p className="text-[10px] text-gray-400 font-medium">Số điện thoại, tên quán và địa chỉ để chúng tôi liên lạc.</p>
+                </div>
+              </div>
+              <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center gap-3 hover:bg-white/10 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center shrink-0">
+                  <Layers size={16} />
+                </div>
+                <div>
+                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">Mô tả menu & quy mô</h6>
+                  <p className="text-[10px] text-gray-400 font-medium">Danh sách các món ăn chính, số lượng bàn hiện có của quán.</p>
+                </div>
+              </div>
+            </div>
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
               <Store size={80} />
             </div>
@@ -1182,10 +1202,30 @@ export default function LandingPage() {
             <h4 className="text-xl font-black text-white group-hover:text-green-400 transition-colors">
               3. Hỗ Trợ Sử Dụng Tại Quán
             </h4>
-            <p className="text-gray-400 text-sm font-medium mt-4 leading-relaxed flex-grow">
+            <p className="text-gray-400 text-sm font-medium mt-4 leading-relaxed">
               Đội ngũ nhân viên sẽ trực tiếp đến quán của bạn để hỗ trợ dán mã QR, hướng dẫn sử dụng chi tiết cho từng bộ phận (bếp, nhân viên) giúp vận hành trơn tru.
             </p>
-            <div className="mt-6">
+            <div className="space-y-3 mt-6 text-left">
+              <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center gap-3 hover:bg-white/10 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center shrink-0">
+                  <QrCode size={16} />
+                </div>
+                <div>
+                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">Thiết lập QR & menu</h6>
+                  <p className="text-[10px] text-gray-400 font-medium">Bàn giao & dán tem QR chất lượng cao tại mỗi vị trí bàn.</p>
+                </div>
+              </div>
+              <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center gap-3 hover:bg-white/10 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center shrink-0">
+                  <Sparkles size={16} />
+                </div>
+                <div>
+                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">Đào tạo nhân sự và bếp</h6>
+                  <p className="text-[10px] text-gray-400 font-medium">Hướng dẫn cụ thể cho nhân viên phục vụ và tổ chế biến.</p>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 flex-grow flex items-end">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full text-xs font-black uppercase tracking-wider">
                 Hoàn toàn miễn phí
               </span>
