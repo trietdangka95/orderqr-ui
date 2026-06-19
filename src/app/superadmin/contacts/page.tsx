@@ -89,7 +89,7 @@ export default function SuperAdminContactsPage() {
       {/* Controls: Tab and Search */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* Tab Filter */}
-        <div className="flex flex-wrap bg-gray-100 p-1.5 rounded-2xl border shadow-sm gap-1 w-fit">
+        <div className="flex flex-wrap bg-gray-100/80 backdrop-blur-sm p-1 rounded-2xl border border-gray-200/50 shadow-sm gap-1 w-fit">
           {(["PENDING", "CONTACTED", "COMPLETED", "ALL"] as const).map((tab) => {
             const count =
               tab === "ALL"
@@ -99,10 +99,10 @@ export default function SuperAdminContactsPage() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase transition-all flex items-center gap-2 ${
+                className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase transition-all duration-200 flex items-center gap-2 ${
                   activeTab === tab
-                    ? "bg-white shadow-md text-blue-600 font-extrabold"
-                    : "text-gray-500 hover:text-gray-900"
+                    ? "bg-white shadow-sm text-blue-600 font-black"
+                    : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/40"
                 }`}
               >
                 {tab === "PENDING"
@@ -113,8 +113,8 @@ export default function SuperAdminContactsPage() {
                   ? "Hoàn tất"
                   : "Tất cả"}
                 <span
-                  className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${
-                    activeTab === tab ? "bg-blue-100 text-blue-600" : "bg-gray-200 text-gray-600"
+                  className={`px-1.5 py-0.5 rounded-full text-[9px] font-black transition-colors ${
+                    activeTab === tab ? "bg-blue-50 text-blue-600" : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   {count}

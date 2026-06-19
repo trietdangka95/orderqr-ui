@@ -245,17 +245,25 @@ export default function KitchenPage() {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="flex bg-gray-100 p-1.5 rounded-2xl border shadow-sm h-fit">
+          <div className="flex bg-gray-100/80 backdrop-blur-sm p-1 rounded-2xl border border-gray-200/50 shadow-sm h-fit gap-1">
             <button
               onClick={() => setView("board")}
-              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all ${view === "board" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-gray-400 hover:text-gray-600"}`}
+              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all duration-200 ${
+                view === "board"
+                  ? "bg-white shadow-sm text-primary"
+                  : "text-gray-400 hover:text-gray-700 hover:bg-gray-200/30"
+              }`}
             >
               <LayoutGrid size={18} />
               <span className="hidden sm:inline">Kanban</span>
             </button>
             <button
               onClick={() => setView("summary")}
-              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all ${view === "summary" ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-gray-400 hover:text-gray-600"}`}
+              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all duration-200 ${
+                view === "summary"
+                  ? "bg-white shadow-sm text-primary"
+                  : "text-gray-400 hover:text-gray-700 hover:bg-gray-200/30"
+              }`}
             >
               <List size={18} />
               <span className="hidden sm:inline">Tổng hợp</span>

@@ -23,23 +23,23 @@ export default function MenuHeader({
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex bg-gray-100 p-1.5 rounded-2xl border shadow-sm">
+        <div className="flex bg-gray-100/80 backdrop-blur-sm p-1 rounded-2xl border border-gray-200/50 shadow-sm gap-1">
           <button
             onClick={() => setViewMode("grid")}
-            className={`p-2 rounded-xl transition-all ${
+            className={`p-2 rounded-xl transition-all duration-200 ${
               viewMode === "grid"
-                ? "bg-white shadow-md text-primary"
-                : "text-gray-400 hover:text-gray-600"
+                ? "bg-white shadow-sm text-primary"
+                : "text-gray-400 hover:text-gray-700 hover:bg-gray-200/30"
             }`}
           >
             <LayoutGrid size={20} />
           </button>
           <button
             onClick={() => setViewMode("list")}
-            className={`p-2 rounded-xl transition-all ${
+            className={`p-2 rounded-xl transition-all duration-200 ${
               viewMode === "list"
-                ? "bg-white shadow-md text-primary"
-                : "text-gray-400 hover:text-gray-600"
+                ? "bg-white shadow-sm text-primary"
+                : "text-gray-400 hover:text-gray-700 hover:bg-gray-200/30"
             }`}
           >
             <ListIcon size={20} />

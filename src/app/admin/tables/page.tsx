@@ -258,16 +258,24 @@ export default function AdminTablesPage() {
           <p className="text-gray-500 font-medium italic">Theo dõi trạng thái và in mã QR cho từng bàn tại quán</p>
         </div>
 
-        <div className="flex bg-gray-100 p-1.5 rounded-2xl border shadow-sm h-fit">
+        <div className="flex bg-gray-100/80 backdrop-blur-sm p-1 rounded-2xl border border-gray-200/50 shadow-sm h-fit gap-1">
           <button
             onClick={() => setActiveTab("status")}
-            className={`px-6 py-2 rounded-xl text-sm font-black transition-all ${activeTab === "status" ? "bg-white shadow-md text-primary" : "text-gray-500"}`}
+            className={`px-6 py-2 rounded-xl text-sm font-black transition-all duration-200 ${
+              activeTab === "status"
+                ? "bg-white shadow-sm text-primary"
+                : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/30"
+            }`}
           >
             Trạng thái
           </button>
           <button
             onClick={() => setActiveTab("qr")}
-            className={`px-6 py-2 rounded-xl text-sm font-black transition-all ${activeTab === "qr" ? "bg-white shadow-md text-primary" : "text-gray-500"}`}
+            className={`px-6 py-2 rounded-xl text-sm font-black transition-all duration-200 ${
+              activeTab === "qr"
+                ? "bg-white shadow-sm text-primary"
+                : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/30"
+            }`}
           >
             Mã QR
           </button>
