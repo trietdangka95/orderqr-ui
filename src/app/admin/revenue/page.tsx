@@ -19,6 +19,9 @@ import {
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
+import { FILTER_PRESETS, FilterType } from "@/constants/filters";
+
+const REVENUE_TABLE_HEADERS = ["Thời gian", "Bàn", "Thanh toán", "Tổng tiền", ""] as const;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface OrderItemDetail {
@@ -454,7 +457,7 @@ export default function RevenuePage() {
   const storeConfig = useCartStore((state) => state.storeConfig);
 
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState<"ALL_TIME" | "TODAY" | "THIS_WEEK" | "THIS_MONTH" | "THIS_YEAR" | "CUSTOM">("ALL_TIME");
+  const [filterType, setFilterType] = useState<FilterType>("ALL_TIME");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
   const [selectedInv, setSelectedInv] = useState<InvoiceRecord | null>(null);
@@ -563,6 +566,41 @@ export default function RevenuePage() {
     return { from: customFrom, to: customTo };
   };
 
+  const statCards = [
+    {
+      icon: <TrendingUp size={18} />,
+      color: "bg-primary shadow-primary/30",
+      label: hasFilter ? "Doanh thu (lọc)" : "Tổng doanh thu",
+      value: fmt(totalRev),
+      border: "border-orange-50",
+      shadow: "shadow-primary/10",
+    },
+    {
+      icon: <Calendar size={18} />,
+      color: "bg-blue-500 shadow-blue-200",
+      label: "Hôm nay",
+      value: fmt(todayRev),
+      border: "border-blue-50",
+      shadow: "shadow-blue-100/50",
+    },
+    {
+      icon: <CreditCard size={18} />,
+      color: "bg-gray-800 shadow-gray-200",
+      label: hasFilter ? "Số đơn (lọc)" : "Tổng số đơn",
+      value: String(filtered.length),
+      border: "border-gray-100",
+      shadow: "shadow-gray-100/50",
+    },
+    {
+      icon: <BarChart3 size={18} />,
+      color: "bg-purple-500 shadow-purple-200",
+      label: "TB / đơn",
+      value: fmt(avgOrder),
+      border: "border-purple-50",
+      shadow: "shadow-purple-100/50",
+    },
+  ];
+
   return (
     <>
       <AnimatePresence>
@@ -594,40 +632,7 @@ export default function RevenuePage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-          {[
-            {
-              icon: <TrendingUp size={18} />,
-              color: "bg-primary shadow-primary/30",
-              label: hasFilter ? "Doanh thu (lọc)" : "Tổng doanh thu",
-              value: fmt(totalRev),
-              border: "border-orange-50",
-              shadow: "shadow-primary/10",
-            },
-            {
-              icon: <Calendar size={18} />,
-              color: "bg-blue-500 shadow-blue-200",
-              label: "Hôm nay",
-              value: fmt(todayRev),
-              border: "border-blue-50",
-              shadow: "shadow-blue-100/50",
-            },
-            {
-              icon: <CreditCard size={18} />,
-              color: "bg-gray-800 shadow-gray-200",
-              label: hasFilter ? "Số đơn (lọc)" : "Tổng số đơn",
-              value: String(filtered.length),
-              border: "border-gray-100",
-              shadow: "shadow-gray-100/50",
-            },
-            {
-              icon: <BarChart3 size={18} />,
-              color: "bg-purple-500 shadow-purple-200",
-              label: "TB / đơn",
-              value: fmt(avgOrder),
-              border: "border-purple-50",
-              shadow: "shadow-purple-100/50",
-            },
-          ].map((c, i) => (
+          {statCards.map((c, i) => (
             <motion.div
               key={c.label}
               initial={{ opacity: 0, y: 20 }}
@@ -666,17 +671,10 @@ export default function RevenuePage() {
 
             {/* Filter Preset Toolbar */}
             <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200">
-              {[
-                { id: "ALL_TIME", label: "Tất cả" },
-                { id: "TODAY", label: "Hôm nay" },
-                { id: "THIS_WEEK", label: "Tuần" },
-                { id: "THIS_MONTH", label: "Tháng" },
-                { id: "THIS_YEAR", label: "Năm" },
-                { id: "CUSTOM", label: "Tùy chọn" },
-              ].map((btn) => (
+              {FILTER_PRESETS.map((btn) => (
                 <button
                   key={btn.id}
-                  onClick={() => setFilterType(btn.id as any)}
+                  onClick={() => setFilterType(btn.id)}
                   className={`px-3 py-1.5 rounded-xl font-bold text-[10px] md:text-xs uppercase tracking-wider transition-all cursor-pointer ${
                     filterType === btn.id
                       ? "bg-white text-primary shadow-sm"
@@ -752,7 +750,7 @@ export default function RevenuePage() {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-100">
-                      {["Thời gian", "Bàn", "Thanh toán", "Tổng tiền", ""].map((h) => (
+                      {REVENUE_TABLE_HEADERS.map((h) => (
                         <th
                           key={h}
                           className={`px-5 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest ${

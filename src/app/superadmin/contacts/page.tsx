@@ -16,6 +16,13 @@ import {
 } from "lucide-react";
 import useIsMounted from "@/hooks/useIsMounted";
 
+const CONTACT_STATUS_TABS = [
+  { id: "PENDING", label: "Chờ liên hệ" },
+  { id: "CONTACTED", label: "Đã liên hệ" },
+  { id: "COMPLETED", label: "Hoàn tất" },
+  { id: "ALL", label: "Tất cả" },
+] as const;
+
 export default function SuperAdminContactsPage() {
   const isMounted = useIsMounted();
   const { data: contacts = [], isLoading } = useContactRequests();
@@ -90,31 +97,25 @@ export default function SuperAdminContactsPage() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         {/* Tab Filter */}
         <div className="flex flex-wrap bg-gray-100/80 backdrop-blur-sm p-1 rounded-2xl border border-gray-200/50 shadow-sm gap-1 w-fit">
-          {(["PENDING", "CONTACTED", "COMPLETED", "ALL"] as const).map((tab) => {
+          {CONTACT_STATUS_TABS.map((tab) => {
             const count =
-              tab === "ALL"
+              tab.id === "ALL"
                 ? contacts.length
-                : contacts.filter((c) => c.status === tab).length;
+                : contacts.filter((c) => c.status === tab.id).length;
             return (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
                 className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase transition-all duration-200 flex items-center gap-2 ${
-                  activeTab === tab
+                  activeTab === tab.id
                     ? "bg-white shadow-sm text-blue-600 font-black"
                     : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/40"
                 }`}
               >
-                {tab === "PENDING"
-                  ? "Chờ liên hệ"
-                  : tab === "CONTACTED"
-                  ? "Đã liên hệ"
-                  : tab === "COMPLETED"
-                  ? "Hoàn tất"
-                  : "Tất cả"}
+                {tab.label}
                 <span
                   className={`px-1.5 py-0.5 rounded-full text-[9px] font-black transition-colors ${
-                    activeTab === tab ? "bg-blue-50 text-blue-600" : "bg-gray-200 text-gray-500"
+                    activeTab === tab.id ? "bg-blue-50 text-blue-600" : "bg-gray-200 text-gray-500"
                   }`}
                 >
                   {count}

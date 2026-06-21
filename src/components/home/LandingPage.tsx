@@ -29,6 +29,8 @@ import { getImageUrl } from "@/utils/image";
 import { useEffect } from "react";
 import axiosInstance from "@/api/axiosInstance";
 
+const MOCK_WEEKLY_HEIGHTS = [30, 50, 45, 65, 80, 55, 95] as const;
+
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -630,7 +632,7 @@ export default function LandingPage() {
                             Doanh số tuần này
                           </p>
                           <div className="h-24 flex items-end justify-between px-1 gap-1 pt-2">
-                            {[30, 50, 45, 65, 80, 55, 95].map((val, idx) => (
+                            {MOCK_WEEKLY_HEIGHTS.map((val, idx) => (
                               <div
                                 key={idx}
                                 className="flex-grow flex flex-col items-center gap-1"

@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { FILTER_PRESETS, FilterType } from "@/constants/filters";
 
 import AdminStatCard from "./components/AdminStatCard";
 import { useProducts } from "@/hooks/useProducts";
@@ -358,7 +359,7 @@ export default function AdminDashboard() {
   const { data: orders = [] } = useOrders();
   const { data: invoices = [] } = useInvoices();
 
-  const [filterType, setFilterType] = useState<"ALL_TIME" | "TODAY" | "THIS_WEEK" | "THIS_MONTH" | "THIS_YEAR" | "CUSTOM">("ALL_TIME");
+  const [filterType, setFilterType] = useState<FilterType>("ALL_TIME");
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
 
@@ -431,17 +432,10 @@ export default function AdminDashboard() {
 
         {/* Filter Toolbar */}
         <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200">
-          {[
-            { id: "ALL_TIME", label: "Tất cả" },
-            { id: "TODAY", label: "Hôm nay" },
-            { id: "THIS_WEEK", label: "Tuần" },
-            { id: "THIS_MONTH", label: "Tháng" },
-            { id: "THIS_YEAR", label: "Năm" },
-            { id: "CUSTOM", label: "Tùy chọn" },
-          ].map((btn) => (
+          {FILTER_PRESETS.map((btn) => (
             <button
               key={btn.id}
-              onClick={() => setFilterType(btn.id as any)}
+              onClick={() => setFilterType(btn.id)}
               className={`px-3 py-1.5 rounded-xl font-bold text-[10px] md:text-xs uppercase tracking-wider transition-all cursor-pointer ${
                 filterType === btn.id
                   ? "bg-white text-primary shadow-sm"

@@ -25,6 +25,8 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Textarea from "@/components/ui/Textarea";
 import { motion, AnimatePresence } from "framer-motion";
+import { BANK_OPTIONS } from "@/constants/banks";
+
 
 
 const sanitizeBankId = (bankId: string | undefined | null): string => {
@@ -481,22 +483,7 @@ export default function AdminBillingPage() {
               required
             >
               <option value="" disabled>Chọn ngân hàng...</option>
-              {[
-                { id: "MB", name: "MB Bank (Ngân hàng Quân đội)" },
-                { id: "VCB", name: "Vietcombank (Ngoại thương)" },
-                { id: "CTG", name: "VietinBank (Công thương)" },
-                { id: "TCB", name: "Techcombank (Kỹ thương)" },
-                { id: "BIDV", name: "BIDV (Đầu tư & Phát triển)" },
-                { id: "ACB", name: "ACB (Á Châu)" },
-                { id: "VPB", name: "VPBank (Việt Nam Thịnh Vượng)" },
-                { id: "TPB", name: "TPBank (Tiên Phong)" },
-                { id: "STB", name: "Sacombank (Sài Gòn Thương Tín)" },
-                { id: "HDB", name: "HDBank (Phát triển TP.HCM)" },
-                { id: "VBA", name: "Agribank (Nông nghiệp)" },
-                { id: "VIB", name: "VIB (Quốc tế)" },
-                { id: "SHB", name: "SHB (Sài Gòn - Hà Nội)" },
-                { id: "OCB", name: "OCB (Phương Đông)" },
-              ].map((b) => (
+              {BANK_OPTIONS.map((b) => (
                 <option key={b.id} value={b.id}>{b.name}</option>
               ))}
             </Select>

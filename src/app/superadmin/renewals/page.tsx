@@ -16,6 +16,13 @@ import {
 } from "lucide-react";
 import useIsMounted from "@/hooks/useIsMounted";
  
+const RENEWAL_STATUS_TABS = [
+  { id: "PENDING", label: "Chờ duyệt" },
+  { id: "APPROVED", label: "Đã duyệt" },
+  { id: "REJECTED", label: "Đã từ chối" },
+  { id: "ALL", label: "Tất cả" },
+] as const;
+
 export default function SuperAdminRenewalsPage() {
   const isMounted = useIsMounted();
   const { data: requests = [], isLoading } = useRenewalRequests();
@@ -106,23 +113,23 @@ export default function SuperAdminRenewalsPage() {
  
       {/* Tab Filter */}
       <div className="flex bg-gray-100/80 backdrop-blur-sm p-1 rounded-2xl border border-gray-200/50 shadow-sm w-fit gap-1">
-        {(["PENDING", "APPROVED", "REJECTED", "ALL"] as const).map((tab) => {
-          const count = tab === "ALL" 
+        {RENEWAL_STATUS_TABS.map((tab) => {
+          const count = tab.id === "ALL" 
             ? requests.length 
-            : requests.filter(r => r.status === tab).length;
+            : requests.filter(r => r.status === tab.id).length;
           return (
             <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
               className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase transition-all duration-200 flex items-center gap-2 ${
-                activeTab === tab 
+                activeTab === tab.id 
                   ? "bg-white shadow-sm text-blue-600 font-black" 
                   : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/40"
               }`}
             >
-              {tab === "PENDING" ? "Chờ duyệt" : tab === "APPROVED" ? "Đã duyệt" : tab === "REJECTED" ? "Đã từ chối" : "Tất cả"}
+              {tab.label}
               <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black transition-colors ${
-                activeTab === tab 
+                activeTab === tab.id 
                   ? "bg-blue-50 text-blue-600" 
                   : "bg-gray-200 text-gray-500"
               }`}>
