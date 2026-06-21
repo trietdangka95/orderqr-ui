@@ -121,3 +121,15 @@ export const useUpdateOrderItemStatus = () => {
     },
   });
 };
+
+export const useCancelOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, tableNumber }: { id: string; tableNumber: string }) =>
+      ordersApi.cancelOrder(id, tableNumber),
+    onSuccess: (updatedOrder) => {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["orders", "table", updatedOrder.tableNumber] });
+    },
+  });
+};

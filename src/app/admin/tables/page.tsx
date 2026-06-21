@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Receipt as ReceiptIcon,
@@ -25,6 +25,14 @@ export default function AdminTablesPage() {
   const queryClient = useQueryClient();
   const { socket } = useSocket();
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      audioRef.current = new Audio("https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg");
+    }
+  }, []);
+
   // Custom confirmation modal states
   const [checkoutConfirmTable, setCheckoutConfirmTable] = useState<string | null>(null);
   const [paymentConfirmInvoice, setPaymentConfirmInvoice] = useState<{ invoiceId: string; tableNumber: string; amount: number; paymentMethod: string } | null>(null);
@@ -37,16 +45,24 @@ export default function AdminTablesPage() {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
     };
 
+    const handlePaymentRequest = () => {
+      refreshOrders();
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(() => {});
+      }
+    };
+
     socket.on('newOrder', refreshOrders);
     socket.on('orderUpdate', refreshOrders);
     socket.on('checkout', refreshOrders);
-    socket.on('payment_request', refreshOrders);
+    socket.on('payment_request', handlePaymentRequest);
 
     return () => {
       socket.off('newOrder', refreshOrders);
       socket.off('orderUpdate', refreshOrders);
       socket.off('checkout', refreshOrders);
-      socket.off('payment_request', refreshOrders);
+      socket.off('payment_request', handlePaymentRequest);
     };
   }, [socket, queryClient]);
 

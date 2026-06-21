@@ -5,7 +5,7 @@ import { useCartStore } from "@/store/cartStore";
 import { showConfirm, showAlert } from "@/store/dialogStore";
 import { X, ClipboardList, CheckCircle2, Clock, ChefHat, Copy, Check, CreditCard, Coins, QrCode, Sparkles, AlertCircle } from "lucide-react";
 import Image from "next/image";
-import { useOrders, useConfirmOrder, useUpdateOrderStatus, useTableOrders, useUpdateOrderItemQuantity, useRequestCheckout, useUpdateOrderItemStatus } from "@/hooks/useOrders";
+import { useOrders, useConfirmOrder, useUpdateOrderStatus, useTableOrders, useUpdateOrderItemQuantity, useRequestCheckout, useUpdateOrderItemStatus, useCancelOrder } from "@/hooks/useOrders";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -70,6 +70,7 @@ export default function OrdersDrawer() {
   const updateOrderItemMutation = useUpdateOrderItemQuantity();
   const requestCheckoutMutation = useRequestCheckout();
   const updateItemStatusMutation = useUpdateOrderItemStatus();
+  const cancelOrderMutation = useCancelOrder();
 
   const [activeTab, setActiveTab] = useState<"current" | "all" | "serving">("current");
   const [isCheckoutMode, setIsCheckoutMode] = useState(false);
@@ -598,6 +599,28 @@ export default function OrdersDrawer() {
                         <>
                           <CheckCircle2 size={16} />
                           Đã phục vụ xong
+                        </>
+                      )}
+                    </button>
+                  )}
+
+                  {/* Guest Cancel Button */}
+                  {userRole === "guest" && order.status === "pending" && (
+                    <button
+                      disabled={cancelOrderMutation.isPending}
+                      onClick={async () => {
+                        if (await showConfirm("Bạn có chắc chắn muốn hủy đợt gọi món này không?")) {
+                          cancelOrderMutation.mutate({ id: order.id, tableNumber: selectedTable });
+                        }
+                      }}
+                      className="w-full bg-red-50 text-red-600 border border-red-200 font-bold py-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all active:scale-[0.98] flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+                    >
+                      {cancelOrderMutation.isPending && cancelOrderMutation.variables?.id === order.id ? (
+                        <div className="w-5 h-5 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <X size={16} />
+                          Hủy đợt gọi món này
                         </>
                       )}
                     </button>

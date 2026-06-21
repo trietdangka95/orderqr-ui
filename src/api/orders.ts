@@ -51,4 +51,9 @@ export const ordersApi = {
     const response = await axiosInstance.patch<Order>(`/orders/${orderId}/items/${orderItemId}/status`, payload);
     return response.data;
   },
+
+  cancelOrder: async (id: string, tableNumber: string): Promise<Order> => {
+    const response = await axiosInstance.post<Order>(`/orders/${id}/cancel`, { tableNumber });
+    return response.data;
+  },
 };
