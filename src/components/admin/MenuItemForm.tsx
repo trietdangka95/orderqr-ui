@@ -35,6 +35,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
   });
 
   const [priceInput, setPriceInput] = useState(item?.price?.toString() || "0");
+  const [discountInput, setDiscountInput] = useState(item?.discountPercent?.toString() || "0");
   const [previewError, setPreviewError] = useState(false);
   const [isBannerUploading, setIsBannerUploading] = useState(false);
 
@@ -75,6 +76,27 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
     const value = e.target.value.replace(/\D/g, "");
     setPriceInput(value);
     setFormData({ ...formData, price: Number(value) });
+  };
+
+  const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Remove all non-digits
+    let value = e.target.value.replace(/\D/g, "");
+
+    // Prevent leading zero if value length > 1 (e.g. "05" -> "5")
+    if (value.length > 1 && value.startsWith("0")) {
+      value = value.replace(/^0+/, "");
+    }
+
+    // Limit to max 100
+    if (value !== "") {
+      const num = Number(value);
+      if (num > 100) {
+        value = "100";
+      }
+    }
+
+    setDiscountInput(value);
+    setFormData({ ...formData, discountPercent: value === "" ? 0 : Number(value) });
   };
 
   const formatPrice = (val: string) => {
@@ -319,11 +341,9 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 Phần trăm giảm giá (%)
               </label>
               <input
-                type="number"
-                min="0"
-                max="100"
-                value={formData.discountPercent}
-                onChange={(e) => setFormData({ ...formData, discountPercent: Number(e.target.value) })}
+                type="text"
+                value={discountInput}
+                onChange={handleDiscountChange}
                 className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-bold text-red-600"
                 placeholder="VD: 20 (giảm 20%)"
               />
