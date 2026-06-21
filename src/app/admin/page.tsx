@@ -21,35 +21,102 @@ import { useInvoices } from "@/hooks/useInvoices";
 function RevenueLineChart({ invoices }: { invoices: any[] }) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
-  const last7DaysData = useMemo(() => {
-    const dataMap: { [key: string]: number } = {};
-
-    // Khởi tạo 7 ngày gần nhất
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
-      dataMap[dateStr] = 0;
+  const chartData = useMemo(() => {
+    if (invoices.length === 0) {
+      // Mặc định: 7 ngày gần nhất với doanh thu = 0
+      const dataMap: { [key: string]: number } = {};
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
+        dataMap[dateStr] = 0;
+      }
+      return Object.entries(dataMap).map(([date, revenue]) => ({ date, revenue }));
     }
 
-    // Cộng dồn doanh thu
-    invoices.forEach((inv) => {
-      const dateStr = new Date(inv.createdAt).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
-      if (dataMap[dateStr] !== undefined) {
-        dataMap[dateStr] += inv.totalAmount;
-      }
-    });
+    const timestamps = invoices.map(inv => new Date(inv.createdAt).getTime());
+    const minTime = Math.min(...timestamps);
+    const maxTime = Math.max(...timestamps, Date.now());
+    const diffDays = Math.ceil((maxTime - minTime) / (1000 * 60 * 60 * 24));
 
-    return Object.entries(dataMap).map(([date, revenue]) => ({
-      date,
-      revenue,
-    }));
+    if (diffDays <= 31) {
+      // Gom nhóm theo Ngày
+      const dataMap: { [key: string]: number } = {};
+      const start = new Date(minTime);
+      const end = new Date(maxTime);
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+
+      const current = new Date(start);
+      let safetyCount = 0;
+      while (current <= end && safetyCount < 50) {
+        const dateStr = current.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
+        dataMap[dateStr] = 0;
+        current.setDate(current.getDate() + 1);
+        safetyCount++;
+      }
+
+      invoices.forEach((inv) => {
+        const dateStr = new Date(inv.createdAt).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
+        if (dataMap[dateStr] !== undefined) {
+          dataMap[dateStr] += inv.totalAmount;
+        }
+      });
+
+      return Object.entries(dataMap).map(([date, revenue]) => ({ date, revenue }));
+    } else if (diffDays <= 366) {
+      // Gom nhóm theo Tháng
+      const dataMap: { [key: string]: number } = {};
+      const start = new Date(minTime);
+      const end = new Date(maxTime);
+      
+      const current = new Date(start.getFullYear(), start.getMonth(), 1);
+      const final = new Date(end.getFullYear(), end.getMonth(), 1);
+      
+      let safetyCount = 0;
+      while (current <= final && safetyCount < 24) {
+        const dateStr = `T${current.getMonth() + 1}/${String(current.getFullYear()).slice(-2)}`;
+        dataMap[dateStr] = 0;
+        current.setMonth(current.getMonth() + 1);
+        safetyCount++;
+      }
+
+      invoices.forEach((inv) => {
+        const d = new Date(inv.createdAt);
+        const dateStr = `T${d.getMonth() + 1}/${String(d.getFullYear()).slice(-2)}`;
+        if (dataMap[dateStr] !== undefined) {
+          dataMap[dateStr] += inv.totalAmount;
+        }
+      });
+
+      return Object.entries(dataMap).map(([date, revenue]) => ({ date, revenue }));
+    } else {
+      // Gom nhóm theo Năm
+      const dataMap: { [key: string]: number } = {};
+      const startYear = new Date(minTime).getFullYear();
+      const endYear = new Date(maxTime).getFullYear();
+      
+      let safetyCount = 0;
+      for (let yr = startYear; yr <= endYear && safetyCount < 20; yr++) {
+        dataMap[yr.toString()] = 0;
+        safetyCount++;
+      }
+
+      invoices.forEach((inv) => {
+        const yrStr = new Date(inv.createdAt).getFullYear().toString();
+        if (dataMap[yrStr] !== undefined) {
+          dataMap[yrStr] += inv.totalAmount;
+        }
+      });
+
+      return Object.entries(dataMap).map(([date, revenue]) => ({ date, revenue }));
+    }
   }, [invoices]);
 
   const maxRevenue = useMemo(() => {
-    const vals = last7DaysData.map((d) => d.revenue);
+    const vals = chartData.map((d) => d.revenue);
     return Math.max(...vals, 100000); // Tối thiểu 100k để tránh chia cho 0
-  }, [last7DaysData]);
+  }, [chartData]);
 
   // Kích thước SVG
   const width = 800;
@@ -63,12 +130,15 @@ function RevenueLineChart({ invoices }: { invoices: any[] }) {
   const chartHeight = height - paddingTop - paddingBottom;
 
   const points = useMemo(() => {
-    return last7DaysData.map((d, i) => {
-      const x = paddingLeft + (i * (chartWidth / (last7DaysData.length - 1)));
+    return chartData.map((d, i) => {
+      const divisor = chartData.length > 1 ? chartData.length - 1 : 1;
+      const x = chartData.length > 1
+        ? paddingLeft + (i * (chartWidth / divisor))
+        : paddingLeft + chartWidth / 2;
       const y = paddingTop + chartHeight - (d.revenue / maxRevenue * chartHeight);
       return { x, y, date: d.date, revenue: d.revenue };
     });
-  }, [last7DaysData, chartWidth, chartHeight, paddingLeft, paddingTop, maxRevenue]);
+  }, [chartData, chartWidth, chartHeight, paddingLeft, paddingTop, maxRevenue]);
 
   // Hàm sinh đường cong Bezier mượt
   const getBezierCurve = (pts: typeof points) => {
@@ -100,6 +170,17 @@ function RevenueLineChart({ invoices }: { invoices: any[] }) {
     return n.toString();
   };
 
+  const getSubtitle = () => {
+    const timestamps = invoices.map(inv => new Date(inv.createdAt).getTime());
+    if (timestamps.length === 0) return "Biểu đồ doanh thu 7 ngày gần nhất";
+    const minTime = Math.min(...timestamps);
+    const maxTime = Math.max(...timestamps, Date.now());
+    const diffDays = Math.ceil((maxTime - minTime) / (1000 * 60 * 60 * 24));
+    if (diffDays <= 31) return "Biểu đồ doanh thu theo Ngày";
+    if (diffDays <= 366) return "Biểu đồ doanh thu theo Tháng";
+    return "Biểu đồ doanh thu theo Năm";
+  };
+
   return (
     <div className="relative w-full bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 p-6 md:p-8 hover:border-orange-200 transition-all">
       <div className="flex items-center justify-between mb-8 px-2">
@@ -109,7 +190,7 @@ function RevenueLineChart({ invoices }: { invoices: any[] }) {
           </div>
           <div>
             <h3 className="font-black text-gray-900 text-lg uppercase tracking-wider">Doanh thu quán</h3>
-            <p className="text-gray-400 text-xs font-medium mt-0.5">Biểu đồ doanh thu 7 ngày gần nhất</p>
+            <p className="text-gray-400 text-xs font-medium mt-0.5">{getSubtitle()}</p>
           </div>
         </div>
         <Link 
@@ -136,7 +217,7 @@ function RevenueLineChart({ invoices }: { invoices: any[] }) {
               }}
             >
               <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                Ngày {points[hoveredIdx].date}
+                Mốc {points[hoveredIdx].date}
               </span>
               <span className="font-black text-orange-400 text-sm mt-1">
                 {points[hoveredIdx].revenue.toLocaleString("vi-VN")} ₫
@@ -250,7 +331,7 @@ function RevenueLineChart({ invoices }: { invoices: any[] }) {
 
           {/* Hover bars */}
           {points.map((p, idx) => {
-            const sliceWidth = chartWidth / (points.length - 1);
+            const sliceWidth = points.length > 1 ? chartWidth / (points.length - 1) : chartWidth;
             const startX = p.x - sliceWidth / 2;
             return (
               <rect
@@ -277,14 +358,125 @@ export default function AdminDashboard() {
   const { data: orders = [] } = useOrders();
   const { data: invoices = [] } = useInvoices();
 
-  const totalRevenue = invoices.reduce((sum, i) => sum + Number(i.totalAmount), 0);
+  const [filterType, setFilterType] = useState<"ALL_TIME" | "TODAY" | "THIS_WEEK" | "THIS_MONTH" | "THIS_YEAR" | "CUSTOM">("ALL_TIME");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+
+  const filteredInvoices = useMemo(() => {
+    const getStartOfWeek = () => {
+      const d = new Date();
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(d.setDate(diff));
+      monday.setHours(0, 0, 0, 0);
+      return monday.getTime();
+    };
+
+    const getStartOfToday = () => {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      return d.getTime();
+    };
+
+    const getStartOfMonth = () => {
+      const d = new Date();
+      return new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+    };
+
+    const getStartOfYear = () => {
+      const d = new Date();
+      return new Date(d.getFullYear(), 0, 1).getTime();
+    };
+
+    const startOfToday = getStartOfToday();
+    const startOfWeek = getStartOfWeek();
+    const startOfMonth = getStartOfMonth();
+    const startOfYear = getStartOfYear();
+
+    return invoices.map((inv: any) => ({
+      ...inv,
+      totalAmount: Number(inv.totalAmount),
+      timestamp: new Date(inv.createdAt).getTime(),
+    })).filter((inv: any) => {
+      if (filterType === "ALL_TIME") return true;
+      if (filterType === "TODAY") return inv.timestamp >= startOfToday;
+      if (filterType === "THIS_WEEK") return inv.timestamp >= startOfWeek;
+      if (filterType === "THIS_MONTH") return inv.timestamp >= startOfMonth;
+      if (filterType === "THIS_YEAR") return inv.timestamp >= startOfYear;
+      if (filterType === "CUSTOM") {
+        const tYMD = (ts: number) => {
+          const d = new Date(ts);
+          return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        };
+        const dStr = tYMD(inv.timestamp);
+        if (customFrom && dStr < customFrom) return false;
+        if (customTo && dStr > customTo) return false;
+        return true;
+      }
+      return true;
+    });
+  }, [invoices, filterType, customFrom, customTo]);
+
+  const totalRevenue = useMemo(() => {
+    return filteredInvoices.reduce((sum, i) => sum + i.totalAmount, 0);
+  }, [filteredInvoices]);
 
   return (
     <div className="max-w-5xl mx-auto">
-      <header className="mb-12">
-        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Hệ thống Quản trị</h1>
-        <p className="text-gray-500 font-medium italic">Monitoring and managing your restaurant operations</p>
+      <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Hệ thống Quản trị</h1>
+          <p className="text-gray-500 font-medium italic">Monitoring and managing your restaurant operations</p>
+        </div>
+
+        {/* Filter Toolbar */}
+        <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200">
+          {[
+            { id: "ALL_TIME", label: "Tất cả" },
+            { id: "TODAY", label: "Hôm nay" },
+            { id: "THIS_WEEK", label: "Tuần" },
+            { id: "THIS_MONTH", label: "Tháng" },
+            { id: "THIS_YEAR", label: "Năm" },
+            { id: "CUSTOM", label: "Tùy chọn" },
+          ].map((btn) => (
+            <button
+              key={btn.id}
+              onClick={() => setFilterType(btn.id as any)}
+              className={`px-3 py-1.5 rounded-xl font-bold text-[10px] md:text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                filterType === btn.id
+                  ? "bg-white text-primary shadow-sm"
+                  : "text-gray-400 hover:text-gray-600"
+              }`}
+            >
+              {btn.label}
+            </button>
+          ))}
+        </div>
       </header>
+
+      {/* Custom Date Inputs if CUSTOM filter type is active */}
+      {filterType === "CUSTOM" && (
+        <div className="bg-white p-4 border border-gray-100 rounded-2xl shadow-sm mb-12 flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Từ ngày</span>
+            <input
+              type="date"
+              value={customFrom}
+              onChange={(e) => setCustomFrom(e.target.value)}
+              className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:border-primary focus:outline-none text-xs font-bold text-gray-700 transition-all"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Đến ngày</span>
+            <input
+              type="date"
+              value={customTo}
+              onChange={(e) => setCustomTo(e.target.value)}
+              className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:border-primary focus:outline-none text-xs font-bold text-gray-700 transition-all"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
@@ -299,7 +491,7 @@ export default function AdminDashboard() {
         <AdminStatCard
           href="/admin/revenue"
           icon={ShoppingBag}
-          value={invoices.length}
+          value={filteredInvoices.length}
           label="Hóa đơn đã xuất"
           colorClass="text-blue-500"
           bgClass="bg-blue-50"
@@ -356,12 +548,7 @@ export default function AdminDashboard() {
 
       {/* Revenue Chart - Full Width Row */}
       <div className="mb-12">
-        <RevenueLineChart 
-          invoices={useMemo(() => invoices.map((inv: any) => ({
-            ...inv,
-            totalAmount: Number(inv.totalAmount)
-          })), [invoices])} 
-        />
+        <RevenueLineChart invoices={filteredInvoices} />
       </div>
 
       <div className="mt-12 text-center pb-12">
