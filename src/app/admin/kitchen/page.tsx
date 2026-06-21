@@ -192,7 +192,7 @@ export default function KitchenPage() {
 
   const columns: { key: ColumnType; title: string; color: string; dot: string; tickets: VirtualTicket[] }[] = [
     { key: "pending",   title: "Chờ chế biến", dot: "bg-red-500",   color: "bg-white border-t-red-500   shadow-xl shadow-red-100",    tickets: pendingTickets   },
-    { key: "cooking",   title: "Đang chế biến", dot: "bg-primary",   color: "bg-white border-t-orange-500 shadow-xl shadow-orange-100", tickets: cookingTickets   },
+    { key: "cooking",   title: "Đang chế biến", dot: "bg-orange-500",   color: "bg-white border-t-orange-500 shadow-xl shadow-orange-100", tickets: cookingTickets   },
     { key: "serving",   title: "Chờ phục vụ",  dot: "bg-blue-500",  color: "bg-white border-t-blue-500   shadow-xl shadow-blue-100",   tickets: servingTickets   },
     { key: "completed", title: "Hoàn thành",   dot: "bg-green-500", color: "bg-white border-t-green-500  shadow-xl shadow-green-100",  tickets: completedTickets },
   ];
@@ -252,7 +252,7 @@ export default function KitchenPage() {
               onClick={() => setView("board")}
               className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all duration-200 ${
                 view === "board"
-                  ? "bg-white shadow-sm text-primary"
+                  ? "bg-white shadow-sm text-orange-600"
                   : "text-gray-400 hover:text-gray-700 hover:bg-gray-200/30"
               }`}
             >
@@ -263,7 +263,7 @@ export default function KitchenPage() {
               onClick={() => setView("summary")}
               className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all duration-200 ${
                 view === "summary"
-                  ? "bg-white shadow-sm text-primary"
+                  ? "bg-white shadow-sm text-orange-600"
                   : "text-gray-400 hover:text-gray-700 hover:bg-gray-200/30"
               }`}
             >
@@ -284,7 +284,7 @@ export default function KitchenPage() {
                     type="button"
                     onClick={() => setIsNameModalOpen(true)}
                     title="Đổi ca / Sửa tên"
-                    className="w-8 h-8 rounded-xl bg-gray-50 hover:bg-primary text-gray-400 hover:text-white flex items-center justify-center transition-all shrink-0 cursor-pointer"
+                    className="w-8 h-8 rounded-xl bg-gray-50 hover:bg-orange-500 text-gray-400 hover:text-white flex items-center justify-center transition-all shrink-0 cursor-pointer"
                   >
                     <Pencil size={14} />
                   </button>
@@ -348,7 +348,7 @@ export default function KitchenPage() {
                     const totalCount = totalPending + totalCooking;
 
                     return (
-                      <div key={name} className="flex flex-col p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/30 hover:border-primary/30 transition-all group">
+                      <div key={name} className="flex flex-col p-8 bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/30 hover:border-orange-500/30 transition-all group">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-gray-900 text-white rounded-2xl flex items-center justify-center text-2xl font-black shadow-lg">
@@ -370,7 +370,7 @@ export default function KitchenPage() {
                             </span>
                           )}
                           {totalCooking > 0 && (
-                            <span className="inline-flex items-center gap-1 text-primary bg-primary-soft border border-primary/20 px-2.5 py-1 rounded-xl">
+                            <span className="inline-flex items-center gap-1 text-orange-600 bg-orange-50 border border-orange-100 px-2.5 py-1 rounded-xl">
                               <ChefHat size={12} />
                               Đang nấu: {totalCooking}
                             </span>
@@ -383,7 +383,7 @@ export default function KitchenPage() {
                             <button
                               onClick={() => handleBatchAction(`${name}-startCooking`, data.pendingItems, "startCooking")}
                               disabled={updatingBatches.length > 0}
-                              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white hover:border-orange-500 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-red-50 text-red-600 border border-red-200 hover:bg-red-500 hover:text-white hover:border-red-500 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
                             >
                               <ChefHat size={12} />
                               {updatingBatches.includes(`${name}-startCooking`) ? "Đang xử lý..." : `Nấu ${totalPending} phần`}
@@ -393,7 +393,7 @@ export default function KitchenPage() {
                             <button
                               onClick={() => handleBatchAction(`${name}-doneCooking`, data.cookingItems, "doneCooking")}
                               disabled={updatingBatches.length > 0}
-                              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-primary text-white hover:bg-primary/95 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-md shadow-primary/10"
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-orange-500 text-white hover:bg-orange-600 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-md shadow-orange-200/50"
                             >
                               <Check size={12} strokeWidth={3} />
                               {updatingBatches.includes(`${name}-doneCooking`) ? "Đang xử lý..." : `Xong ${totalCooking} phần`}

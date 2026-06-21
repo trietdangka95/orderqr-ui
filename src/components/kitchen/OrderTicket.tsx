@@ -26,8 +26,22 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
     }
   };
 
+  const hoverBorderColors = {
+    pending: "hover:border-red-500/30",
+    cooking: "hover:border-orange-500/30",
+    serving: "hover:border-blue-500/30",
+    completed: "hover:border-green-500/30",
+  };
+
+  const noteColors = {
+    pending: "bg-red-50 border-red-200 text-red-600",
+    cooking: "bg-orange-50 border-orange-200 text-orange-600",
+    serving: "bg-blue-50 border-blue-200 text-blue-600",
+    completed: "bg-green-50 border-green-200 text-green-600",
+  };
+
   return (
-    <div className="bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden hover:border-primary/30 transition-all">
+    <div className={`bg-white rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 overflow-hidden ${hoverBorderColors[columnType]} transition-all`}>
       {/* Header */}
       <div className="p-5 border-b border-gray-50 bg-gray-50/50 flex justify-between items-center">
         <div className="flex items-center gap-3">
@@ -67,7 +81,7 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
                     <button
                       onClick={() => handleItemAction(item.orderItemId, "startCooking")}
                       disabled={updateItemStatusMutation.isPending}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-500 hover:text-white hover:border-orange-500 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 shrink-0 disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 hover:bg-red-500 hover:text-white hover:border-red-500 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 shrink-0 disabled:opacity-50"
                     >
                       <ChefHat size={12} />
                       Nấu
@@ -78,7 +92,7 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
                     <button
                       onClick={() => handleItemAction(item.orderItemId, "doneCooking")}
                       disabled={updateItemStatusMutation.isPending}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white hover:bg-primary/90 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 shrink-0 shadow-md shadow-primary/20 disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white hover:bg-orange-600 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 shrink-0 shadow-md shadow-orange-200/50 disabled:opacity-50"
                     >
                       <Check size={12} strokeWidth={3} />
                       Xong
@@ -103,7 +117,7 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
 
               {/* Note */}
               {item.note && (
-                <div className="ml-10 text-[10px] bg-primary-soft/70 border border-primary/60 text-primary px-2.5 py-1.5 rounded-xl font-bold italic self-start leading-relaxed">
+                <div className={`ml-10 text-[10px] border ${noteColors[columnType]} px-2.5 py-1.5 rounded-xl font-bold italic self-start leading-relaxed`}>
                   {item.note}
                 </div>
               )}
