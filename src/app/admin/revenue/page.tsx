@@ -454,8 +454,9 @@ export default function RevenuePage() {
   const storeConfig = useCartStore((state) => state.storeConfig);
 
   const [search, setSearch] = useState("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const [filterType, setFilterType] = useState<"ALL_TIME" | "TODAY" | "THIS_WEEK" | "THIS_MONTH" | "THIS_YEAR" | "CUSTOM">("ALL_TIME");
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
   const [selectedInv, setSelectedInv] = useState<InvoiceRecord | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
@@ -471,19 +472,61 @@ export default function RevenuePage() {
   );
 
   const filtered = useMemo(() => {
+    const getStartOfWeek = () => {
+      const d = new Date();
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(d.setDate(diff));
+      monday.setHours(0, 0, 0, 0);
+      return monday.getTime();
+    };
+
+    const getStartOfToday = () => {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      return d.getTime();
+    };
+
+    const getStartOfMonth = () => {
+      const d = new Date();
+      return new Date(d.getFullYear(), d.getMonth(), 1).getTime();
+    };
+
+    const getStartOfYear = () => {
+      const d = new Date();
+      return new Date(d.getFullYear(), 0, 1).getTime();
+    };
+
+    const startOfToday = getStartOfToday();
+    const startOfWeek = getStartOfWeek();
+    const startOfMonth = getStartOfMonth();
+    const startOfYear = getStartOfYear();
+
     return revenue.filter((r) => {
-      const d = toYMD(r.timestamp);
-      if (dateFrom && d < dateFrom) return false;
-      if (dateTo && d > dateTo) return false;
+      // 1. Search text filter
       if (
         search &&
         !r.tableNumber.includes(search) &&
         !r.id.toLowerCase().includes(search.toLowerCase())
-      )
+      ) {
         return false;
+      }
+
+      // 2. Date preset filter
+      if (filterType === "ALL_TIME") return true;
+      if (filterType === "TODAY") return r.timestamp >= startOfToday;
+      if (filterType === "THIS_WEEK") return r.timestamp >= startOfWeek;
+      if (filterType === "THIS_MONTH") return r.timestamp >= startOfMonth;
+      if (filterType === "THIS_YEAR") return r.timestamp >= startOfYear;
+      if (filterType === "CUSTOM") {
+        const dStr = toYMD(r.timestamp);
+        if (customFrom && dStr < customFrom) return false;
+        if (customTo && dStr > customTo) return false;
+        return true;
+      }
       return true;
     });
-  }, [revenue, dateFrom, dateTo, search]);
+  }, [revenue, filterType, customFrom, customTo, search]);
 
   const totalRev = useMemo(() => filtered.reduce((s, r) => s + r.totalAmount, 0), [filtered]);
   const todayRev = useMemo(
@@ -495,9 +538,14 @@ export default function RevenuePage() {
   );
   const avgOrder = filtered.length ? Math.round(totalRev / filtered.length) : 0;
 
-  const hasFilter = !!(dateFrom || dateTo || search);
+  const hasFilter = filterType !== "ALL_TIME" || !!search;
 
-  const clearFilters = () => { setDateFrom(""); setDateTo(""); setSearch(""); };
+  const clearFilters = () => {
+    setFilterType("ALL_TIME");
+    setCustomFrom("");
+    setCustomTo("");
+    setSearch("");
+  };
 
   const toggleRow = (id: string) =>
     setExpandedRows((prev) => {
@@ -506,20 +554,13 @@ export default function RevenuePage() {
       return next;
     });
 
-  const quickDate = (from: string, to: string) => { setDateFrom(from); setDateTo(to); };
-  const todayStr = toYMD(Date.now());
-
-  const thisWeekStart = () => {
-    const n = new Date();
-    const day = n.getDay();
-    const mon = new Date(n);
-    mon.setDate(n.getDate() - (day === 0 ? 6 : day - 1));
-    return toYMD(mon.getTime());
-  };
-
-  const thisMonthStart = () => {
-    const n = new Date();
-    return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-01`;
+  const getExportPeriod = () => {
+    if (filterType === "ALL_TIME") return { from: "Tất cả", to: "" };
+    if (filterType === "TODAY") return { from: "Hôm nay", to: "" };
+    if (filterType === "THIS_WEEK") return { from: "Tuần này", to: "" };
+    if (filterType === "THIS_MONTH") return { from: "Tháng này", to: "" };
+    if (filterType === "THIS_YEAR") return { from: "Năm nay", to: "" };
+    return { from: customFrom, to: customTo };
   };
 
   return (
@@ -540,7 +581,10 @@ export default function RevenuePage() {
             </p>
           </div>
           <button
-            onClick={() => exportCSV(filtered, dateFrom, dateTo)}
+            onClick={() => {
+              const { from, to } = getExportPeriod();
+              exportCSV(filtered, from, to);
+            }}
             className="flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 text-white font-black rounded-xl transition-all shadow-md shadow-green-100 hover:scale-[1.02] active:scale-95 text-sm shrink-0"
           >
             <Download size={18} />
@@ -620,38 +664,26 @@ export default function RevenuePage() {
               />
             </div>
 
-            {/* Date range */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-wider shrink-0">Từ</label>
-              <input
-                type="date"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-                className="px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-orange-400 focus:outline-none text-sm font-medium transition-all"
-              />
-              <label className="text-[10px] font-black text-gray-400 uppercase tracking-wider shrink-0">Đến</label>
-              <input
-                type="date"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-                className="px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-orange-400 focus:outline-none text-sm font-medium transition-all"
-              />
-            </div>
-
-            {/* Quick buttons */}
-            <div className="flex gap-2 flex-wrap">
+            {/* Filter Preset Toolbar */}
+            <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200">
               {[
-                { label: "Hôm nay", action: () => quickDate(todayStr, todayStr) },
-                { label: "Tuần này", action: () => quickDate(thisWeekStart(), todayStr) },
-                { label: "Tháng này", action: () => quickDate(thisMonthStart(), todayStr) },
-                { label: "Tất cả", action: clearFilters },
-              ].map((b) => (
+                { id: "ALL_TIME", label: "Tất cả" },
+                { id: "TODAY", label: "Hôm nay" },
+                { id: "THIS_WEEK", label: "Tuần" },
+                { id: "THIS_MONTH", label: "Tháng" },
+                { id: "THIS_YEAR", label: "Năm" },
+                { id: "CUSTOM", label: "Tùy chọn" },
+              ].map((btn) => (
                 <button
-                  key={b.label}
-                  onClick={b.action}
-                  className="px-3 py-2 bg-gray-50 border border-gray-200 text-gray-600 text-[11px] font-black rounded-xl hover:bg-primary hover:border-primary hover:text-white transition-all"
+                  key={btn.id}
+                  onClick={() => setFilterType(btn.id as any)}
+                  className={`px-3 py-1.5 rounded-xl font-bold text-[10px] md:text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                    filterType === btn.id
+                      ? "bg-white text-primary shadow-sm"
+                      : "text-gray-400 hover:text-gray-600"
+                  }`}
                 >
-                  {b.label}
+                  {btn.label}
                 </button>
               ))}
             </div>
@@ -659,13 +691,37 @@ export default function RevenuePage() {
             {hasFilter && (
               <button
                 onClick={clearFilters}
-                className="flex items-center gap-1.5 px-3 py-2 bg-red-50 border border-red-200 text-red-500 text-[11px] font-black rounded-xl hover:bg-red-100 transition-all"
+                className="flex items-center gap-1.5 px-3 py-2 bg-red-50 border border-red-200 text-red-500 text-[11px] font-black rounded-xl hover:bg-red-100 transition-all cursor-pointer"
               >
                 <X size={12} />
                 Xóa lọc
               </button>
             )}
           </div>
+
+          {/* Custom Date Inputs if CUSTOM filter type is active */}
+          {filterType === "CUSTOM" && (
+            <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100 flex-wrap">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Từ ngày</span>
+                <input
+                  type="date"
+                  value={customFrom}
+                  onChange={(e) => setCustomFrom(e.target.value)}
+                  className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:border-primary focus:outline-none text-xs font-bold text-gray-700 transition-all"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Đến ngày</span>
+                <input
+                  type="date"
+                  value={customTo}
+                  onChange={(e) => setCustomTo(e.target.value)}
+                  className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:border-primary focus:outline-none text-xs font-bold text-gray-700 transition-all"
+                />
+              </div>
+            </div>
+          )}
 
           {hasFilter && (
             <p className="text-xs text-gray-400 font-medium mt-3 pl-1">
