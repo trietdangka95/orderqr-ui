@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useOrders, useConfirmOrder, useUpdateOrderStatus, useTableOrders, useUpdateOrderItemQuantity, useRequestCheckout, useUpdateOrderItemStatus, useCancelOrder } from "@/hooks/useOrders";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useEffect } from "react";
 import { getImageUrl } from "@/utils/image";
 
@@ -54,6 +55,7 @@ interface MappedOrderItem {
 }
 
 export default function OrdersDrawer() {
+  const t = useTranslation();
   const { isOrdersOpen, toggleOrders, selectedTable, userRole, storeConfig } = useCartStore();
   const queryClient = useQueryClient();
   const { socket } = useSocket();
@@ -190,14 +192,14 @@ export default function OrdersDrawer() {
     if (!storeConfig?.bankId || !storeConfig?.bankAccountNo) {
       return (
         <div className="py-6 text-center text-xs text-red-500 font-bold">
-          Quán chưa thiết lập tài khoản ngân hàng. Vui lòng báo nhân viên.
+          {t.ordersDrawer.bankNotConfigured}
         </div>
       );
     }
 
     return (
       <div className="flex flex-col items-center gap-3">
-        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Chuyển khoản VietQR</p>
+        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t.ordersDrawer.vietQrTransfer}</p>
         
         {/* QR Code Image Container */}
         <div 
@@ -213,11 +215,11 @@ export default function OrdersDrawer() {
         {/* Account Details Table */}
         <div className="w-full text-left bg-white border border-gray-100 rounded-xl p-3 text-xs space-y-2 font-medium shadow-sm mt-1">
           <div className="flex justify-between border-b border-gray-50 pb-1.5">
-            <span className="text-gray-400">Ngân hàng</span>
+            <span className="text-gray-400">{t.ordersDrawer.bankLabel}</span>
             <span className="font-bold text-gray-800">{storeConfig.bankId}</span>
           </div>
           <div className="flex justify-between border-b border-gray-50 pb-1.5 items-center">
-            <span className="text-gray-400">Số tài khoản</span>
+            <span className="text-gray-400">{t.ordersDrawer.accountNumberLabel}</span>
             <div className="flex items-center gap-1.5">
               <span className="font-bold text-gray-800">{storeConfig.bankAccountNo}</span>
               <button
@@ -225,7 +227,7 @@ export default function OrdersDrawer() {
                   e.preventDefault();
                   e.stopPropagation();
                   navigator.clipboard.writeText(storeConfig.bankAccountNo || "");
-                  showAlert("Đã sao chép số tài khoản!");
+                  showAlert(t.ordersDrawer.copiedAccount);
                 }}
                 className="p-1 hover:bg-gray-100 rounded text-primary transition-colors"
               >
@@ -234,11 +236,11 @@ export default function OrdersDrawer() {
             </div>
           </div>
           <div className="flex justify-between border-b border-gray-50 pb-1.5">
-            <span className="text-gray-400">Tên thụ hưởng</span>
+            <span className="text-gray-400">{t.ordersDrawer.beneficiaryLabel}</span>
             <span className="font-bold text-gray-800">{storeConfig.bankAccountName || "N/A"}</span>
           </div>
           <div className="flex justify-between border-b border-gray-50 pb-1.5 items-center">
-            <span className="text-gray-400">Nội dung CK</span>
+            <span className="text-gray-400">{t.ordersDrawer.transferContentLabel}</span>
             <div className="flex items-center gap-1.5">
               <span className="font-bold text-primary">Ban {selectedTable} Thanh Toan</span>
               <button
@@ -246,7 +248,7 @@ export default function OrdersDrawer() {
                   e.preventDefault();
                   e.stopPropagation();
                   navigator.clipboard.writeText(`Ban ${selectedTable} Thanh Toan`);
-                  showAlert("Đã sao chép nội dung chuyển khoản!");
+                  showAlert(t.ordersDrawer.copiedContent);
                 }}
                 className="p-1 hover:bg-gray-100 rounded text-primary transition-colors"
               >
@@ -255,7 +257,7 @@ export default function OrdersDrawer() {
             </div>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">Tổng tiền</span>
+            <span className="text-gray-400">{t.orders.totalAmount}</span>
             <span className="font-black text-primary text-sm">{amount.toLocaleString("vi-VN")} ₫</span>
           </div>
         </div>
@@ -263,11 +265,11 @@ export default function OrdersDrawer() {
         {showSubmitPrompt ? (
           <p className="text-[10px] text-amber-600 font-bold leading-normal px-2 mt-1 flex items-start gap-1">
             <Sparkles size={12} className="shrink-0 mt-0.5 animate-pulse" />
-            <span>Sau khi chuyển khoản thành công, vui lòng nhấn nút <b>"Gửi yêu cầu thanh toán"</b> bên dưới để nhân viên xác nhận hóa đơn của bạn.</span>
+            <span>{t.ordersDrawer.instructionAfterTransfer}</span>
           </p>
         ) : (
           <p className="text-[10px] text-gray-400 font-bold leading-normal px-2 mt-1">
-            Vui lòng giữ nguyên màn hình này cho đến khi nhân viên xác nhận đã nhận được tiền.
+            {t.ordersDrawer.instructionWaitApproval}
           </p>
         )}
       </div>
@@ -291,11 +293,11 @@ export default function OrdersDrawer() {
               <h2 className="font-bold text-lg text-gray-900">
                 {isStaff
                   ? activeTab === "all"
-                    ? "Tất cả đơn hàng"
+                    ? t.ordersDrawer.allOrdersTitle
                     : activeTab === "serving"
-                      ? "Món chờ phục vụ"
-                      : `Đơn bàn ${selectedTable}`
-                  : `Đơn đã gọi - Bàn ${selectedTable}`}
+                      ? t.ordersDrawer.waitingServiceTitle
+                      : t.ordersDrawer.tableOrdersTitle.replace("{table}", selectedTable)
+                  : t.ordersDrawer.guestOrdersTitle.replace("{table}", selectedTable)}
               </h2>
             </div>
             <button onClick={toggleOrders} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
@@ -310,19 +312,19 @@ export default function OrdersDrawer() {
                 onClick={() => setActiveTab("current")}
                 className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${activeTab === "current" ? "bg-white shadow-sm text-primary" : "text-gray-500"}`}
               >
-                Bàn {selectedTable}
+                {t.common.table} {selectedTable}
               </button>
               <button
                 onClick={() => setActiveTab("all")}
                 className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${activeTab === "all" ? "bg-white shadow-sm text-primary" : "text-gray-500"}`}
               >
-                Tất cả ({activeOrders.length})
+                {t.ordersDrawer.tabAll.replace("{count}", String(activeOrders.length))}
               </button>
               <button
                 onClick={() => setActiveTab("serving")}
                 className={`flex-1 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${activeTab === "serving" ? "bg-white shadow-sm text-blue-600" : "text-gray-500"} relative`}
               >
-                Chờ phục vụ ({activeOrders.filter(o => o.status === "serving").length})
+                {t.ordersDrawer.tabWaiting.replace("{count}", String(activeOrders.filter(o => o.status === "serving").length))}
                 {activeOrders.filter(o => o.status === "serving").length > 0 && (
                   <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></span>
                 )}
@@ -336,8 +338,8 @@ export default function OrdersDrawer() {
           {activeTab === "current" && selectedTable && tableOrders.length > 0 && (
             <div className="bg-primary-soft border border-primary rounded-2xl p-4 flex justify-between items-center mb-2 shadow-sm">
               <div>
-                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Tổng tạm tính (Chưa thanh toán)</p>
-                <p className="text-[10px] text-gray-400 font-bold mt-0.5">Bao gồm {tableOrders.length} đợt gọi món</p>
+                <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{t.ordersDrawer.subtotalTitle}</p>
+                <p className="text-[10px] text-gray-400 font-bold mt-0.5">{t.ordersDrawer.orderBatchesCount.replace("{count}", String(tableOrders.length))}</p>
               </div>
               <div className="text-right">
                 <p className="text-xl font-black text-primary">{tableTotal.toLocaleString("vi-VN")} ₫</p>
@@ -350,7 +352,7 @@ export default function OrdersDrawer() {
             <div className="bg-blue-50/50 rounded-2xl p-4 border border-blue-100 mb-2">
               <h3 className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-3 flex items-center gap-2">
                 <ChefHat size={14} />
-                Tổng hợp trạng thái bàn {selectedTable}
+                {t.ordersDrawer.tableSummaryTitle.replace("{table}", selectedTable)}
               </h3>
               <div className="grid grid-cols-1 gap-2">
                 {Object.entries(tableSummary).map(([name, data]) => (
@@ -360,7 +362,7 @@ export default function OrdersDrawer() {
                       data.status === "cooking" ? "bg-primary-soft text-primary" :
                         "bg-blue-100 text-blue-600"
                       }`}>
-                      {data.status === "pending" ? "Chờ làm" : data.status === "cooking" ? "Đang nấu" : "Xong"}
+                      {data.status === "pending" ? t.ordersDrawer.waitingCook : data.status === "cooking" ? t.ordersDrawer.cooking : t.ordersDrawer.done}
                     </span>
                   </div>
                 ))}
@@ -372,7 +374,7 @@ export default function OrdersDrawer() {
             <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-4 py-20">
               <ClipboardList className="w-16 h-16 opacity-20" />
               <p className="text-sm font-medium">
-                {activeTab === "serving" ? "Không có món nào chờ phục vụ" : "Chưa có món nào"}
+                {activeTab === "serving" ? t.ordersDrawer.noWaitingItems : t.ordersDrawer.noItems}
               </p>
             </div>
           ) : (
@@ -381,10 +383,10 @@ export default function OrdersDrawer() {
                 <div className={`px-4 py-3 border-b border-gray-100 flex justify-between items-center ${!order.isConfirmed ? "bg-red-50" : order.status === "serving" ? "bg-blue-50" : "bg-primary-soft/50"}`}>
                   <div className="flex items-center gap-2">
                     {(activeTab === "all" || activeTab === "serving") && (
-                      <span className="bg-primary text-white px-2 py-0.5 rounded text-[10px] font-black uppercase">Bàn {order.tableNumber}</span>
+                      <span className="bg-primary text-white px-2 py-0.5 rounded text-[10px] font-black uppercase">{t.common.table} {order.tableNumber}</span>
                     )}
                     <span className="font-bold text-gray-800 text-sm">
-                      {activeTab === "current" ? `Đợt ${tableOrders.length - index}` : `Mã đơn #${order.id.slice(-4)}`}
+                      {activeTab === "current" ? t.ordersDrawer.batchIndex.replace("{index}", String(tableOrders.length - index)) : t.ordersDrawer.orderCode.replace("{code}", order.id.slice(-4))}
                     </span>
                   </div>
                   <span className="text-xs text-gray-500 font-medium">
@@ -410,7 +412,7 @@ export default function OrdersDrawer() {
                         <Clock className="w-4 h-4" />
                       </div>
                       <span className={`text-[10px] font-bold ${!order.isConfirmed ? "text-red-600" : order.status === "pending" ? "text-primary" : "text-gray-400"}`}>
-                        {!order.isConfirmed ? "Xác nhận" : "Bếp nhận"}
+                        {!order.isConfirmed ? t.ordersDrawer.kitchenStatusConfirm : t.ordersDrawer.kitchenStatusReceived}
                       </span>
                     </div>
 
@@ -421,7 +423,7 @@ export default function OrdersDrawer() {
                         }`}>
                         <ChefHat className="w-4 h-4" />
                       </div>
-                      <span className={`text-[10px] font-bold ${order.status === "cooking" ? "text-primary" : "text-gray-400"}`}>Đang nấu</span>
+                      <span className={`text-[10px] font-bold ${order.status === "cooking" ? "text-primary" : "text-gray-400"}`}>{t.ordersDrawer.kitchenStatusCooking}</span>
                     </div>
 
                     <div className="flex flex-col items-center gap-1.5">
@@ -436,10 +438,10 @@ export default function OrdersDrawer() {
                         (order.status === "serving" || order.status === "completed") ? "text-green-600" : "text-gray-400"
                       }`}>
                         {order.status === "completed" 
-                          ? (isStaff ? "Đã phục vụ" : "Đã lên món")
+                          ? (isStaff ? t.ordersDrawer.statusServed : t.ordersDrawer.statusServedGuest)
                           : order.status === "serving"
-                            ? (isStaff ? "Chờ phục vụ" : "Đang lên món")
-                            : "Lên món"}
+                            ? (isStaff ? t.ordersDrawer.statusWaitingService : t.ordersDrawer.statusWaitingServiceGuest)
+                            : t.ordersDrawer.statusWaitingService}
                       </span>
                     </div>
                   </div>
@@ -465,7 +467,7 @@ export default function OrdersDrawer() {
                               ? "bg-gray-100 border-gray-100 text-gray-300 cursor-not-allowed"
                               : "bg-blue-50 border-2 border-blue-500 text-blue-500 hover:bg-blue-100 hover:border-blue-600 shadow-md cursor-pointer transition-all hover:scale-105"
                           }`}
-                          title={!item.isCooked ? "Bếp chưa nấu xong món này" : ""}
+                          title={!item.isCooked ? t.ordersDrawer.kitchenNotCooked : ""}
                         >
                           {item.isServed ? <Check size={14} strokeWidth={3} /> : null}
                         </button>
@@ -502,7 +504,7 @@ export default function OrdersDrawer() {
                                 disabled={updateOrderItemMutation.isPending}
                                 onClick={async () => {
                                   if (item.quantity === 1) {
-                                    if (await showConfirm(`Bạn có chắc chắn muốn xóa món "${item.name}" khỏi đơn hàng?`)) {
+                                    if (await showConfirm(t.ordersDrawer.deleteItemConfirm.replace("{name}", item.name))) {
                                       updateOrderItemMutation.mutate({ orderId: order.id, productId: item.productId, quantity: 0 });
                                     }
                                   } else {
@@ -541,15 +543,15 @@ export default function OrdersDrawer() {
                         <div className="mt-1.5 flex flex-wrap gap-2 items-center">
                           {item.isServed ? (
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-green-50 text-green-600 text-[10px] font-black border border-green-100">
-                              <Check size={10} strokeWidth={3} /> Đã phục vụ
+                              <Check size={10} strokeWidth={3} /> {t.ordersDrawer.statusServed}
                             </span>
                           ) : item.isCooked ? (
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black border border-blue-100 animate-pulse">
-                              <ChefHat size={10} strokeWidth={3} /> Chờ phục vụ
+                              <ChefHat size={10} strokeWidth={3} /> {t.ordersDrawer.statusWaitingService}
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gray-50 text-gray-400 text-[10px] font-bold border border-gray-200">
-                              <Clock size={10} strokeWidth={3} /> Đang chuẩn bị
+                              <Clock size={10} strokeWidth={3} /> {t.ordersDrawer.statusPreparing}
                             </span>
                           )}
                         </div>
@@ -564,7 +566,7 @@ export default function OrdersDrawer() {
 
                 <div className="px-4 py-3 bg-gray-50 flex flex-col gap-3 border-t border-gray-100">
                   <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-gray-500">Tổng cộng đợt này</span>
+                    <span className="text-xs font-medium text-gray-500">{t.ordersDrawer.batchTotal}</span>
                     <span className="font-bold text-gray-900">{order.totalPrice.toLocaleString("vi-VN")} ₫</span>
                   </div>
 
@@ -580,7 +582,7 @@ export default function OrdersDrawer() {
                       ) : (
                         <>
                           <CheckCircle2 size={16} />
-                          Xác nhận khách đang ngồi bàn
+                          {t.ordersDrawer.btnConfirmSeated}
                         </>
                       )}
                     </button>
@@ -598,7 +600,7 @@ export default function OrdersDrawer() {
                       ) : (
                         <>
                           <CheckCircle2 size={16} />
-                          Đã phục vụ xong
+                          {t.ordersDrawer.btnServedDone}
                         </>
                       )}
                     </button>
@@ -609,7 +611,7 @@ export default function OrdersDrawer() {
                     <button
                       disabled={cancelOrderMutation.isPending}
                       onClick={async () => {
-                        if (await showConfirm("Bạn có chắc chắn muốn hủy đợt gọi món này không?")) {
+                        if (await showConfirm(t.ordersDrawer.cancelBatchConfirm)) {
                           cancelOrderMutation.mutate({ id: order.id, tableNumber: selectedTable });
                         }
                       }}
@@ -620,7 +622,7 @@ export default function OrdersDrawer() {
                       ) : (
                         <>
                           <X size={16} />
-                          Hủy đợt gọi món này
+                          {t.ordersDrawer.btnCancelBatch}
                         </>
                       )}
                     </button>
@@ -642,8 +644,8 @@ export default function OrdersDrawer() {
                     <Clock size={16} />
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-amber-800">Yêu cầu thanh toán chờ duyệt</h4>
-                    <p className="text-xs text-amber-600 mt-0.5 font-medium">Nhân viên đang kiểm tra hóa đơn của bạn</p>
+                    <h4 className="font-bold text-sm text-amber-800">{t.ordersDrawer.pendingPaymentRequest}</h4>
+                    <p className="text-xs text-amber-600 mt-0.5 font-medium">{t.ordersDrawer.staffCheckingBill}</p>
                   </div>
                 </div>
 
@@ -654,10 +656,9 @@ export default function OrdersDrawer() {
                 ) : (
                   <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5 text-center space-y-3 font-medium text-xs text-gray-600">
                     <Coins size={36} className="mx-auto text-amber-500 animate-bounce" />
-                    <p className="font-bold text-gray-800 text-sm">Thanh toán Tiền mặt</p>
+                    <p className="font-bold text-gray-800 text-sm">{t.ordersDrawer.cashPaymentTitle}</p>
                     <p className="leading-relaxed text-gray-500">
-                      Vui lòng chuẩn bị sẵn số tiền <span className="font-black text-primary text-sm">{tableTotal.toLocaleString("vi-VN")} ₫</span>. 
-                      Nhân viên phục vụ đang đến bàn của bạn để thu tiền và hoàn tất thanh toán.
+                      {t.ordersDrawer.cashPaymentDesc.replace("{amount}", tableTotal.toLocaleString("vi-VN") + " ₫")}
                     </p>
                   </div>
                 )}
@@ -666,13 +667,13 @@ export default function OrdersDrawer() {
               // Initial button
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">Tổng tiền</span>
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider block">{t.orders.totalAmount}</span>
                   <span className="text-base font-black text-primary">{tableTotal.toLocaleString("vi-VN")} ₫</span>
                 </div>
                 {hasUnservedItems ? (
                   <div className="flex-1 text-center bg-gray-100 text-gray-400 font-bold py-3 px-4 rounded-xl text-xs flex items-center justify-center gap-1.5 border border-gray-200">
                     <AlertCircle size={14} className="text-amber-500 animate-pulse" />
-                    <span>Chờ phục vụ hết món để thanh toán</span>
+                    <span>{t.ordersDrawer.waitUnservedToPay}</span>
                   </div>
                 ) : (
                   <button
@@ -680,7 +681,7 @@ export default function OrdersDrawer() {
                     className="flex-1 bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-primary hover:bg-primary active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
                   >
                     <CreditCard size={18} />
-                    Thanh toán hóa đơn
+                    {t.ordersDrawer.btnPayBill}
                   </button>
                 )}
               </div>
@@ -688,7 +689,7 @@ export default function OrdersDrawer() {
               // Payment choice screen
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-bold text-sm text-gray-800">Phương thức thanh toán</h4>
+                  <h4 className="font-bold text-sm text-gray-800">{t.ordersDrawer.paymentMethodTitle}</h4>
                   <button
                     onClick={() => {
                       setIsCheckoutMode(false);
@@ -696,7 +697,7 @@ export default function OrdersDrawer() {
                     }}
                     className="text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors"
                   >
-                    Quay lại
+                    {t.common.back}
                   </button>
                 </div>
 
@@ -710,7 +711,7 @@ export default function OrdersDrawer() {
                     }`}
                   >
                     <Coins size={28} className={selectedPayment === "CASH" ? "text-primary" : "text-gray-400 group-hover:text-gray-500"} />
-                    <span className="text-xs font-black uppercase">Tiền mặt</span>
+                    <span className="text-xs font-black uppercase">{t.ordersDrawer.cashLabel}</span>
                   </button>
 
                   <button
@@ -723,7 +724,7 @@ export default function OrdersDrawer() {
                     }`}
                   >
                     <QrCode size={28} className={selectedPayment === "QR_TRANSFER" ? "text-primary" : "text-gray-400 group-hover:text-gray-500"} />
-                    <span className="text-xs font-black uppercase">Chuyển khoản QR</span>
+                    <span className="text-xs font-black uppercase">{t.ordersDrawer.qrLabel}</span>
                   </button>
                 </div>
 
@@ -747,7 +748,7 @@ export default function OrdersDrawer() {
                         setSelectedPayment(null);
                       },
                       onError: (err: any) => {
-                        showAlert(err.message || "Không thể gửi yêu cầu thanh toán");
+                        showAlert(err.message || t.ordersDrawer.submitPaymentError);
                       }
                     });
                   }}
@@ -758,7 +759,7 @@ export default function OrdersDrawer() {
                   ) : (
                     <>
                       <Check size={18} />
-                      Gửi yêu cầu thanh toán
+                      {t.ordersDrawer.btnSubmitPaymentRequest}
                     </>
                   )}
                 </button>

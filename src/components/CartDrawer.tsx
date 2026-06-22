@@ -7,15 +7,17 @@ import Image from "next/image";
 import { useCreateOrder } from "@/hooks/useOrders";
 import { getImageUrl } from "@/utils/image";
 import { showAlert } from "@/store/dialogStore";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CartDrawer() {
+  const t = useTranslation();
   const { items, isOpen, toggleCart, removeItem, updateQuantity, updateNote, getTotalItems, getTotalPrice, clearCart, toggleOrders, selectedTable } = useCartStore();
   const createOrder = useCreateOrder();
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
 
   const handleCheckout = () => {
     if (!selectedTable) {
-      showAlert("Vui lòng chọn bàn trước khi gọi món!");
+      showAlert(t.cart.checkoutSelectTableWarning);
       return;
     }
 
@@ -35,7 +37,7 @@ export default function CartDrawer() {
         toggleOrders();
       },
       onError: (error: Error) => {
-        showAlert(error.message || "Không thể gửi đơn hàng. Vui lòng thử lại!");
+        showAlert(error.message || t.cart.checkoutError);
       }
     });
   };
@@ -58,7 +60,7 @@ export default function CartDrawer() {
         <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-primary" />
-            <h2 className="font-bold text-lg text-gray-900">Món đã chọn ({getTotalItems()})</h2>
+            <h2 className="font-bold text-lg text-gray-900">{t.cart.selectedItemsCount.replace("{count}", String(getTotalItems()))}</h2>
           </div>
           <button onClick={toggleCart} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500">
             <X className="w-5 h-5" />
@@ -69,7 +71,7 @@ export default function CartDrawer() {
           {items.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-gray-400 space-y-4">
               <ShoppingBag className="w-16 h-16 opacity-20" />
-              <p>Chưa có món nào được chọn</p>
+              <p>{t.cart.emptyCart}</p>
             </div>
           ) : (
             items.map((item) => (
@@ -95,7 +97,7 @@ export default function CartDrawer() {
                           type="text"
                           value={item.note}
                           onChange={(e) => updateNote(item.id, e.target.value)}
-                          placeholder="Ghi chú (không hành, ít cay...)"
+                          placeholder={t.cart.notePlaceholder}
                           className="flex-1 bg-transparent text-xs py-0.5 focus:outline-none placeholder-gray-400 text-gray-700 min-w-0"
                           autoFocus={editingNoteId === item.id}
                           onBlur={() => {
@@ -121,7 +123,7 @@ export default function CartDrawer() {
                         className="text-[11px] text-gray-400 hover:text-primary transition-colors flex items-center gap-1 font-medium hover:underline py-0.5"
                       >
                         <FileText className="w-3 h-3" />
-                        Thêm ghi chú...
+                        {t.cart.addNote}
                       </button>
                     )}
                   </div>
@@ -155,7 +157,7 @@ export default function CartDrawer() {
         {items.length > 0 && (
           <div className="p-4 bg-white border-t border-gray-100 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)] pb-safe">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-gray-600 font-medium">Tổng cộng</span>
+              <span className="text-gray-600 font-medium">{t.cart.total}</span>
               <span className="text-xl font-bold text-primary">{getTotalPrice().toLocaleString("vi-VN")} ₫</span>
             </div>
             <button
@@ -166,7 +168,7 @@ export default function CartDrawer() {
               {createOrder.isPending ? (
                 <div className="w-6 h-6 border-4 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                "Xác nhận gọi món"
+                t.cart.checkoutButton
               )}
             </button>
           </div>

@@ -7,6 +7,8 @@ import { UserRole, useCartStore } from "@/store/cartStore";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { getImageUrl } from "@/utils/image";
+import { useTranslation } from "@/hooks/useTranslation";
+import LanguageSelector from "@/components/ui/LanguageSelector";
 
 interface HomeHeaderProps {
   userRole: UserRole;
@@ -44,6 +46,7 @@ export default function HomeHeader({
   setViewMode,
 }: HomeHeaderProps) {
   const { storeConfig } = useCartStore();
+  const t = useTranslation();
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-100">
@@ -83,7 +86,9 @@ export default function HomeHeader({
         </div>
 
         {/* Table Badge / Selector */}
-        <div className="relative flex flex-col items-end">
+        <div className="flex items-center gap-3.5">
+          <LanguageSelector light={true} />
+          <div className="relative flex flex-col items-end">
           {userRole === "staff" ? (
             <Button
               onClick={() => setIsTableSelectorOpen(!isTableSelectorOpen)}
@@ -92,7 +97,7 @@ export default function HomeHeader({
             >
               <div className="flex flex-col items-start">
                 <span className="text-[10px] text-primary font-bold uppercase tracking-wider leading-none">
-                  Phục vụ bàn
+                {t.common.servingTable}
                 </span>
                 <span className="font-black text-xl text-primary leading-none">
                   {selectedTable || "??"}
@@ -108,10 +113,10 @@ export default function HomeHeader({
           ) : (
             <div className="bg-primary-soft border-2 border-primary px-4 md:px-6 py-2 rounded-xl flex items-center justify-center shadow-sm gap-2">
               <span className="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider hidden md:inline-block">
-                Bàn số
+                {t.common.table}
               </span>
               <span className="text-[10px] md:text-xs text-primary font-bold uppercase tracking-wider md:hidden mb-0.5">
-                Bàn
+                {t.common.table}
               </span>
               <span className="font-black text-xl md:text-2xl text-primary leading-none">
                 {selectedTable || "??"}
@@ -128,7 +133,7 @@ export default function HomeHeader({
                 className="absolute top-full mt-2 right-0 w-48 bg-white border border-gray-100 shadow-2xl rounded-2xl p-2 z-50 overflow-hidden"
               >
                 <p className="text-[10px] font-bold text-gray-400 uppercase p-2 border-b border-gray-50 mb-1">
-                  Chọn bàn phục vụ
+                  {t.common.selectTable}
                 </p>
                 <div className="grid grid-cols-3 gap-1 max-h-[300px] overflow-y-auto p-1">
                   {tables.map((t) => (
@@ -150,6 +155,7 @@ export default function HomeHeader({
               </motion.div>
             )}
           </AnimatePresence>
+          </div>
         </div>
 
         {/* Desktop Navigation Actions */}
@@ -160,7 +166,7 @@ export default function HomeHeader({
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-50 text-gray-600 hover:bg-primary/10 hover:text-primary transition-all font-bold text-sm border border-transparent hover:border-primary/20 cursor-pointer"
           >
             <ClipboardList size={18} />
-            <span>Đơn đã gọi</span>
+            <span>{t.common.orders}</span>
             {orderCount > 0 && (
               <span className="w-5 h-5 bg-primary text-white text-[10px] rounded-full flex items-center justify-center">
                 {orderCount}
@@ -174,7 +180,7 @@ export default function HomeHeader({
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary transition-all font-bold text-sm shadow-lg shadow-primary cursor-pointer"
           >
             <ShoppingBag size={18} />
-            <span>Giỏ hàng</span>
+            <span>{t.common.cart}</span>
             {getTotalItems() > 0 && (
               <span className="bg-white text-primary w-5 h-5 rounded-full flex items-center justify-center text-[10px]">
                 {getTotalItems()}
@@ -190,7 +196,7 @@ export default function HomeHeader({
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-all font-bold text-sm border border-red-100 cursor-pointer"
             >
               <LogOut size={18} />
-              <span>Đăng xuất</span>
+              <span>{t.common.logout}</span>
             </Button>
           )}
         </div>
@@ -202,7 +208,7 @@ export default function HomeHeader({
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-primary transition-colors" />
           <Input
             type="text"
-            placeholder="Tìm món ngon..."
+            placeholder={t.common.searchPlaceholder}
             unstyled
             className="w-full bg-gray-50 border-none rounded-2xl py-3 md:py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
             value={searchQuery}

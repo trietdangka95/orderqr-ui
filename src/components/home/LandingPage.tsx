@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
+import LanguageSelector from "@/components/ui/LanguageSelector";
 import {
   ChefHat,
   QrCode,
@@ -32,6 +34,7 @@ import axiosInstance from "@/api/axiosInstance";
 const MOCK_WEEKLY_HEIGHTS = [30, 50, 45, 65, 80, 55, 95] as const;
 
 export default function LandingPage() {
+  const t = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [showcaseTab, setShowcaseTab] = useState<"menu" | "kitchen" | "admin">(
@@ -59,15 +62,15 @@ export default function LandingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.phone.trim()) {
-      setSubmitError("Số điện thoại không được để trống!");
+      setSubmitError(t.landing.formPhoneRequired);
       return;
     }
     if (!/^(0|\+84)\d{9,10}$/.test(formData.phone)) {
-      setSubmitError("Số điện thoại không đúng định dạng!");
+      setSubmitError(t.landing.formPhoneInvalid);
       return;
     }
     if (formData.email.trim() && !/\S+@\S+\.\S+/.test(formData.email)) {
-      setSubmitError("Email không đúng định dạng!");
+      setSubmitError(t.landing.formEmailInvalid);
       return;
     }
 
@@ -187,23 +190,24 @@ export default function LandingPage() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-400">
             <a href="#features" className="hover:text-white transition-colors">
-              Tính năng
+              {t.landing.features}
             </a>
             <a href="#workflow" className="hover:text-white transition-colors">
-              Quy trình
+              {t.landing.workflow}
             </a>
             <a href="#pricing" className="hover:text-white transition-colors">
-              Bảng giá
+              {t.landing.pricing}
             </a>
           </nav>
 
           {/* CTAs */}
           <div className="hidden md:flex items-center gap-4">
+            <LanguageSelector />
             <a
               href="#contact"
               className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl text-sm font-black shadow-lg shadow-orange-950/30 hover:scale-102 transition-all flex items-center gap-1"
             >
-              Liên Hệ Ngay
+              {t.landing.contactUs}
               <ArrowRight size={16} />
             </a>
           </div>
@@ -233,30 +237,33 @@ export default function LandingPage() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="hover:text-white py-2 border-b border-white/5"
               >
-                Tính năng
+                {t.landing.features}
               </a>
               <a
                 href="#workflow"
                 onClick={() => setMobileMenuOpen(false)}
                 className="hover:text-white py-2 border-b border-white/5"
               >
-                Quy trình
+                {t.landing.workflow}
               </a>
               <a
                 href="#pricing"
                 onClick={() => setMobileMenuOpen(false)}
                 className="hover:text-white py-2 border-b border-white/5"
               >
-                Bảng giá
+                {t.landing.pricing}
               </a>
             </div>
             <div className="flex flex-col gap-3 pt-2">
+              <div className="flex justify-end py-1">
+                <LanguageSelector />
+              </div>
               <a
                 href="#contact"
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full text-center py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-sm font-black shadow-lg"
               >
-                Liên Hệ Ngay
+                {t.landing.contactUs}
               </a>
             </div>
           </motion.div>
@@ -275,7 +282,7 @@ export default function LandingPage() {
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-orange-500/30 bg-primary/10 text-orange-500 text-xs font-black tracking-widest uppercase mb-6"
             >
               <Sparkles size={14} className="animate-spin-slow" />
-              Giải Pháp Số Hóa Nhà Hàng 2026
+              {t.landing.heroBadge}
             </motion.div>
 
             {/* Headlines */}
@@ -285,7 +292,7 @@ export default function LandingPage() {
               transition={{ delay: 0.1 }}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-orange-500"
             >
-              Menu QR Điện Tử & Gọi Món Tại Bàn
+              {t.landing.heroTitle}
             </motion.h1>
 
             <motion.p
@@ -294,9 +301,7 @@ export default function LandingPage() {
               transition={{ delay: 0.2 }}
               className="text-gray-400 text-base md:text-xl font-medium mt-6 leading-relaxed max-w-2xl"
             >
-              Cách mạng hóa trải nghiệm ăn uống tại nhà hàng của bạn. Khách hàng
-              quét mã gọi món trực tiếp, đơn chuyển tức thì đến Bếp. Tiết kiệm
-              nhân lực, tăng tốc phục vụ.
+              {t.landing.heroDesc}
             </motion.p>
 
             {/* Buttons */}
@@ -310,14 +315,14 @@ export default function LandingPage() {
                 href="#pricing"
                 className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-2xl text-base font-black shadow-xl shadow-orange-950/40 hover:scale-105 transition-all flex items-center justify-center gap-2"
               >
-                Xem Bảng Giá Dịch Vụ
+                {t.landing.pricingBtn}
                 <ArrowRight size={18} />
               </a>
               <a
                 href="#features"
                 className="w-full sm:w-auto px-8 py-4 border border-white/10 hover:border-white/20 rounded-2xl text-base font-bold bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center gap-2"
               >
-                Tìm Hiểu Tính Năng
+                {t.landing.featuresBtn}
                 <Play size={14} className="fill-white" />
               </a>
             </motion.div>
@@ -1434,7 +1439,7 @@ export default function LandingPage() {
           <form onSubmit={handleSubmit} className="space-y-6 text-left">
             <div>
               <label htmlFor="name" className="text-xs font-black text-gray-400 uppercase tracking-wider block mb-2">
-                Tên quán / Tên liên hệ
+                {t.landing.formName}
               </label>
               <input
                 id="name"
@@ -1449,7 +1454,7 @@ export default function LandingPage() {
 
             <div>
               <label htmlFor="phone" className="text-xs font-black text-gray-400 uppercase tracking-wider block mb-2">
-                Số điện thoại <span className="text-orange-500">*</span>
+                {t.landing.formPhone} <span className="text-orange-500">*</span>
               </label>
               <input
                 id="phone"
@@ -1465,7 +1470,7 @@ export default function LandingPage() {
 
             <div>
               <label htmlFor="email" className="text-xs font-black text-gray-400 uppercase tracking-wider block mb-2">
-                Địa chỉ Email
+                {t.landing.formEmail}
               </label>
               <input
                 id="email"
@@ -1480,7 +1485,7 @@ export default function LandingPage() {
 
             <div>
               <label htmlFor="note" className="text-xs font-black text-gray-400 uppercase tracking-wider block mb-2">
-                Ghi chú bổ sung
+                {t.landing.formNote}
               </label>
               <textarea
                 id="note"
@@ -1500,7 +1505,7 @@ export default function LandingPage() {
                 className="p-4 bg-green-500/10 border border-green-500/20 rounded-2xl text-green-400 text-xs md:text-sm font-bold flex items-center gap-2"
               >
                 <CheckCircle2 size={18} className="shrink-0" />
-                <span>Gửi yêu cầu đăng ký thành công! Chúng tôi sẽ phản hồi sớm nhất.</span>
+                <span>{t.landing.formSuccess}</span>
               </motion.div>
             )}
 
@@ -1524,7 +1529,7 @@ export default function LandingPage() {
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
                 <>
-                  <span>Gửi Yêu Cầu Đăng Ký</span>
+                  <span>{t.landing.formSubmit}</span>
                   <ArrowRight size={18} />
                 </>
               )}

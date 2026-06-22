@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
 import { getImageUrl } from "@/utils/image";
 import { showAlert } from "@/store/dialogStore";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Product {
   id: string;
@@ -29,6 +30,7 @@ interface ProductDetailModalProps {
 export default function ProductDetailModal({ product, isOpen, onClose }: ProductDetailModalProps) {
   const { addItem, selectedTable } = useCartStore();
   const [note, setNote] = useState("");
+  const t = useTranslation();
 
   const discountPercent = product?.discountPercent || 0;
   const hasDiscount = discountPercent > 0;
@@ -44,7 +46,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
     if (!product) return;
     if (product.isAvailable === false) return;
     if (!selectedTable) {
-      showAlert("Vui lòng chọn bàn/nhập mã bàn trước khi chọn món!");
+      showAlert(t.productDetail.selectTableWarning);
       return;
     }
     addItem({
@@ -62,7 +64,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
     onClose();
   };
 
-  const presets = ["Không hành", "Ít cay", "Cay nhiều", "Nhiều đá", "Ít ngọt"];
+  const presets = t.productDetail.presets;
 
   const togglePreset = (preset: string) => {
     setNote(prev => {
@@ -123,12 +125,12 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                 </h2>
                 <div className="flex items-center gap-2.5 mb-4 flex-wrap">
                   <div className="inline-block px-3 py-1 bg-primary-soft text-primary rounded-full text-xs md:text-sm font-extrabold whitespace-nowrap">
-                    {finalPrice.toLocaleString("vi-VN")}&nbsp;₫
+                    {finalPrice.toLocaleString("vi-VN")}&nbsp;{t.common.currency}
                   </div>
                   {hasDiscount && (
                     <>
                       <span className="text-xs md:text-sm text-gray-400 line-through font-semibold whitespace-nowrap">
-                        {product.price.toLocaleString("vi-VN")}&nbsp;₫
+                        {product.price.toLocaleString("vi-VN")}&nbsp;{t.common.currency}
                       </span>
                       <span className="bg-red-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1 animate-pulse shrink-0">
                         -{discountPercent}%
@@ -137,19 +139,19 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                   )}
                   {product.isAvailable === false && (
                     <div className="inline-block px-3 py-1 bg-red-50 text-red-500 border border-red-200 rounded-full text-xs font-black uppercase tracking-wider">
-                      Hết món
+                      {t.productDetail.outOfStock}
                     </div>
                   )}
                 </div>
                 <div className="space-y-2 mb-4">
-                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Mô tả món ăn</h4>
+                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t.productDetail.descriptionTitle}</h4>
                   <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
-                    {product.description || "Món ăn này hiện chưa có mô tả chi tiết từ nhà hàng. Tuy nhiên, chúng tôi đảm bảo hương vị sẽ làm bạn hài lòng!"}
+                    {product.description || t.productDetail.defaultDescription}
                   </p>
                 </div>
                 
                 <div className="space-y-2.5">
-                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ghi chú nhanh</h4>
+                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t.productDetail.quickNoteTitle}</h4>
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     {presets.map((preset) => {
                       const tags = note.split(",").map(t => t.trim());
@@ -171,11 +173,11 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                     })}
                   </div>
                   
-                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Ghi chú tự nhập</h4>
+                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t.productDetail.customNoteTitle}</h4>
                   <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    placeholder="Ít cay, không hành, nhiều đá..."
+                    placeholder={t.productDetail.notePlaceholder}
                     className="w-full px-3 py-2 rounded-xl border border-gray-200 text-gray-800 placeholder-gray-400 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none transition-all"
                     rows={2}
                   />
@@ -186,7 +188,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                 {product.isAvailable === false ? (
                   <div className="w-full bg-gray-100 text-gray-500 py-3 rounded-xl font-black flex items-center justify-center gap-2 text-xs md:text-sm border border-gray-200">
                     <span className="text-lg">😔</span>
-                    Tạm thời hết món — Vui lòng chọn món khác
+                    {t.productDetail.outOfStockWarning}
                   </div>
                 ) : (
                   <button
@@ -194,11 +196,11 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                     className="w-full bg-primary text-white py-3 rounded-xl font-black flex items-center justify-center gap-2 shadow-lg shadow-primary hover:bg-primary transition-all active:scale-95 text-xs md:text-sm"
                   >
                     <Plus size={16} strokeWidth={3} />
-                    Thêm vào giỏ hàng
+                    {t.productDetail.addToCart}
                   </button>
                 )}
                 <p className="text-center text-[10px] text-gray-400 font-medium">
-                  Click ra ngoài để quay lại Menu
+                  {t.productDetail.clickOutsideToClose}
                 </p>
               </div>
             </div>

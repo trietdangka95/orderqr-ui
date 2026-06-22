@@ -6,6 +6,7 @@ import { useCartStore } from "@/store/cartStore";
 import { motion } from "framer-motion";
 import { getImageUrl } from "@/utils/image";
 import { showAlert } from "@/store/dialogStore";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type Product = {
   id: string;
@@ -23,6 +24,7 @@ type Product = {
 
 export default function ProductCard({ product, viewMode = "list" }: { product: Product, viewMode?: "grid" | "list" }) {
   const { addItem, selectedTable } = useCartStore();
+  const t = useTranslation();
 
   const discountPercent = product.discountPercent || 0;
   const hasDiscount = discountPercent > 0;
@@ -31,7 +33,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
   const handleAddToCart = () => {
     if (product.isAvailable === false) return;
     if (!selectedTable) {
-      showAlert("Vui lòng chọn bàn/nhập mã bàn trước khi chọn món!");
+      showAlert(t.productDetail.selectTableWarning);
       return;
     }
     addItem({
@@ -49,7 +51,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
   };
 
   const formatPrice = (price: number) => {
-    return price.toLocaleString("vi-VN") + "\u00A0₫";
+    return price.toLocaleString("vi-VN") + `\u00A0${t.common.currency}`;
   };
 
   if (viewMode === "grid") {
@@ -67,12 +69,12 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
           )}
           {product.isNew && (
             <span className="bg-green-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
-              <Star size={10} fill="currentColor" /> MỚI
+              <Star size={10} fill="currentColor" /> {t.common.labelNew}
             </span>
           )}
           {product.isHot && (
             <span className="bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
-              <Flame size={10} fill="currentColor" /> HOT
+              <Flame size={10} fill="currentColor" /> {t.common.labelHot}
             </span>
           )}
         </div>
@@ -89,7 +91,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
           {product.isAvailable === false && (
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px] z-20">
               <span className="bg-gray-900/90 text-white font-black px-4 py-2 rounded-xl text-sm tracking-widest shadow-xl rotate-[-10deg] border border-white/20">
-                TẠM HẾT
+                {t.common.soldOut}
               </span>
             </div>
           )}
@@ -142,10 +144,10 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
           <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md">-{discountPercent}%</span>
         )}
         {product.isNew && (
-          <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md">MỚI</span>
+          <span className="bg-green-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md">{t.common.labelNew}</span>
         )}
         {product.isHot && (
-          <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md">HOT</span>
+          <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-md">{t.common.labelHot}</span>
         )}
       </div>
 
@@ -161,7 +163,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
         {product.isAvailable === false && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px] z-20">
             <span className="bg-gray-900/90 text-white font-black px-2 py-1 rounded-lg text-[10px] tracking-widest shadow-xl border border-white/20">
-              TẠM HẾT
+              {t.common.soldOut}
             </span>
           </div>
         )}

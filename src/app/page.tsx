@@ -19,8 +19,10 @@ import { useOrders, useTableOrders } from "@/hooks/useOrders";
 import { Product } from "@/types/api";
 import LandingPage from "@/components/home/LandingPage";
 import { getImageUrl } from "@/utils/image";
+import { useTranslation } from "@/hooks/useTranslation";
 
 function HomeContent() {
+  const t = useTranslation();
   const searchParams = useSearchParams();
   const tableParam = searchParams.get("table");
   const router = useRouter();
@@ -198,10 +200,10 @@ function HomeContent() {
 
   if (storeError) {
     const is403 = storeError.status === 403;
-    const errorTitle = is403 ? "Cửa Hàng Tạm Ngưng Hoạt Động" : "Không Tìm Thấy Cửa Hàng";
+    const errorTitle = is403 ? t.page.storeSuspendedTitle : t.page.storeNotFoundTitle;
     const errorDesc = is403 
-      ? "Cửa hàng đang tạm thời đóng cửa hoặc ngừng hoạt động. Vui lòng quay lại sau hoặc liên hệ với quản trị viên quán."
-      : "Đường dẫn cửa hàng không tồn tại hoặc đã được thay đổi. Vui lòng kiểm tra lại địa chỉ URL.";
+      ? t.page.storeSuspendedDesc
+      : t.page.storeNotFoundDesc;
 
     return (
       <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between p-6 relative overflow-hidden">
@@ -222,7 +224,7 @@ function HomeContent() {
 
           <div>
             <span className="text-xs md:text-sm font-black text-gray-500 tracking-[0.25em] uppercase block">
-              Thông Báo Hệ Thống
+              {t.common.error}
             </span>
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white mt-2">
               {errorTitle}
@@ -244,7 +246,7 @@ function HomeContent() {
             
             <div className="space-y-3">
               <h3 className="text-xl font-black text-white">
-                {is403 ? "Quán đang tạm đóng" : "Đường dẫn không hợp lệ"}
+                {is403 ? t.page.storeSuspendedTitle : t.page.storeNotFoundTitle}
               </h3>
               <p className="text-xs md:text-sm text-gray-400 font-bold leading-relaxed px-2">
                 {errorDesc}
@@ -256,7 +258,7 @@ function HomeContent() {
                 href="/"
                 className="inline-flex items-center justify-center px-6 py-3 border border-white/10 rounded-2xl text-xs font-black uppercase tracking-wider bg-white/5 hover:bg-white/10 transition-all duration-300"
               >
-                Quay Lại
+                {t.common.back}
               </Link>
             </div>
           </motion.div>
@@ -282,7 +284,7 @@ function HomeContent() {
             <Soup size={32} />
           </div>
           <div className="text-gray-400 font-bold text-sm tracking-wide">
-            Đang tải cấu hình quán...
+            {t.page.loadingConfig}
           </div>
         </div>
       </div>
@@ -331,7 +333,7 @@ function HomeContent() {
               </p>
             )}
             <p className="text-gray-400 font-medium text-xs mt-4 max-w-sm mx-auto italic">
-              Vui lòng chọn bàn của bạn để xem thực đơn & gọi món
+              {t.page.selectTableTitle}
             </p>
           </div>
         </header>
@@ -340,7 +342,7 @@ function HomeContent() {
         <main className="max-w-2xl mx-auto w-full py-12 relative z-10 flex-grow flex items-center">
           <div className="w-full space-y-8">
             {productsLoading || categoriesLoading ? (
-              <div className="text-center font-bold text-gray-400">Đang tải cấu hình quán...</div>
+              <div className="text-center font-bold text-gray-400">{t.page.loadingConfig}</div>
             ) : tables.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -351,9 +353,9 @@ function HomeContent() {
                   <Sparkles size={28} />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-black text-white">Quán Đang Chuẩn Bị...</h3>
+                  <h3 className="text-xl font-black text-white">{t.page.tableGridEmptyTitle}</h3>
                   <p className="text-xs text-gray-400 font-bold leading-relaxed px-2">
-                    Cửa hàng đang thiết lập thực đơn và sơ đồ bàn ăn. Vui lòng quay lại sau ít phút để bắt đầu gọi món nhé!
+                    {t.page.tableGridEmptyDesc}
                   </p>
                 </div>
                 <div className="inline-block px-4 py-1.5 bg-primary/10 text-primary text-[9px] font-black rounded-full uppercase tracking-widest font-mono">
@@ -366,22 +368,22 @@ function HomeContent() {
                 animate={{ opacity: 1, y: 0 }}
                 className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4 px-2"
               >
-                 {tables.map((t) => (
+                 {tables.map((tableNum) => (
                   <Button
-                    key={t}
+                    key={tableNum}
                     as={motion.button}
                     unstyled
                     whileHover={{ scale: 1.08, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
-                      setSelectedTable(t);
-                      const newUrl = `${window.location.pathname}?table=${t}`;
+                      setSelectedTable(tableNum);
+                      const newUrl = `${window.location.pathname}?table=${tableNum}`;
                       window.history.pushState(null, "", newUrl);
                     }}
                     className="aspect-square flex flex-col items-center justify-center rounded-2xl border-2 border-gray-800 bg-gray-900/20 backdrop-blur-md hover:border-primary hover:bg-gray-900/60 shadow-lg transition-all duration-300 group"
                   >
-                    <span className="text-[11px] font-bold text-gray-500 tracking-wider group-hover:text-primary-soft uppercase">BÀN</span>
-                    <span className="text-3xl font-black text-white group-hover:text-primary">{t}</span>
+                    <span className="text-[11px] font-bold text-gray-500 tracking-wider group-hover:text-primary-soft uppercase">{t.common.table}</span>
+                    <span className="text-3xl font-black text-white group-hover:text-primary">{tableNum}</span>
                   </Button>
                 ))}
               </motion.div>
@@ -391,7 +393,7 @@ function HomeContent() {
 
         {/* Footer */}
         <footer className="text-center py-6 text-xs text-gray-500 font-medium relative z-10">
-          <p className="opacity-80">Hoặc quét mã QR dán tại bàn của bạn</p>
+          <p className="opacity-80">{t.page.footerQrHint}</p>
           <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mt-4">© 2026 Triet Dang</p>
         </footer>
       </div>
@@ -420,7 +422,7 @@ function HomeContent() {
 
       <main className="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-12">
         {productsLoading || categoriesLoading ? (
-          <div className="py-20 text-center font-bold text-gray-400">Đang tải dữ liệu...</div>
+          <div className="py-20 text-center font-bold text-gray-400">{t.page.loadingData}</div>
         ) : (
           <>
             {banners.length > 0 && <BannerSlider banners={banners} />}
@@ -478,7 +480,7 @@ function HomeContent() {
                   className="text-orange-500 hover:text-primary font-bold text-sm flex items-center justify-center gap-2 transition-colors"
                 >
                   <LayoutDashboard size={16} />
-                  Vào Bếp
+                  {t.orders.kitchenLabel}
                 </Link>
               )}
               <button
@@ -486,7 +488,7 @@ function HomeContent() {
                 className="text-red-500 hover:text-red-600 font-bold text-sm flex items-center justify-center gap-2 transition-colors"
               >
                 <LogOut size={16} />
-                Đăng xuất
+                {t.common.logout}
               </button>
             </div>
           </div>
@@ -514,8 +516,10 @@ function HomeContent() {
               ✨
             </div>
             <div>
-              <p className="text-sm font-black text-white leading-tight">{toastMessage}</p>
-              <p className="text-[10px] text-gray-400 font-bold tracking-wider uppercase mt-1">Giỏ hàng đã cập nhật</p>
+              <p className="text-sm font-black text-white leading-tight">
+                {t.page.cartAddedToast.replace("{name}", toastMessage)}
+              </p>
+              <p className="text-[10px] text-gray-400 font-bold tracking-wider uppercase mt-1">{t.page.cartUpdatedToast}</p>
             </div>
           </motion.div>
         )}
@@ -524,9 +528,18 @@ function HomeContent() {
   );
 }
 
+function LoadingFallback() {
+  const t = useTranslation();
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center font-bold text-gray-400">
+      {t.page.loadingData}
+    </div>
+  );
+}
+
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center font-bold text-gray-400">Đang tải menu...</div>}>
+    <Suspense fallback={<LoadingFallback />}>
       <HomeContent />
     </Suspense>
   );

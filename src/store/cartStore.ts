@@ -113,7 +113,17 @@ interface CartStore {
   getTotalItems: () => number;
   getTotalPrice: () => number;
   fetchStoreConfig: (slug: string) => Promise<void>;
+
+  // i18n
+  language: "vi" | "en";
+  setLanguage: (lang: "vi" | "en") => void;
 }
+
+const getInitialLanguage = (): "vi" | "en" => {
+  if (typeof window === "undefined") return "vi";
+  const browserLang = navigator.language || (navigator as any).userLanguage || "";
+  return browserLang.toLowerCase().startsWith("vi") ? "vi" : "en";
+};
 
 export const useCartStore = create<CartStore>()(
   persist(
@@ -122,6 +132,9 @@ export const useCartStore = create<CartStore>()(
       setStoreConfig: (config) => set({ storeConfig: config }),
       storeError: null,
       setStoreError: (error) => set({ storeError: error }),
+
+      language: getInitialLanguage(),
+      setLanguage: (lang) => set({ language: lang }),
 
       isOpen: false,
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
@@ -184,8 +197,8 @@ export const useCartStore = create<CartStore>()(
           set({ items: [...currentItems, item] });
         }
 
-        // Set toast message with emoji feedback
-        set({ toastMessage: `Đã thêm món ${item.name} vào giỏ!` });
+        // Set toast message with emoji feedback (store item name for client-side localized rendering)
+        set({ toastMessage: item.name });
       },
       
       removeItem: (productId) =>
@@ -312,6 +325,7 @@ export const useCartStore = create<CartStore>()(
         selectedTable: state.selectedTable,
         storeConfigId: state.storeConfig?.id,
         activeStaffName: state.activeStaffName,
+        language: state.language,
       }),
     }
   )

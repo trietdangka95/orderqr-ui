@@ -2,6 +2,8 @@
 
 import { CheckCircle2, Clock, MapPin, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useCartStore } from "@/store/cartStore";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type OrderStatus = "pending" | "cooking" | "completed";
 
@@ -13,6 +15,9 @@ export default function OrderStatusModal({
   onClose: () => void;
 }) {
   const [status, setStatus] = useState<OrderStatus>("pending");
+  const t = useTranslation();
+  const selectedTable = useCartStore((state) => state.selectedTable);
+  const displayTable = selectedTable || "05";
 
   // Reset status during render phase when opening to avoid cascading renders in useEffect
   const [lastIsOpen, setLastIsOpen] = useState(isOpen);
@@ -58,15 +63,15 @@ export default function OrderStatusModal({
             </div>
             
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              {status === "pending" && "Đã gửi đơn cho Bếp!"}
-              {status === "cooking" && "Bếp đang chuẩn bị..."}
-              {status === "completed" && "Món đã sẵn sàng!"}
+              {status === "pending" && t.orderStatusModal.pendingTitle}
+              {status === "cooking" && t.orderStatusModal.cookingTitle}
+              {status === "completed" && t.orderStatusModal.completedTitle}
             </h2>
             
             <p className="text-gray-500 text-sm mb-6">
-              {status === "pending" && "Bếp đã nhận được Order của Bàn 05. Vui lòng đợi trong giây lát."}
-              {status === "cooking" && "Đầu bếp đang chế biến các món ăn thơm ngon cho Bàn 05."}
-              {status === "completed" && "Tuyệt vời! Nhân viên sẽ mang ra Bàn 05 cho bạn ngay."}
+              {status === "pending" && t.orderStatusModal.pendingDesc.replace("{table}", displayTable)}
+              {status === "cooking" && t.orderStatusModal.cookingDesc.replace("{table}", displayTable)}
+              {status === "completed" && t.orderStatusModal.completedDesc.replace("{table}", displayTable)}
             </p>
 
             {/* Progress bar */}
@@ -83,7 +88,7 @@ export default function OrderStatusModal({
               onClick={onClose}
               className="w-full bg-gray-100 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-200 transition-colors"
             >
-              {status === "completed" ? "Đóng" : "Ẩn thông báo"}
+              {status === "completed" ? t.orderStatusModal.close : t.orderStatusModal.hide}
             </button>
           </div>
         </div>

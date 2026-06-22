@@ -19,6 +19,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cartStore";
 import { useState, useEffect } from "react";
 import StaffNameModal from "@/components/admin/StaffNameModal";
+import { useTranslation } from "@/hooks/useTranslation";
+import LanguageSelector from "@/components/ui/LanguageSelector";
 
 export default function AdminLayout({
   children,
@@ -31,6 +33,7 @@ export default function AdminLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isStaffNameModalOpen, setIsStaffNameModalOpen] = useState(false);
   const [canCloseModal, setCanCloseModal] = useState(true);
+  const t = useTranslation();
 
   useEffect(() => {
     const isManageRole = ["admin", "staff", "kitchen"].includes(userRole);
@@ -71,19 +74,19 @@ export default function AdminLayout({
 
   const navItems = isSuspended
     ? [
-        { href: "/admin/billing", label: "Gói cước", icon: CreditCard }
+        { href: "/admin/billing", label: t.admin.billingTab, icon: CreditCard }
       ]
     : [
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-        { href: "/admin/tables", label: "Quản lý Bàn", icon: Store },
-        { href: "/admin/kitchen", label: "Quản lý Bếp", icon: Soup },
-        { href: "/admin/revenue", label: "Doanh thu", icon: TrendingUp },
-        { href: "/admin/menu", label: "Thực đơn", icon: Settings },
+        { href: "/admin/tables", label: t.admin.tablesTab, icon: Store },
+        { href: "/admin/kitchen", label: t.admin.kitchenTab, icon: Soup },
+        { href: "/admin/revenue", label: t.admin.revenueTab, icon: TrendingUp },
+        { href: "/admin/menu", label: t.admin.menuTab, icon: Settings },
         ...(userRole === "admin" ? [
-          { href: "/admin/billing", label: "Gói cước", icon: CreditCard },
-          { href: "/admin/logs", label: "Nhật ký", icon: ClipboardList }
+          { href: "/admin/billing", label: t.admin.billingTab, icon: CreditCard },
+          { href: "/admin/logs", label: t.admin.logsTab, icon: ClipboardList }
         ] : []),
-        { href: "/admin/credentials", label: "Tài khoản", icon: Users },
+        { href: "/admin/credentials", label: t.admin.credentialsTab, icon: Users },
       ];
 
   const isActive = (path: string) => {
@@ -125,8 +128,13 @@ export default function AdminLayout({
             </div>
             <div>
               <h1 className="font-black text-xl tracking-tight leading-none text-white">{storeConfig?.name || "Menu Việt"}</h1>
-              <p className="text-[10px] font-bold text-primary uppercase tracking-widest mt-1">Hệ thống quản lý</p>
+              <p className="text-[10px] font-bold text-primary uppercase tracking-widest mt-1">{t.admin.systemTitle}</p>
             </div>
+          </div>
+
+          {/* Language Selector */}
+          <div className="mb-6 px-2 flex justify-start">
+            <LanguageSelector light={false} />
           </div>
 
           <nav className="space-y-2 flex-1">
@@ -150,7 +158,7 @@ export default function AdminLayout({
                   </div>
                   {isBillingTab && isSuspended && (
                     <span className="bg-red-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse shrink-0">
-                      Hết hạn
+                      {t.admin.expiredLabel}
                     </span>
                   )}
                 </Link>
@@ -162,7 +170,7 @@ export default function AdminLayout({
           {activeStaffName && (
             <div className="mt-auto mb-4 p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-between gap-2">
               <div className="flex flex-col min-w-0">
-                <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">Đang trực ca</span>
+                <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider">{t.admin.shiftWorking}</span>
                 <span className="text-sm font-black text-white truncate">{activeStaffName}</span>
               </div>
               <button
@@ -171,7 +179,7 @@ export default function AdminLayout({
                   setCanCloseModal(true);
                   setIsStaffNameModalOpen(true);
                 }}
-                title="Đổi ca / Sửa tên"
+                title={t.admin.changeShift}
                 className="w-8 h-8 rounded-xl bg-white/5 hover:bg-primary text-gray-400 hover:text-white flex items-center justify-center transition-all shrink-0 cursor-pointer"
               >
                 <Pencil size={14} />
@@ -184,7 +192,7 @@ export default function AdminLayout({
             className={`${activeStaffName ? "" : "mt-auto"} flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white font-bold transition-all`}
           >
             <LogOut size={20} />
-            <span>Đăng xuất</span>
+            <span>{t.common.logout}</span>
           </button>
         </aside>
 
@@ -204,11 +212,11 @@ export default function AdminLayout({
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5 shrink-0">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                 </svg>
-                <span>Cửa hàng đã hết hạn dịch vụ Premium! Khách hàng không thể đặt món vào thời điểm này.</span>
+                <span>{t.admin.subExpiredBanner}</span>
               </div>
               {pathname !== "/admin/billing" && (
                 <Link href="/admin/billing" className="underline hover:text-red-100 shrink-0 font-black uppercase text-xs tracking-wider">
-                  Gia hạn ngay &rarr;
+                  {t.admin.renewNow} &rarr;
                 </Link>
               )}
             </div>
@@ -223,13 +231,13 @@ export default function AdminLayout({
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                     </svg>
                   </div>
-                  <h2 className="text-gray-900 text-xl font-black mb-3 uppercase tracking-tight">Gói dịch vụ đã hết hạn</h2>
+                  <h2 className="text-gray-900 text-xl font-black mb-3 uppercase tracking-tight">{t.admin.subExpiredTitle}</h2>
                   <p className="text-gray-500 text-sm leading-relaxed mb-8">
-                    Gói Premium của cửa hàng <span className="text-gray-950 font-bold">{storeConfig?.name}</span> đã hết thời hạn sử dụng. Vui lòng gia hạn gói dịch vụ để mở khóa đầy đủ tính năng và tiếp tục nhận đơn gọi món từ khách hàng.
+                    {t.admin.subExpiredDesc.replace("{name}", storeConfig?.name || "")}
                   </p>
                   <Link href="/admin/billing" className="w-full">
                     <button className="w-full py-3.5 bg-primary hover:bg-orange-600 active:bg-orange-700 text-white font-bold rounded-2xl shadow-lg shadow-orange-500/10 transition-all text-sm cursor-pointer select-none">
-                      Gia hạn dịch vụ ngay
+                      {t.admin.renewNow}
                     </button>
                   </Link>
                 </div>
@@ -255,10 +263,10 @@ export default function AdminLayout({
         <div className="fixed bottom-6 right-6 z-[9999] select-none text-right font-sans opacity-45 hover:opacity-100 transition-opacity duration-300 pointer-events-auto bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-gray-200/20 shadow-sm max-w-[240px]">
           <Link href="/admin/billing" className="block text-right group">
             <p className="text-xs font-black text-gray-400 uppercase tracking-wider group-hover:text-primary transition-colors">
-              Gói cước sắp hết hạn
+              {t.admin.billingWarnTitle}
             </p>
             <p className="text-[10px] text-gray-500 font-bold mt-1 leading-normal group-hover:text-gray-700 transition-colors">
-              Còn lại {daysLeft} ngày sử dụng. Nhập để gia hạn.
+              {t.admin.billingWarnDesc.replace("{days}", String(daysLeft))}
             </p>
           </Link>
         </div>

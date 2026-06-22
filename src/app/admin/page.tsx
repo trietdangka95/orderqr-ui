@@ -18,9 +18,11 @@ import AdminStatCard from "./components/AdminStatCard";
 import { useProducts } from "@/hooks/useProducts";
 import { useOrders } from "@/hooks/useOrders";
 import { useInvoices } from "@/hooks/useInvoices";
+import { useTranslation } from "@/hooks/useTranslation";
 
 function RevenueLineChart({ invoices }: { invoices: any[] }) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const t = useTranslation();
 
   const chartData = useMemo(() => {
     if (invoices.length === 0) {
@@ -173,13 +175,13 @@ function RevenueLineChart({ invoices }: { invoices: any[] }) {
 
   const getSubtitle = () => {
     const timestamps = invoices.map(inv => new Date(inv.createdAt).getTime());
-    if (timestamps.length === 0) return "Biểu đồ doanh thu 7 ngày gần nhất";
+    if (timestamps.length === 0) return t.admin.revenueSubtitleDefault;
     const minTime = Math.min(...timestamps);
     const maxTime = Math.max(...timestamps, Date.now());
     const diffDays = Math.ceil((maxTime - minTime) / (1000 * 60 * 60 * 24));
-    if (diffDays <= 31) return "Biểu đồ doanh thu theo Ngày";
-    if (diffDays <= 366) return "Biểu đồ doanh thu theo Tháng";
-    return "Biểu đồ doanh thu theo Năm";
+    if (diffDays <= 31) return t.admin.revenueSubtitleDay;
+    if (diffDays <= 366) return t.admin.revenueSubtitleMonth;
+    return t.admin.revenueSubtitleYear;
   };
 
   return (
@@ -190,7 +192,7 @@ function RevenueLineChart({ invoices }: { invoices: any[] }) {
             <TrendingUp size={18} />
           </div>
           <div>
-            <h3 className="font-black text-gray-900 text-lg uppercase tracking-wider">Doanh thu quán</h3>
+            <h3 className="font-black text-gray-900 text-lg uppercase tracking-wider">{t.admin.revenueTitle}</h3>
             <p className="text-gray-400 text-xs font-medium mt-0.5">{getSubtitle()}</p>
           </div>
         </div>
@@ -198,7 +200,7 @@ function RevenueLineChart({ invoices }: { invoices: any[] }) {
           href="/admin/revenue" 
           className="text-xs font-black text-primary hover:text-orange-600 bg-primary-soft hover:bg-primary/20 px-4 py-2 rounded-xl transition-all select-none uppercase tracking-wider"
         >
-          Xem chi tiết &rarr;
+          {t.admin.viewDetails} &rarr;
         </Link>
       </div>
 
@@ -218,10 +220,10 @@ function RevenueLineChart({ invoices }: { invoices: any[] }) {
               }}
             >
               <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                Mốc {points[hoveredIdx].date}
+                {t.admin.chartPoint.replace("{date}", points[hoveredIdx].date)}
               </span>
               <span className="font-black text-orange-400 text-sm mt-1">
-                {points[hoveredIdx].revenue.toLocaleString("vi-VN")} ₫
+                {points[hoveredIdx].revenue.toLocaleString("vi-VN")} {t.common.currency}
               </span>
             </motion.div>
           )}
@@ -358,6 +360,7 @@ export default function AdminDashboard() {
   const { data: products = [] } = useProducts();
   const { data: orders = [] } = useOrders();
   const { data: invoices = [] } = useInvoices();
+  const t = useTranslation();
 
   const [filterType, setFilterType] = useState<FilterType>("ALL_TIME");
   const [customFrom, setCustomFrom] = useState("");
@@ -426,25 +429,36 @@ export default function AdminDashboard() {
     <div className="max-w-5xl mx-auto">
       <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Hệ thống Quản trị</h1>
-          <p className="text-gray-500 font-medium italic">Monitoring and managing your restaurant operations</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.admin.systemTitle}</h1>
+          <p className="text-gray-500 font-medium italic">{t.admin.systemSubtitle}</p>
         </div>
 
         {/* Filter Toolbar */}
         <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200">
-          {FILTER_PRESETS.map((btn) => (
-            <button
-              key={btn.id}
-              onClick={() => setFilterType(btn.id)}
-              className={`px-3 py-1.5 rounded-xl font-bold text-[10px] md:text-xs uppercase tracking-wider transition-all cursor-pointer ${
-                filterType === btn.id
-                  ? "bg-white text-primary shadow-sm"
-                  : "text-gray-400 hover:text-gray-600"
-              }`}
-            >
-              {btn.label}
-            </button>
-          ))}
+          {FILTER_PRESETS.map((btn) => {
+            const getFilterLabel = (id: typeof btn.id) => {
+              if (id === "ALL_TIME") return t.admin.filterAllTime;
+              if (id === "TODAY") return t.admin.filterToday;
+              if (id === "THIS_WEEK") return t.admin.filterThisWeek;
+              if (id === "THIS_MONTH") return t.admin.filterThisMonth;
+              if (id === "THIS_YEAR") return t.admin.filterThisYear;
+              if (id === "CUSTOM") return t.admin.filterCustom;
+              return btn.label;
+            };
+            return (
+              <button
+                key={btn.id}
+                onClick={() => setFilterType(btn.id)}
+                className={`px-3 py-1.5 rounded-xl font-bold text-[10px] md:text-xs uppercase tracking-wider transition-all cursor-pointer ${
+                  filterType === btn.id
+                    ? "bg-white text-primary shadow-sm"
+                    : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                {getFilterLabel(btn.id)}
+              </button>
+            );
+          })}
         </div>
       </header>
 
@@ -452,7 +466,7 @@ export default function AdminDashboard() {
       {filterType === "CUSTOM" && (
         <div className="bg-white p-4 border border-gray-100 rounded-2xl shadow-sm mb-12 flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Từ ngày</span>
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.admin.fromDate}</span>
             <input
               type="date"
               value={customFrom}
@@ -461,7 +475,7 @@ export default function AdminDashboard() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Đến ngày</span>
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.admin.toDate}</span>
             <input
               type="date"
               value={customTo}
@@ -478,7 +492,7 @@ export default function AdminDashboard() {
           href="/admin/revenue"
           icon={TrendingUp}
           value={new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(totalRevenue)}
-          label="Doanh thu tổng"
+          label={t.admin.totalRevenue}
           colorClass="text-green-500"
           bgClass="bg-green-50"
         />
@@ -486,7 +500,7 @@ export default function AdminDashboard() {
           href="/admin/revenue"
           icon={ShoppingBag}
           value={filteredInvoices.length}
-          label="Hóa đơn đã xuất"
+          label={t.admin.issuedInvoices}
           colorClass="text-blue-500"
           bgClass="bg-blue-50"
         />
@@ -494,7 +508,7 @@ export default function AdminDashboard() {
           href="/admin/tables"
           icon={LayoutDashboard}
           value={new Set(orders.map(o => o.tableNumber)).size}
-          label="Bàn đang phục vụ"
+          label={t.admin.activeTables}
           colorClass="text-orange-500"
           bgClass="bg-primary-soft"
         />
@@ -502,7 +516,7 @@ export default function AdminDashboard() {
           href="/admin/menu"
           icon={Settings}
           value={products.length}
-          label="Món ăn trong Menu"
+          label={t.admin.menuItemsCount}
           colorClass="text-purple-500"
           bgClass="bg-purple-50"
         />
@@ -514,22 +528,22 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between mb-6 px-4">
             <div className="flex items-center gap-3">
               <div className="w-2 h-6 bg-purple-600 rounded-full"></div>
-              <h2 className="text-lg font-black text-gray-900 uppercase tracking-wider">Trạng thái quán</h2>
+              <h2 className="text-lg font-black text-gray-900 uppercase tracking-wider">{t.admin.storeStatusTitle}</h2>
             </div>
-            <span className="text-xs font-bold text-purple-600 group-hover:underline">Xem tất cả</span>
+            <span className="text-xs font-bold text-purple-600 group-hover:underline">{t.admin.viewAll}</span>
           </div>
           <div className="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 relative overflow-hidden group-hover:border-purple-300 transition-all">
             <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="flex justify-between items-center pb-4 md:pb-0 border-b md:border-b-0 md:border-r border-gray-100 px-4">
-                <span className="text-gray-500 font-bold text-sm">Đang chờ xác nhận</span>
+                <span className="text-gray-500 font-bold text-sm">{t.admin.pendingConfirm}</span>
                 <span className="font-black text-3xl text-orange-500">{orders.filter(o => o.status === "PENDING").length}</span>
               </div>
               <div className="flex justify-between items-center pb-4 md:pb-0 border-b md:border-b-0 md:border-r border-gray-100 px-4">
-                <span className="text-gray-500 font-bold text-sm">Đang chế biến</span>
+                <span className="text-gray-500 font-bold text-sm">{t.admin.cooking}</span>
                 <span className="font-black text-3xl text-blue-600">{orders.filter(o => o.status === "COOKING").length}</span>
               </div>
               <div className="flex justify-between items-center px-4">
-                <span className="text-gray-500 font-bold text-sm">Đang phục vụ</span>
+                <span className="text-gray-500 font-bold text-sm">{t.admin.serving}</span>
                 <span className="font-black text-3xl text-green-600">{orders.filter(o => o.status === "SERVING").length}</span>
               </div>
             </div>
@@ -550,7 +564,7 @@ export default function AdminDashboard() {
           href="/"
           className="text-gray-400 hover:text-gray-600 font-bold text-sm flex items-center justify-center gap-2 transition-colors"
         >
-          Quay lại trang Menu khách hàng
+          {t.admin.backToMenu}
         </Link>
       </div>
     </div>
