@@ -250,7 +250,7 @@ export default function KitchenPage() {
         </div>
 
         <div className="flex items-center gap-4">
-          <LanguageSelector light={true} />
+          {userRole === "kitchen" && <LanguageSelector light={true} />}
           
           <div className="flex bg-gray-100/80 backdrop-blur-sm p-1 rounded-2xl border border-gray-200/50 shadow-sm h-fit gap-1">
             <button

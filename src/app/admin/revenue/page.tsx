@@ -26,10 +26,20 @@ import { formatPrice as utilsFormatPrice } from "@/utils/currency";
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface OrderItemDetail {
   id: string;
+  productId?: string;
   quantity: number;
   priceAtTime: number | string;
+  originalPriceAtTime?: string | number | null;
+  discountPercentAtTime?: number | null;
   note?: string;
-  product?: { name: string; category?: { name: string } };
+  product?: { 
+    id?: string;
+    name: string; 
+    price?: number;
+    description?: string;
+    category?: { name: string };
+    discountPercent?: number;
+  };
 }
 
 interface OrderDetail {
@@ -214,44 +224,127 @@ function buildTop(invoices: InvoiceRecord[], language: string) {
 function exportCSV(records: InvoiceRecord[], from: string, to: string, t: any, language: string) {
   const sep = ",";
   const bom = "\uFEFF";
-  const locale = language === "vi" ? "vi-VN" : "en-US";
 
-  const invoiceRows = records.map((inv) => {
-    const items = inv.orders
-      .flatMap((o) => o.orderItems)
-      .map(
-        (it) =>
-          `${it.quantity}x ${it.product?.name || (language === "vi" ? "Món" : "Item")} @${Number(it.priceAtTime).toLocaleString(locale)}${t.common.currency}${it.note ? ` (${it.note})` : ""}`
-      )
-      .join(" | ");
+  const groupMap: Record<string, {
+    productId: string;
+    name: string;
+    description: string;
+    originalPrice: number;
+    quantity: number;
+    discountPercent: number;
+    totalDiscount: number;
+    actualRevenue: number;
+  }> = {};
+
+  records.forEach((inv) => {
+    inv.orders.forEach((ord) => {
+      ord.orderItems.forEach((it) => {
+        const productId = it.productId || it.product?.id || "";
+        const name = it.product?.name || (language === "vi" ? "Món ăn" : "Dish");
+        const description = it.product?.description || "";
+        
+        // Calculate prices
+        const priceAtTime = Number(it.priceAtTime !== undefined ? it.priceAtTime : (it.product?.price || 0));
+        const originalPrice = Number(it.originalPriceAtTime !== null && it.originalPriceAtTime !== undefined
+          ? it.originalPriceAtTime
+          : (it.product?.price || 0));
+        const discountPercent = Number(it.discountPercentAtTime !== null && it.discountPercentAtTime !== undefined
+          ? it.discountPercentAtTime
+          : (it.product?.discountPercent || 0));
+        
+        const qty = it.quantity;
+        const totalDiscount = Math.max(0, originalPrice - priceAtTime) * qty;
+        const actualRev = priceAtTime * qty;
+
+        const key = `${productId}_${originalPrice}_${discountPercent}`;
+
+        if (!groupMap[key]) {
+          groupMap[key] = {
+            productId,
+            name,
+            description,
+            originalPrice,
+            quantity: 0,
+            discountPercent,
+            totalDiscount: 0,
+            actualRevenue: 0
+          };
+        }
+
+        const group = groupMap[key];
+        group.quantity += qty;
+        group.totalDiscount += totalDiscount;
+        group.actualRevenue += actualRev;
+      });
+    });
+  });
+
+  const groupRows = Object.values(groupMap);
+
+  // Headers: Mã hàng | Tên sản phẩm | Mô tả sản phẩm | Giá | Số lượng | Tổng | Giảm giá | Tổng giảm | Thực thu
+  const headers = language === "vi" 
+    ? ["Mã hàng", "Tên sản phẩm", "Mô tả sản phẩm", "Giá", "Số lượng", "Tổng", "Giảm giá", "Tổng giảm", "Thực thu"]
+    : ["Product Code", "Product Name", "Product Description", "Price", "Quantity", "Total", "Discount (%)", "Total Discount", "Actual Revenue"];
+
+  const formatCSVField = (field: string | number) => {
+    const stringVal = String(field);
+    if (stringVal.includes(",") || stringVal.includes('"') || stringVal.includes("\n")) {
+      return `"${stringVal.replace(/"/g, '""')}"`;
+    }
+    return stringVal;
+  };
+
+  const rows = groupRows.map((it) => {
+    const total = it.originalPrice * it.quantity;
     return [
-      `"${inv.id}"`,
-      `"${new Date(inv.timestamp).toLocaleString(locale)}"`,
-      `"${t.common.table} ${inv.tableNumber}"`,
-      `"${inv.paymentMethod === "QR_TRANSFER" ? t.tables.qrTransfer : t.tables.cashPayment}"`,
-      inv.totalAmount,
-      `"${items.replace(/"/g, '""')}"`,
+      formatCSVField(it.productId),
+      formatCSVField(it.name),
+      formatCSVField(it.description),
+      it.originalPrice,
+      it.quantity,
+      total,
+      formatCSVField(`${it.discountPercent}%`),
+      it.totalDiscount,
+      it.actualRevenue
     ].join(sep);
   });
 
-  const top = buildTop(records, language);
-  const topRows = top.map((it) =>
-    [`"${it.name}"`, `"${it.cat}"`, it.qty, it.rev].join(sep)
-  );
+  // Calculate totals for the bottom row
+  const totalQty = groupRows.reduce((sum, r) => sum + r.quantity, 0);
+  const totalSum = groupRows.reduce((sum, r) => sum + (r.originalPrice * r.quantity), 0);
+  const totalDiscountSum = groupRows.reduce((sum, r) => sum + r.totalDiscount, 0);
+  const totalActualSum = groupRows.reduce((sum, r) => sum + r.actualRevenue, 0);
 
-  const period =
-    from && to ? `${t.revenue.fromDate} ${from} ${t.revenue.toDate.toLowerCase()} ${to}` : from ? `${t.revenue.fromDate} ${from}` : to ? `${t.revenue.toDate} ${to}` : (language === "vi" ? "Toàn bộ" : "All");
+  const totalRow = [
+    "",
+    formatCSVField(language === "vi" ? "Tổng cộng" : "Total"),
+    "",
+    "",
+    totalQty,
+    totalSum,
+    "",
+    totalDiscountSum,
+    totalActualSum
+  ].join(sep);
+
+  const period = from && to 
+    ? `${from} - ${to}`
+    : from 
+      ? `${t.revenue.fromDate} ${from}` 
+      : to 
+        ? `${t.revenue.toDate} ${to}` 
+        : (language === "vi" ? "Toàn bộ" : "All");
+
+  const titleText = language === "vi" 
+    ? `BÁO CÁO DOANH THU CHI TIẾT (${period})` 
+    : `DETAILED REVENUE REPORT (${period})`;
 
   const content = [
-    `"${t.revenue.title.toUpperCase()} - ${period}"`,
+    formatCSVField(titleText),
     "",
-    `=== ${t.revenue.invoiceListTitle.toUpperCase()} ===`,
-    `"${t.revenue.headerInvoiceId}","${t.revenue.headerTime}","${t.revenue.headerTable}","${t.revenue.headerStatus}","${t.revenue.headerAmount} (${t.common.currency})","${language === "vi" ? "Danh sách món" : "Items list"}"`,
-    ...invoiceRows,
-    "",
-    `=== ${t.revenue.topSellingTitle.toUpperCase()} ===`,
-    `"${language === "vi" ? "Tên món" : "Item name"}","${language === "vi" ? "Danh mục" : "Category"}","${t.revenue.receiptQty}","${t.revenue.headerAmount} (${t.common.currency})"`,
-    ...topRows,
+    headers.map(formatCSVField).join(sep),
+    ...rows,
+    totalRow
   ].join("\n");
 
   const blob = new Blob([bom + content], { type: "text/csv;charset=utf-8;" });
@@ -259,7 +352,7 @@ function exportCSV(records: InvoiceRecord[], from: string, to: string, t: any, l
   const a = document.createElement("a");
   a.href = url;
   const suffix = from || to ? `_${from || "start"}_${to || "end"}` : "_all";
-  a.download = `${language === "vi" ? "doanh_thu" : "revenue"}${suffix}_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.download = `${language === "vi" ? "bao_cao_doanh_thu" : "revenue_report"}${suffix}_${new Date().toISOString().slice(0, 10)}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -670,16 +763,6 @@ export default function RevenuePage() {
               {t.revenue.subtitle}
             </p>
           </div>
-          <button
-            onClick={() => {
-              const { from, to } = getExportPeriod();
-              exportCSV(filtered, from, to, t, language);
-            }}
-            className="flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 text-white font-black rounded-xl transition-all shadow-md shadow-green-100 hover:scale-[1.02] active:scale-95 text-sm shrink-0"
-          >
-            <Download size={18} />
-            {t.revenue.exportBtn}{hasFilter ? t.revenue.filteredSuffix : t.revenue.allSuffix}
-          </button>
         </header>
 
         {/* Stats */}
@@ -747,6 +830,17 @@ export default function RevenuePage() {
                 {t.revenue.clearFilter}
               </button>
             )}
+
+            <button
+              onClick={() => {
+                const { from, to } = getExportPeriod();
+                exportCSV(filtered, from, to, t, language);
+              }}
+              className="ml-auto flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-black rounded-xl transition-all shadow-md shadow-green-100/50 hover:scale-[1.02] active:scale-95 text-xs shrink-0 cursor-pointer"
+            >
+              <Download size={14} />
+              <span>{t.revenue.exportBtn}</span>
+            </button>
           </div>
 
           {/* Custom Date Inputs if CUSTOM filter type is active */}
