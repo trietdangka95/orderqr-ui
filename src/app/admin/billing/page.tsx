@@ -15,7 +15,6 @@ import {
   QrCode,
   Crown,
   Calendar,
-  Info,
   ShieldCheck,
   Zap
 } from "lucide-react";
@@ -26,8 +25,7 @@ import Button from "@/components/ui/Button";
 import Textarea from "@/components/ui/Textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import { BANK_OPTIONS } from "@/constants/banks";
-
-
+import { useTranslation } from "@/hooks/useTranslation";
 
 const sanitizeBankId = (bankId: string | undefined | null): string => {
   if (!bankId) return "";
@@ -57,7 +55,8 @@ const sanitizeBankId = (bankId: string | undefined | null): string => {
 };
 
 export default function AdminBillingPage() {
-  const { storeConfig, setStoreConfig } = useCartStore();
+  const t = useTranslation();
+  const { storeConfig, setStoreConfig, language } = useCartStore();
   const isMounted = useIsMounted();
   const { data: requests = [], isLoading: requestsLoading } = useRenewalRequests();
   const { data: bankConfig } = useBankConfig();
@@ -107,13 +106,13 @@ export default function AdminBillingPage() {
 
   // Base packages definitions, switching dynamic labels and prices for testing
   const packages = isTestMode ? [
-    { months: 3, price: 3000, label: "3 phút (Test)", originalPrice: 3000, desc: "Gói Phút 1", popular: false },
-    { months: 6, price: 6000, label: "6 phút (Test)", originalPrice: 6000, desc: "Gói Phút 2", popular: true },
-    { months: 12, price: 12000, label: "12 phút (Test)", originalPrice: 12000, desc: "Gói Phút 3", popular: false },
+    { months: 3, price: 3000, label: language === "vi" ? "3 phút (Test)" : "3 mins (Test)", originalPrice: 3000, desc: language === "vi" ? "Gói Phút 1" : "Minute Plan 1", popular: false },
+    { months: 6, price: 6000, label: language === "vi" ? "6 phút (Test)" : "6 mins (Test)", originalPrice: 6000, desc: language === "vi" ? "Gói Phút 2" : "Minute Plan 2", popular: true },
+    { months: 12, price: 12000, label: language === "vi" ? "12 phút (Test)" : "12 mins (Test)", originalPrice: 12000, desc: language === "vi" ? "Gói Phút 3" : "Minute Plan 3", popular: false },
   ] : [
-    { months: 3, price: 3 * MONTHLY_PRICE, label: "3 tháng", originalPrice: 3 * MONTHLY_PRICE, desc: "Gói Cơ Bản", popular: false },
-    { months: 6, price: Math.round(6 * MONTHLY_PRICE * 0.9), label: "6 tháng (Giảm 10%)", originalPrice: 6 * MONTHLY_PRICE, desc: "Gói Phổ Biến", popular: true },
-    { months: 12, price: Math.round(12 * MONTHLY_PRICE * 0.8), label: "12 tháng (Giảm 20%)", originalPrice: 12 * MONTHLY_PRICE, desc: "Gói Tiết Kiệm", popular: false },
+    { months: 3, price: 3 * MONTHLY_PRICE, label: language === "vi" ? "3 tháng" : "3 months", originalPrice: 3 * MONTHLY_PRICE, desc: language === "vi" ? "Gói Cơ Bản" : "Basic Plan", popular: false },
+    { months: 6, price: Math.round(6 * MONTHLY_PRICE * 0.9), label: language === "vi" ? "6 tháng (Giảm 10%)" : "6 months (10% Off)", originalPrice: 6 * MONTHLY_PRICE, desc: language === "vi" ? "Gói Phổ Biến" : "Popular Plan", popular: true },
+    { months: 12, price: Math.round(12 * MONTHLY_PRICE * 0.8), label: language === "vi" ? "12 tháng (Giảm 20%)" : "12 months (20% Off)", originalPrice: 12 * MONTHLY_PRICE, desc: language === "vi" ? "Gói Tiết Kiệm" : "Saver Plan", popular: false },
   ];
 
   const superAdminBankId = bankConfig?.bankId || process.env.NEXT_PUBLIC_SUPERADMIN_BANK_ID || "MB";
@@ -136,7 +135,7 @@ export default function AdminBillingPage() {
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    showToast(`Đã sao chép ${label}!`, "success");
+    showToast(t.billing.copiedToast.replace("{label}", label), "success");
   };
 
   const handleOpenModal = (pkg: typeof packages[0]) => {
@@ -157,11 +156,11 @@ export default function AdminBillingPage() {
         setIsModalOpen(false);
         setSelectedPkg(null);
         setNotes("");
-        showToast("Gửi yêu cầu gia hạn thành công! Vui lòng chờ hệ thống đối soát duyệt.", "success");
+        showToast(t.billing.submitSuccess, "success");
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
-        showToast(err.message || "Gửi yêu cầu gia hạn thất bại. Vui lòng thử lại!", "error");
+        showToast(err.message || t.billing.submitError, "error");
       }
     });
   };
@@ -169,7 +168,7 @@ export default function AdminBillingPage() {
   const handleUpdateBank = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!bankId || !bankAccountNo || !bankAccountName) {
-      showToast("Vui lòng điền đầy đủ thông tin ngân hàng!", "error");
+      showToast(t.billing.bankInputEmptyError, "error");
       return;
     }
     updateStoreBankMutation.mutate({
@@ -184,11 +183,11 @@ export default function AdminBillingPage() {
           bankAccountNo: data.bankAccountNo,
           bankAccountName: data.bankAccountName
         });
-        showToast("Lưu thông tin ngân hàng thành công!", "success");
+        showToast(t.billing.bankSaveSuccess, "success");
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
-        showToast(err.message || "Không thể cập nhật cấu hình ngân hàng", "error");
+        showToast(err.message || t.billing.bankSaveError, "error");
       }
     });
   };
@@ -203,14 +202,15 @@ export default function AdminBillingPage() {
     setSelectedPkg(null);
   };
 
-  const unitLabel = isTestMode ? "phút" : "tháng";
+  const unitLabel = isTestMode ? t.billing.historyMinutesUnit : t.billing.historyMonthsUnit;
+  const locale = language === "vi" ? "vi-VN" : "en-US";
 
   return (
     <div className="max-w-7xl mx-auto space-y-10">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Gói cước & Thanh toán</h1>
-          <p className="text-gray-500 font-medium italic">Quản lý thời hạn gói Premium và gửi yêu cầu gia hạn hệ thống</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.billing.title}</h1>
+          <p className="text-gray-500 font-medium italic">{t.billing.subtitle}</p>
         </div>
       </header>
 
@@ -242,7 +242,7 @@ export default function AdminBillingPage() {
                           PREMIUM PLAN
                         </span>
                         <h2 className="text-2xl font-black tracking-tight text-gray-900 mt-1">
-                          Tài khoản Premium
+                          {t.billing.premiumPlan}
                         </h2>
                       </div>
                     </div>
@@ -255,7 +255,7 @@ export default function AdminBillingPage() {
                           : "bg-emerald-500 text-white"
                         }`}>
                         {!isExpired && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
-                        {isExpired ? "Hết hạn" : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? "Sắp hết hạn" : "Hoạt động"}
+                        {isExpired ? t.billing.expired : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? t.billing.approachingExpiry : t.billing.active}
                       </span>
                     </div>
                   </div>
@@ -264,15 +264,15 @@ export default function AdminBillingPage() {
                     <div className="flex items-center gap-3 bg-gray-50/50 border border-gray-100 p-3.5 rounded-2xl">
                       <Calendar className="text-gray-400 shrink-0" size={18} />
                       <div>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Ngày hết hạn</p>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{t.billing.expiryDate}</p>
                         <p className="text-sm font-extrabold text-gray-800 mt-0.5">
                           {storeConfig?.subscriptionEnd
-                            ? new Date(storeConfig.subscriptionEnd).toLocaleDateString("vi-VN", {
+                            ? new Date(storeConfig.subscriptionEnd).toLocaleDateString(locale, {
                               year: "numeric",
                               month: "long",
                               day: "numeric"
                             })
-                            : "Không có hạn"}
+                            : t.billing.noExpiry}
                         </p>
                       </div>
                     </div>
@@ -280,9 +280,9 @@ export default function AdminBillingPage() {
                     <div className="flex items-center gap-3 bg-gray-50/50 border border-gray-100 p-3.5 rounded-2xl">
                       <Clock className="text-gray-400 shrink-0" size={18} />
                       <div>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Thời gian còn lại</p>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{t.billing.timeRemaining}</p>
                         <p className={`text-sm font-extrabold mt-0.5 ${isExpired ? "text-red-500" : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? "text-amber-600" : "text-emerald-600"}`}>
-                          {isExpired ? "0 ngày (Vui lòng gia hạn)" : storeConfig?.subscriptionEnd == null ? "Không giới hạn" : `${daysLeft} day`}
+                          {isExpired ? t.billing.zeroDaysWarning : storeConfig?.subscriptionEnd == null ? t.billing.infiniteDays : t.billing.daysLeft.replace("{days}", String(daysLeft))}
                         </p>
                       </div>
                     </div>
@@ -295,39 +295,39 @@ export default function AdminBillingPage() {
                     <div className="flex items-start gap-3 bg-red-50 border border-red-200/60 text-red-800 p-4 rounded-2xl text-sm font-medium h-full justify-center flex-col">
                       <div className="flex items-center gap-2 mb-1">
                         <AlertTriangle className="text-red-500" size={20} />
-                        <p className="font-bold text-red-950">Dịch vụ đã tạm dừng</p>
+                        <p className="font-bold text-red-950">{t.billing.expired}</p>
                       </div>
-                      <p className="text-xs text-red-700/90 leading-relaxed">Cửa hàng đã hết hạn dịch vụ. Vui lòng thanh toán gia hạn bên dưới để khách hàng của bạn có thể tiếp tục gọi món trực tuyến.</p>
+                      <p className="text-xs text-red-700/90 leading-relaxed">{t.billing.suspendedDesc}</p>
                     </div>
                   ) : (storeConfig?.subscriptionEnd != null && daysLeft <= 7) ? (
                     <div className="flex items-start gap-3 bg-amber-50 border border-amber-200/60 text-amber-800 p-4 rounded-2xl text-sm font-medium h-full justify-center flex-col">
                       <div className="flex items-center gap-2 mb-1">
                         <AlertTriangle className="text-amber-600 animate-bounce" size={20} />
-                        <p className="font-bold text-amber-950">Yêu cầu gia hạn sớm</p>
+                        <p className="font-bold text-amber-950">{t.billing.approachingExpiry}</p>
                       </div>
-                      <p className="text-xs text-amber-700/90 leading-relaxed">Gói dịch vụ sẽ hết hạn trong {daysLeft} ngày nữa. Hãy gia hạn ngay hôm nay để tránh gián đoạn dịch vụ của bạn.</p>
+                      <p className="text-xs text-amber-700/90 leading-relaxed">{t.billing.approachingExpiryDesc.replace("{days}", String(daysLeft))}</p>
                     </div>
                   ) : (
                     <div className="flex flex-col justify-between h-full bg-amber-50/40 border border-amber-100 p-5 rounded-2xl">
                       <div>
-                        <h4 className="text-xs font-black text-amber-800 uppercase tracking-wider mb-2">Tính năng đang kích hoạt</h4>
+                        <h4 className="text-xs font-black text-amber-800 uppercase tracking-wider mb-2">{t.billing.featuresTitle}</h4>
                         <ul className="space-y-2 text-xs font-semibold text-gray-700">
                           <li className="flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                            Tự động tạo mã QR theo bàn
+                            {t.billing.featureQr}
                           </li>
                           <li className="flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                            Đồng bộ đặt món thời gian thực
+                            {t.billing.featureRealtime}
                           </li>
                           <li className="flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                            Báo cáo doanh thu & Quản lý nâng cao
+                            {t.billing.featureDashboard}
                           </li>
                         </ul>
                       </div>
                       <p className="text-[11px] font-bold text-amber-700/85 italic mt-4">
-                        Cảm ơn bạn đã đồng hành cùng Menu Việt!
+                        {t.billing.thankYou}
                       </p>
                     </div>
                   )}
@@ -337,8 +337,6 @@ export default function AdminBillingPage() {
           ) : (
             /* Free Plan Card Design */
             <div className="relative overflow-hidden rounded-[2rem] border border-gray-100 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 p-8 shadow-md hover:shadow-lg transition-all duration-300 h-full">
-              {/* Background decorative elements */}
-
               <div className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch h-full">
                 {/* Left Column: Plan Details */}
                 <div className="flex flex-col justify-between space-y-6">
@@ -352,7 +350,7 @@ export default function AdminBillingPage() {
                           FREE PLAN
                         </span>
                         <h2 className="text-2xl font-black tracking-tight text-gray-900 mt-1">
-                          Tài khoản Miễn phí
+                          {t.billing.freePlan}
                         </h2>
                       </div>
                     </div>
@@ -364,10 +362,10 @@ export default function AdminBillingPage() {
                         }`}>
                         {storeConfig?.subscriptionStatus !== "EXPIRED" && <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />}
                         {storeConfig?.subscriptionStatus === "EXPIRED"
-                          ? "Hết hạn"
+                          ? t.billing.expired
                           : storeConfig?.subscriptionStatus === "ACTIVE"
-                            ? "Hoạt động"
-                            : storeConfig?.subscriptionStatus || "Hoạt động"}
+                            ? t.billing.active
+                            : storeConfig?.subscriptionStatus || t.billing.active}
                       </span>
                     </div>
                   </div>
@@ -376,15 +374,15 @@ export default function AdminBillingPage() {
                     <div className="flex items-center gap-3 bg-gray-50/50 border border-gray-100 p-3.5 rounded-2xl">
                       <Calendar className="text-gray-400 shrink-0" size={18} />
                       <div>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Ngày hết hạn</p>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{t.billing.expiryDate}</p>
                         <p className="text-sm font-extrabold text-gray-800 mt-0.5">
                           {storeConfig?.subscriptionEnd
-                            ? new Date(storeConfig.subscriptionEnd).toLocaleDateString("vi-VN", {
+                            ? new Date(storeConfig.subscriptionEnd).toLocaleDateString(locale, {
                               year: "numeric",
                               month: "long",
                               day: "numeric"
                             })
-                            : "Không giới hạn"}
+                            : t.billing.infiniteDays}
                         </p>
                       </div>
                     </div>
@@ -392,14 +390,13 @@ export default function AdminBillingPage() {
                     <div className="flex items-center gap-3 bg-gray-50/50 border border-gray-100 p-3.5 rounded-2xl">
                       <ShieldCheck className={`shrink-0 ${storeConfig?.subscriptionStatus === "EXPIRED" ? "text-red-500" : "text-emerald-500"}`} size={18} />
                       <div>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Trạng thái gói</p>
-                        <p className={`text-sm font-extrabold mt-0.5 ${storeConfig?.subscriptionStatus === "EXPIRED" ? "text-red-500" : "text-emerald-600"
-                          }`}>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{t.billing.historyHeaderStatus}</p>
+                        <p className={`text-sm font-extrabold mt-0.5 ${storeConfig?.subscriptionStatus === "EXPIRED" ? "text-red-500" : "text-emerald-600"}`}>
                           {storeConfig?.subscriptionStatus === "ACTIVE"
-                            ? "Hoạt động"
+                            ? t.billing.active
                             : storeConfig?.subscriptionStatus === "EXPIRED"
-                              ? "Hết hạn"
-                              : storeConfig?.subscriptionStatus || "Hoạt động"}
+                              ? t.billing.expired
+                              : storeConfig?.subscriptionStatus || t.billing.active}
                         </p>
                       </div>
                     </div>
@@ -409,18 +406,26 @@ export default function AdminBillingPage() {
             </div>
           )}
         </div>
-
-
       </div>
-
-
 
       {/* Renewal Packages Grid */}
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h3 className="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-            <Coins className="text-orange-500" /> Chọn gói Gia hạn Premium
+            <Coins className="text-orange-500" /> {t.billing.choosePackage}
           </h3>
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="test-mode"
+              checked={isTestMode}
+              onChange={handleToggleTestMode}
+              className="rounded border-gray-300 text-primary focus:ring-primary w-4 h-4"
+            />
+            <label htmlFor="test-mode" className="text-xs font-bold text-gray-500 select-none cursor-pointer">
+              Test Mode (Minutes)
+            </label>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -432,7 +437,7 @@ export default function AdminBillingPage() {
             >
               {pkg.popular && (
                 <div className="absolute top-0 right-0 bg-primary text-white text-[9px] font-black uppercase px-3 py-1 rounded-bl-xl tracking-widest">
-                  Phổ biến nhất
+                  {t.billing.popularBadge}
                 </div>
               )}
               <div className="space-y-3">
@@ -440,11 +445,11 @@ export default function AdminBillingPage() {
                 <h4 className="text-2xl font-black text-gray-900">{pkg.label}</h4>
                 <div className="pt-2">
                   <span className="text-2xl sm:text-3xl font-black text-primary whitespace-nowrap">
-                    {pkg.price.toLocaleString("vi-VN")}&nbsp;₫
+                    {pkg.price.toLocaleString(locale)}&nbsp;₫
                   </span>
                   {pkg.price < pkg.originalPrice && (
                     <span className="text-xs text-gray-400 line-through block font-medium mt-1">
-                      {pkg.originalPrice.toLocaleString("vi-VN")}&nbsp;₫
+                      {pkg.originalPrice.toLocaleString(locale)}&nbsp;₫
                     </span>
                   )}
                 </div>
@@ -454,12 +459,13 @@ export default function AdminBillingPage() {
                 variant={pkg.popular ? "primary" : "secondary"}
                 className={`w-full mt-6 py-3 h-auto ${pkg.popular ? "shadow-lg shadow-primary/20" : ""}`}
               >
-                Gia hạn ngay
+                {t.billing.renewButton}
               </Button>
             </div>
           ))}
         </div>
       </div>
+
       {/* Store Bank Configuration Card */}
       <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-xl shadow-gray-200/50 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-50 pb-6 gap-4">
@@ -468,21 +474,21 @@ export default function AdminBillingPage() {
               <QrCode size={24} />
             </div>
             <div>
-              <h3 className="text-xl font-black text-gray-900 tracking-tight">Tài khoản Ngân hàng nhận QR</h3>
-              <p className="text-sm text-gray-500 font-medium">Cấu hình thông tin tài khoản ngân hàng của quán để tự động tạo mã QR VietQR nhận tiền khi khách thanh toán chuyển khoản.</p>
+              <h3 className="text-xl font-black text-gray-900 tracking-tight">{t.billing.bankConfigTitle}</h3>
+              <p className="text-sm text-gray-500 font-medium">{t.billing.bankConfigDesc}</p>
             </div>
           </div>
         </div>
 
         <form onSubmit={handleUpdateBank} className="flex flex-col gap-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Ngân hàng</label>
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">{t.billing.bankLabel}</label>
             <Select
               value={bankId}
               onChange={(e) => setBankId(e.target.value)}
               required
             >
-              <option value="" disabled>Chọn ngân hàng...</option>
+              <option value="" disabled>{t.billing.bankPlaceholder}</option>
               {BANK_OPTIONS.map((b) => (
                 <option key={b.id} value={b.id}>{b.name}</option>
               ))}
@@ -490,23 +496,23 @@ export default function AdminBillingPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Số tài khoản</label>
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">{t.billing.accountNumber}</label>
             <Input
               type="text"
               value={bankAccountNo}
               onChange={(e) => setBankAccountNo(e.target.value)}
-              placeholder="Nhập số tài khoản"
+              placeholder={t.billing.accountNumber}
               required
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">Tên chủ tài khoản (Viết liền không dấu)</label>
+            <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block">{t.billing.accountName}</label>
             <Input
               type="text"
               value={bankAccountName}
               onChange={(e) => setBankAccountName(e.target.value.toUpperCase())}
-              placeholder="Ví dụ: NGUYEN VAN A"
+              placeholder={t.billing.accountNamePlaceholder}
               required
             />
           </div>
@@ -518,7 +524,7 @@ export default function AdminBillingPage() {
               leftIcon={<CheckCircle2 size={16} />}
               className="px-8 shadow-lg shadow-primary/20"
             >
-              Lưu cấu hình
+              {t.billing.saveBankConfig}
             </Button>
           </div>
         </form>
@@ -527,14 +533,14 @@ export default function AdminBillingPage() {
       {/* Renewal Request History */}
       <div className="space-y-6">
         <h3 className="text-xl font-black text-gray-900 tracking-tight flex items-center gap-2">
-          <History className="text-blue-500" /> Nhật ký gia hạn
+          <History className="text-blue-500" /> {t.billing.historyTitle}
         </h3>
 
         {requestsLoading ? (
-          <div className="text-center font-bold text-gray-400 py-10">Đang tải lịch sử...</div>
+          <div className="text-center font-bold text-gray-400 py-10">{t.billing.loadingHistory}</div>
         ) : requests.length === 0 ? (
           <div className="bg-white rounded-3xl border border-gray-100 p-10 text-center text-gray-400 italic">
-            Chưa có lịch sử gia hạn nào được ghi nhận.
+            {t.billing.emptyHistory}
           </div>
         ) : (
           <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
@@ -542,12 +548,12 @@ export default function AdminBillingPage() {
               <table className="w-full text-left text-sm font-medium">
                 <thead className="bg-gray-50 text-[10px] font-black uppercase text-gray-400 border-b border-gray-100">
                   <tr>
-                    <th className="px-6 py-4">Gói cước</th>
-                    <th className="px-6 py-4">Số tháng / phút</th>
-                    <th className="px-6 py-4">Số tiền</th>
-                    <th className="px-6 py-4">Ngày gửi</th>
-                    <th className="px-6 py-4">Trạng thái</th>
-                    <th className="px-6 py-4">Ghi chú duyệt</th>
+                    <th className="px-6 py-4">{t.billing.historyHeaderPackage}</th>
+                    <th className="px-6 py-4">{t.billing.historyHeaderMonths}</th>
+                    <th className="px-6 py-4">{t.billing.historyHeaderAmount}</th>
+                    <th className="px-6 py-4">{t.billing.historyHeaderDate}</th>
+                    <th className="px-6 py-4">{t.billing.historyHeaderStatus}</th>
+                    <th className="px-6 py-4">{t.billing.historyHeaderNotes}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50 text-gray-700">
@@ -557,13 +563,13 @@ export default function AdminBillingPage() {
                         <span className="font-bold text-gray-800">Premium</span>
                       </td>
                       <td className="px-6 py-4 font-bold">
-                        {req.months} {req.notes?.includes('[TEST_MINUTES]') ? 'phút (test)' : 'tháng'}
+                        {req.months} {req.notes?.includes('[TEST_MINUTES]') ? t.billing.historyMinutesUnit : t.billing.historyMonthsUnit}
                       </td>
                       <td className="px-6 py-4 font-black text-primary">
-                        {Number(req.price).toLocaleString("vi-VN")} ₫
+                        {Number(req.price).toLocaleString(locale)} ₫
                       </td>
                       <td className="px-6 py-4 text-xs font-semibold text-gray-500">
-                        {new Date(req.createdAt).toLocaleDateString("vi-VN")} {new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(req.createdAt).toLocaleDateString(locale)} {new Date(req.createdAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
                       </td>
                       <td className="px-6 py-4">
                         <span className={`px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-wider ${req.status === "APPROVED"
@@ -572,11 +578,11 @@ export default function AdminBillingPage() {
                             ? "bg-red-100 text-red-700"
                             : "bg-amber-100 text-amber-700 animate-pulse"
                           }`}>
-                          {req.status === "APPROVED" ? "Đã duyệt" : req.status === "REJECTED" ? "Từ chối" : "Chờ duyệt"}
+                          {req.status === "APPROVED" ? t.billing.historyStatusApproved : req.status === "REJECTED" ? t.billing.historyStatusRejected : t.billing.historyStatusPending}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-xs italic text-gray-500">
-                        {req.notes || "Không có"}
+                        {req.notes || t.billing.historyNoNotes}
                       </td>
                     </tr>
                   ))}
@@ -595,12 +601,12 @@ export default function AdminBillingPage() {
               <div className="flex items-center gap-2">
                 <CreditCard className="text-primary" />
                 <h3 className="font-bold text-lg text-gray-900">
-                  Gia hạn Premium {selectedPkg.months} {unitLabel}
+                  {t.billing.checkoutTitle.replace("{months}", String(selectedPkg.months)).replace("{unit}", unitLabel)}
                 </h3>
               </div>
               <button
                 onClick={handleCloseModal}
-                className="p-1.5 hover:bg-gray-200 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-1.5 hover:bg-gray-200 rounded-full text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
               >
                 <X size={20} />
               </button>
@@ -608,7 +614,7 @@ export default function AdminBillingPage() {
 
             <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
               <div className="bg-primary-soft border border-primary rounded-2xl p-4 flex flex-col items-center gap-3">
-                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Chuyển khoản VietQR đến hệ thống</p>
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t.billing.checkoutInstruction}</p>
                 <div className="w-44 h-44 bg-white border border-gray-200/60 rounded-xl flex items-center justify-center p-2 relative shadow-md">
                   <img
                     src={`https://img.vietqr.io/image/${sanitizeBankId(superAdminBankId)}-${superAdminBankAcc}-compact2.png?amount=${selectedPkg.price}&addInfo=GIAHAN%20${storeConfig?.slug}%20${selectedPkg.months}%20${isTestMode ? 'PHUT' : 'THANG'}&accountName=${encodeURIComponent(superAdminBankName)}`}
@@ -620,47 +626,47 @@ export default function AdminBillingPage() {
 
               <div className="bg-gray-50 rounded-2xl p-4 text-xs font-semibold space-y-2 text-gray-700">
                 <div className="flex justify-between border-b border-gray-200/50 pb-1.5">
-                  <span className="text-gray-400 font-bold">Ngân hàng</span>
+                  <span className="text-gray-400 font-bold">{t.billing.bankLabel}</span>
                   <span className="font-bold text-gray-800">{superAdminBankId}</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-200/50 pb-1.5 items-center">
-                  <span className="text-gray-400 font-bold">Số tài khoản</span>
+                  <span className="text-gray-400 font-bold">{t.billing.accountNumber}</span>
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-gray-800">{superAdminBankAcc}</span>
                     <button
-                      onClick={() => handleCopy(superAdminBankAcc, "Số tài khoản")}
-                      className="text-primary hover:text-primary transition-colors"
+                      onClick={() => handleCopy(superAdminBankAcc, t.billing.accountNumber)}
+                      className="text-primary hover:text-primary transition-colors cursor-pointer"
                     >
                       <Copy size={12} />
                     </button>
                   </div>
                 </div>
                 <div className="flex justify-between border-b border-gray-200/50 pb-1.5">
-                  <span className="text-gray-400 font-bold">Tên thụ hưởng</span>
+                  <span className="text-gray-400 font-bold">{t.billing.accountName}</span>
                   <span className="font-bold text-gray-800">{superAdminBankName}</span>
                 </div>
                 <div className="flex justify-between border-b border-gray-200/50 pb-1.5 items-center">
-                  <span className="text-gray-400 font-bold">Nội dung chuyển khoản</span>
+                  <span className="text-gray-400 font-bold">{t.ordersDrawer.transferContentLabel}</span>
                   <div className="flex items-center gap-1.5">
                     <span className="font-bold text-primary">GIAHAN {storeConfig?.slug} {selectedPkg.months} {isTestMode ? 'PHUT' : 'THANG'}</span>
                     <button
-                      onClick={() => handleCopy(`GIAHAN ${storeConfig?.slug} ${selectedPkg.months} ${isTestMode ? 'PHUT' : 'THANG'}`, "Nội dung chuyển khoản")}
-                      className="text-primary hover:text-primary transition-colors"
+                      onClick={() => handleCopy(`GIAHAN ${storeConfig?.slug} ${selectedPkg.months} ${isTestMode ? 'PHUT' : 'THANG'}`, t.ordersDrawer.transferContentLabel)}
+                      className="text-primary hover:text-primary transition-colors cursor-pointer"
                     >
                       <Copy size={12} />
                     </button>
                   </div>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400 font-bold">Số tiền chuyển</span>
-                  <span className="font-black text-primary text-sm">{selectedPkg.price.toLocaleString("vi-VN")} ₫</span>
+                  <span className="text-gray-400 font-bold">{t.billing.historyHeaderAmount}</span>
+                  <span className="font-black text-primary text-sm">{selectedPkg.price.toLocaleString(locale)} ₫</span>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-black text-gray-500 uppercase block">Ghi chú bổ sung (nếu có)</label>
+                <label className="text-xs font-black text-gray-500 uppercase block">{t.billing.notesLabel}</label>
                 <Textarea
-                  placeholder="Ví dụ: MB Bank, Tên người chuyển..."
+                  placeholder={t.billing.notesPlaceholder}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   rows={2}
@@ -674,7 +680,7 @@ export default function AdminBillingPage() {
                 variant="secondary"
                 className="flex-1 py-3 h-auto"
               >
-                Hủy bỏ
+                {t.billing.cancelButton}
               </Button>
               <Button
                 isLoading={createRequestMutation.isPending}
@@ -682,7 +688,7 @@ export default function AdminBillingPage() {
                 className="flex-1 py-3 h-auto shadow-lg shadow-primary/20"
                 leftIcon={<CheckCircle2 size={16} />}
               >
-                Đã chuyển tiền, Gửi yêu cầu
+                {t.billing.submitRequestButton}
               </Button>
             </div>
           </div>

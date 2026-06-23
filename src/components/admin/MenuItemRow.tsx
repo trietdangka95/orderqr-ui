@@ -1,12 +1,13 @@
 "use client";
 
-import { MenuItem } from "@/store/cartStore";
+import { MenuItem, useCartStore } from "@/store/cartStore";
 import { Edit2, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useDeleteProduct, useUpdateProduct } from "@/hooks/useProducts";
 import Image from "next/image";
 import { getImageUrl } from "@/utils/image";
 import { showConfirm } from "@/store/dialogStore";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface MenuItemRowProps {
   item: MenuItem;
@@ -22,45 +23,53 @@ interface ActionButtonsProps {
   onDelete: (e: React.MouseEvent) => void;
 }
 
-const ActionButtons = ({ item, isGrid, onEdit, onToggleAvailability, onDelete }: ActionButtonsProps) => (
-  <div className={`flex items-center gap-2 mt-4 flex-wrap ${isGrid ? "justify-start" : "justify-end"}`}>
-    <button
-      onClick={onToggleAvailability}
-      className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 ${item.isAvailable
-        ? "bg-green-50 text-green-600 hover:bg-green-600 hover:text-white"
-        : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-        }`}
-    >
-      <span className={`w-2 h-2 rounded-full ${item.isAvailable ? "bg-green-500" : "bg-gray-400"}`}></span>
-      {item.isAvailable ? "Còn món" : "Hết món"}
-    </button>
+const ActionButtons = ({ item, isGrid, onEdit, onToggleAvailability, onDelete }: ActionButtonsProps) => {
+  const t = useTranslation();
+  const { language } = useCartStore();
 
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        onEdit(item);
-      }}
-      className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all active:scale-95"
-    >
-      <Edit2 size={14} />
-      Sửa
-    </button>
-    <button
-      onClick={onDelete}
-      className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition-all active:scale-95"
-    >
-      <Trash2 size={14} />
-      Xóa
-    </button>
-  </div>
-);
+  return (
+    <div className={`flex items-center gap-2 mt-4 flex-wrap ${isGrid ? "justify-start" : "justify-end"}`}>
+      <button
+        onClick={onToggleAvailability}
+        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer ${item.isAvailable
+          ? "bg-green-50 text-green-600 hover:bg-green-600 hover:text-white"
+          : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+          }`}
+      >
+        <span className={`w-2 h-2 rounded-full ${item.isAvailable ? "bg-green-500" : "bg-gray-400"}`}></span>
+        {item.isAvailable ? (language === "vi" ? "Còn món" : "Available") : t.common.soldOut}
+      </button>
+
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onEdit(item);
+        }}
+        className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all active:scale-95 cursor-pointer"
+      >
+        <Edit2 size={14} />
+        {language === "vi" ? "Sửa" : "Edit"}
+      </button>
+      <button
+        onClick={onDelete}
+        className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition-all active:scale-95 cursor-pointer"
+      >
+        <Trash2 size={14} />
+        {language === "vi" ? "Xóa" : "Delete"}
+      </button>
+    </div>
+  );
+};
 
 export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuItemRowProps) {
+  const t = useTranslation();
+  const { language } = useCartStore();
   const deleteProduct = useDeleteProduct();
   const updateProduct = useUpdateProduct();
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("vi-VN", {
+    const locale = language === "vi" ? "vi-VN" : "en-US";
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: "VND",
     }).format(price);
@@ -73,7 +82,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (await showConfirm(`Bạn có chắc chắn muốn xóa món "${item.name}"?`)) {
+    if (await showConfirm(t.menuAdmin.deleteConfirm.replace("{name}", item.name))) {
       deleteProduct.mutate(item.id);
     }
   };
@@ -112,7 +121,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
           {item.isAvailable === false && (
             <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
               <span className="bg-red-500 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-xl shadow-lg shadow-red-500/20">
-                Hết món
+                {t.common.soldOut}
               </span>
             </div>
           )}
@@ -166,7 +175,7 @@ export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuIte
         {item.isAvailable === false && (
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
             <span className="bg-red-500 text-white text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg shadow-lg shadow-red-500/20">
-              Hết món
+              {t.common.soldOut}
             </span>
           </div>
         )}

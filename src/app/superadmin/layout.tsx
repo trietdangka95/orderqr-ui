@@ -5,12 +5,15 @@ import { ShieldAlert, LogOut, LayoutDashboard, Store, CreditCard, Menu, X, Messa
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
+import LanguageSelector from "@/components/ui/LanguageSelector";
  
 export default function SuperAdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const t = useTranslation();
   const { userRole, logout, isLoggedIn } = useCartStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -48,11 +51,11 @@ export default function SuperAdminLayout({
   };
  
   const navItems = [
-    { href: "/superadmin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/superadmin/stores", label: "Manage Stores", icon: Store },
-    { href: "/superadmin/renewals", label: "Yêu cầu gia hạn", icon: CreditCard },
-    { href: "/superadmin/contacts", label: "Yêu cầu đăng ký", icon: MessageSquare },
-    { href: "/superadmin/security", label: "Bảo mật (2FA)", icon: KeyRound },
+    { href: "/superadmin", label: t.superadmin.dashboardTab, icon: LayoutDashboard },
+    { href: "/superadmin/stores", label: t.superadmin.manageStoresTab, icon: Store },
+    { href: "/superadmin/renewals", label: t.superadmin.renewalsTab, icon: CreditCard },
+    { href: "/superadmin/contacts", label: t.superadmin.contactsTab, icon: MessageSquare },
+    { href: "/superadmin/security", label: t.superadmin.securityTab, icon: KeyRound },
   ];
  
   return (
@@ -65,18 +68,21 @@ export default function SuperAdminLayout({
           </div>
           <div>
             <h1 className="font-black text-sm tracking-tight text-white leading-none">Super Admin</h1>
-            <p className="text-[8px] font-bold text-blue-400 uppercase tracking-widest mt-0.5">Platform</p>
+            <p className="text-[8px] font-bold text-blue-400 uppercase tracking-widest mt-0.5">{t.superadmin.platformLabel}</p>
           </div>
         </div>
-
-        <button 
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
-          className="p-1 text-gray-400 hover:text-white transition-colors"
-        >
-          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+ 
+        <div className="flex items-center gap-3">
+          <LanguageSelector light={false} />
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+            className="p-1 text-gray-400 hover:text-white transition-colors"
+          >
+            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </header>
-
+ 
       {/* Sidebar (Desktop persistent, Mobile sliding/collapsible overlay) */}
       <aside className={`bg-gray-900 text-white p-6 flex flex-col transition-all duration-300 md:w-64 md:h-full md:flex shrink-0 ${
         isMobileMenuOpen 
@@ -90,7 +96,7 @@ export default function SuperAdminLayout({
           </div>
           <div>
             <h1 className="font-black text-xl tracking-tight leading-none text-white">Super Admin</h1>
-            <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mt-1">Platform Manager</p>
+            <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mt-1">{t.superadmin.platformLabel}</p>
           </div>
         </div>
  
@@ -115,16 +121,23 @@ export default function SuperAdminLayout({
           })}
         </nav>
  
-        <button
-          onClick={() => {
-            logout();
-            router.push("/");
-          }}
-          className="mt-8 md:mt-auto flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white font-bold transition-all"
-        >
-          <LogOut size={20} />
-          <span>Logout</span>
-        </button>
+        <div className="mt-8 pt-6 border-t border-gray-800 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] font-black text-gray-500 uppercase tracking-wider">Language</span>
+            <LanguageSelector light={false} />
+          </div>
+
+          <button
+            onClick={() => {
+              logout();
+              router.push("/");
+            }}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white font-bold transition-all cursor-pointer"
+          >
+            <LogOut size={20} />
+            <span>{t.common.logout}</span>
+          </button>
+        </div>
       </aside>
  
       {/* Main Content */}

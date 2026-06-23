@@ -6,12 +6,14 @@ import { X, Plus, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { useCreateCategory, useDeleteCategory } from "@/hooks/useProducts";
 import { Category } from "@/types/api";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface CategoryManagerProps {
   categories: Category[];
 }
 
 export default function CategoryManager({ categories }: CategoryManagerProps) {
+  const t = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
   const createCategoryMutation = useCreateCategory();
@@ -25,17 +27,17 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
           setNewCategoryName("");
         },
         onError: (err: any) => {
-          showAlert("Lỗi khi thêm danh mục: " + (err.message || "Lỗi không xác định"));
+          showAlert(t.menuAdmin.errorAddCategory.replace("{error}", err.message || "Unknown error"));
         }
       });
     }
   };
 
   const handleRemove = async (id: number) => {
-    if (await showConfirm("Bạn có chắc chắn muốn xóa danh mục này? Các sản phẩm thuộc danh mục này có thể bị ảnh hưởng.")) {
+    if (await showConfirm(t.menuAdmin.deleteCategoryConfirm)) {
       deleteCategoryMutation.mutate(id, {
         onError: (err: any) => {
-          showAlert("Lỗi khi xóa danh mục: " + (err.message || "Lỗi không xác định"));
+          showAlert(t.menuAdmin.errorDeleteCategory.replace("{error}", err.message || "Unknown error"));
         }
       });
     }
@@ -46,16 +48,16 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between outline-none"
+        className="w-full flex items-center justify-between outline-none cursor-pointer"
       >
         <div className="flex items-center gap-3">
           <div className="w-1.5 h-6 bg-primary rounded-full"></div>
           <h2 className="text-sm font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
-            Quản lý Danh mục <span className="text-xs font-bold text-gray-400 normal-case bg-gray-50 px-2 py-0.5 rounded-lg">({categories.length} danh mục)</span>
+            {t.menuAdmin.manageCategories} <span className="text-xs font-bold text-gray-400 normal-case bg-gray-50 px-2 py-0.5 rounded-lg">{t.menuAdmin.categoriesCount.replace("{count}", String(categories.length))}</span>
           </h2>
         </div>
         <div className="flex items-center gap-1.5 text-xs font-black text-primary uppercase tracking-widest hover:text-orange-600 transition-colors">
-          <span>{isOpen ? "Thu gọn" : "Chỉnh sửa"}</span>
+          <span>{isOpen ? t.menuAdmin.collapse : t.menuAdmin.edit}</span>
           {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </div>
       </button>
@@ -83,7 +85,7 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
                     <button
                       onClick={() => handleRemove(cat.id)}
                       disabled={deleteCategoryMutation.isPending}
-                      className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
+                      className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50 cursor-pointer"
                     >
                       <X size={16} />
                     </button>
@@ -95,7 +97,7 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
             <form onSubmit={handleSubmit} className="flex gap-3 items-center">
               <input
                 type="text"
-                placeholder="Nhập tên danh mục mới..."
+                placeholder={t.menuAdmin.newCategoryPlaceholder}
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
                 className="flex-1 px-4 py-4 bg-gray-50 border-2 border-transparent rounded-xl focus:border-orange-500 outline-none transition-all font-bold text-xs text-gray-700"
@@ -103,14 +105,14 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
               <button
                 type="submit"
                 disabled={createCategoryMutation.isPending || !newCategoryName.trim()}
-                className="px-5 py-4 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-primary shadow-md shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1.5 shrink-0"
+                className="px-5 py-4 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-primary shadow-md shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1.5 shrink-0 cursor-pointer"
               >
                 {createCategoryMutation.isPending ? (
                   <Loader2 size={12} className="animate-spin" />
                 ) : (
                   <Plus size={12} strokeWidth={3} />
                 )}
-                <span>Thêm nhanh</span>
+                <span>{t.menuAdmin.quickAdd}</span>
               </button>
             </form>
           </motion.div>

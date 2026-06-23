@@ -20,8 +20,7 @@ import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
 import { FILTER_PRESETS, FilterType } from "@/constants/filters";
-
-const REVENUE_TABLE_HEADERS = ["Thời gian", "Bàn", "Thanh toán", "Tổng tiền", ""] as const;
+import { useTranslation } from "@/hooks/useTranslation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface OrderItemDetail {
@@ -51,25 +50,12 @@ interface InvoiceRecord {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const fmt = (n: number) => n.toLocaleString("vi-VN") + " ₫";
-
-const fmtDate = (ts: number) =>
-  new Date(ts).toLocaleString("vi-VN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-
 const toYMD = (ts: number) => {
   const d = new Date(ts);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
-const payLabel = (m?: string) => (m === "QR_TRANSFER" ? "QR / CK" : "Tiền mặt");
-
-const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any) => {
+const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any, t: any, language: string) => {
   const iframe = document.createElement("iframe");
   iframe.style.position = "fixed";
   iframe.style.right = "0";
@@ -86,7 +72,7 @@ const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any) => {
   const itemMap: Record<string, { name: string; quantity: number; price: number }> = {};
   inv.orders.forEach((order) => {
     order.orderItems.forEach((item) => {
-      const name = item.product?.name || "Món ăn";
+      const name = item.product?.name || (language === "vi" ? "Món ăn" : "Dish");
       const price = Number(item.priceAtTime);
       if (!itemMap[name]) {
         itemMap[name] = {
@@ -100,25 +86,26 @@ const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any) => {
   });
   const receiptItems = Object.values(itemMap);
   
-  const storeName = storeConfig?.name || "MENU VIỆT";
+  const storeName = storeConfig?.name || (language === "vi" ? "MENU VIỆT" : "MENU VIET");
   const storeDesc = storeConfig?.description || "";
+  const locale = language === "vi" ? "vi-VN" : "en-US";
   
   const itemsHtml = receiptItems.map((item) => `
     <tr style="border-bottom: 1px dotted #e5e7eb;">
       <td style="padding: 6px 0; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: bold; color: #1f2937;">${item.name}</td>
       <td style="padding: 6px 0; text-align: center; font-weight: bold; color: #1f2937;">${item.quantity}</td>
-      <td style="padding: 6px 0; text-align: right; font-weight: bold; color: #1f2937;">${(item.price * item.quantity).toLocaleString("vi-VN")}</td>
+      <td style="padding: 6px 0; text-align: right; font-weight: bold; color: #1f2937;">${(item.price * item.quantity).toLocaleString(locale)}</td>
     </tr>
   `).join("");
   
-  const dateFormatted = new Date(inv.timestamp).toLocaleString("vi-VN");
-  const printTimeFormatted = new Date().toLocaleString("vi-VN");
-  const paymentLabel = inv.paymentMethod === "QR_TRANSFER" ? "Chuyển khoản VietQR" : "Tiền mặt";
+  const dateFormatted = new Date(inv.timestamp).toLocaleString(locale);
+  const printTimeFormatted = new Date().toLocaleString(locale);
+  const paymentLabel = inv.paymentMethod === "QR_TRANSFER" ? t.tables.qrTransfer : t.tables.cashPayment;
   
   doc.write(`
     <html>
       <head>
-        <title>In hóa đơn Bàn ${inv.tableNumber}</title>
+        <title>${t.tables.qrPrint} - ${t.common.table} ${inv.tableNumber}</title>
         <style>
           @page {
             size: 80mm auto;
@@ -146,20 +133,20 @@ const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any) => {
         <div style="font-family: monospace; text-align: center;">
           <h2 style="margin: 0; font-size: 14px; font-weight: 900; text-transform: uppercase;">${storeName}</h2>
           ${storeDesc ? `<p style="margin: 2px 0; font-size: 9px; font-weight: bold; color: #555;">${storeDesc}</p>` : ''}
-          <p style="margin: 2px 0; font-size: 9px; color: #888;">Hệ thống Order QR</p>
+          <p style="margin: 2px 0; font-size: 9px; color: #888;">${t.revenue.receiptSystemHint}</p>
           <div style="border-top: 1px dashed black; margin: 8px 0;"></div>
-          <h3 style="margin: 0; font-size: 12px; font-weight: 900;">HÓA ĐƠN THANH TOÁN</h3>
-          <p style="margin: 4px 0; font-size: 16px; font-weight: 900; color: #f97316;">BÀN: ${inv.tableNumber}</p>
-          <p style="margin: 2px 0; font-size: 9px; color: #555;">Thời gian: ${dateFormatted}</p>
-          <p style="margin: 2px 0; font-size: 9px; color: #555;">Giờ in: ${printTimeFormatted}</p>
+          <h3 style="margin: 0; font-size: 12px; font-weight: 900;">${t.revenue.receiptTitle}</h3>
+          <p style="margin: 4px 0; font-size: 16px; font-weight: 900; color: #f97316;">${t.common.table.toUpperCase()}: ${inv.tableNumber}</p>
+          <p style="margin: 2px 0; font-size: 9px; color: #555;">${t.revenue.receiptTimeIn.replace("{time}", dateFormatted)}</p>
+          <p style="margin: 2px 0; font-size: 9px; color: #555;">${t.revenue.receiptTimePrint.replace("{time}", printTimeFormatted)}</p>
         </div>
 
         <table style="width: 100%; font-size: 10px; border-collapse: collapse; margin-top: 8px;">
           <thead>
             <tr style="border-bottom: 1px dashed black; text-align: left; font-weight: bold;">
-              <th style="padding: 4px 0;">Món ăn</th>
-              <th style="padding: 4px 0; text-align: center;">SL</th>
-              <th style="padding: 4px 0; text-align: right;">T.Tiền</th>
+              <th style="padding: 4px 0;">${t.revenue.itemDish}</th>
+              <th style="padding: 4px 0; text-align: center;">${t.revenue.receiptQty}</th>
+              <th style="padding: 4px 0; text-align: right;">${t.revenue.receiptSubtotal}</th>
             </tr>
           </thead>
           <tbody>
@@ -171,23 +158,23 @@ const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any) => {
 
         <div style="font-size: 11px; font-weight: bold;">
           <div style="display: flex; justify-content: space-between;">
-            <span>Tạm tính:</span>
-            <span>${inv.totalAmount.toLocaleString("vi-VN")} ₫</span>
+            <span>${t.revenue.receiptOriginalTotal}</span>
+            <span>${inv.totalAmount.toLocaleString(locale)} ${t.common.currency}</span>
           </div>
           <div style="display: flex; justify-content: space-between; margin-top: 4px;">
-            <span>Thanh toán:</span>
+            <span>${t.revenue.receiptPayment}</span>
             <span>${paymentLabel}</span>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 900; border-top: 1px solid black; padding-top: 6px; margin-top: 4px;">
-            <span>TỔNG CỘNG:</span>
-            <span style="color: #f97316;">${inv.totalAmount.toLocaleString("vi-VN")} ₫</span>
+            <span>${t.revenue.receiptTotal}</span>
+            <span style="color: #f97316;">${inv.totalAmount.toLocaleString(locale)} ${t.common.currency}</span>
           </div>
         </div>
 
         <div style="border-top: 1px dashed black; margin: 16px 0;"></div>
 
         <div style="text-align: center; font-size: 9px; font-weight: bold;">
-          <p style="margin: 0 0 4px 0;">CẢM ƠN QUÝ KHÁCH & HẸN GẶP LẠI!</p>
+          <p style="margin: 0 0 4px 0;">${t.revenue.receiptThankYou}</p>
           <p style="margin: 0; font-style: italic; color: #aaa;">Powered by orderqr.id.vn</p>
         </div>
 
@@ -206,12 +193,12 @@ const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any) => {
 };
 
 // ─── Build top-selling items ───────────────────────────────────────────────────
-function buildTop(invoices: InvoiceRecord[]) {
+function buildTop(invoices: InvoiceRecord[], language: string) {
   const map: Record<string, { name: string; cat: string; qty: number; rev: number }> = {};
   invoices.forEach((inv) =>
     inv.orders.forEach((ord) =>
       ord.orderItems.forEach((it) => {
-        const name = it.product?.name || "Không rõ";
+        const name = it.product?.name || (language === "vi" ? "Không rõ" : "Unknown");
         const cat = (it.product as any)?.category?.name || "—";
         if (!map[name]) map[name] = { name, cat, qty: 0, rev: 0 };
         map[name].qty += it.quantity;
@@ -223,45 +210,46 @@ function buildTop(invoices: InvoiceRecord[]) {
 }
 
 // ─── CSV Export ────────────────────────────────────────────────────────────────
-function exportCSV(records: InvoiceRecord[], from: string, to: string) {
+function exportCSV(records: InvoiceRecord[], from: string, to: string, t: any, language: string) {
   const sep = ",";
   const bom = "\uFEFF";
+  const locale = language === "vi" ? "vi-VN" : "en-US";
 
   const invoiceRows = records.map((inv) => {
     const items = inv.orders
       .flatMap((o) => o.orderItems)
       .map(
         (it) =>
-          `${it.quantity}x ${it.product?.name || "Món"} @${Number(it.priceAtTime).toLocaleString("vi-VN")}đ${it.note ? ` (${it.note})` : ""}`
+          `${it.quantity}x ${it.product?.name || (language === "vi" ? "Món" : "Item")} @${Number(it.priceAtTime).toLocaleString(locale)}${t.common.currency}${it.note ? ` (${it.note})` : ""}`
       )
       .join(" | ");
     return [
       `"${inv.id}"`,
-      `"${fmtDate(inv.timestamp)}"`,
-      `"Bàn ${inv.tableNumber}"`,
-      `"${payLabel(inv.paymentMethod)}"`,
+      `"${new Date(inv.timestamp).toLocaleString(locale)}"`,
+      `"${t.common.table} ${inv.tableNumber}"`,
+      `"${inv.paymentMethod === "QR_TRANSFER" ? t.tables.qrTransfer : t.tables.cashPayment}"`,
       inv.totalAmount,
       `"${items.replace(/"/g, '""')}"`,
     ].join(sep);
   });
 
-  const top = buildTop(records);
+  const top = buildTop(records, language);
   const topRows = top.map((it) =>
     [`"${it.name}"`, `"${it.cat}"`, it.qty, it.rev].join(sep)
   );
 
   const period =
-    from && to ? `Từ ${from} đến ${to}` : from ? `Từ ${from}` : to ? `Đến ${to}` : "Toàn bộ";
+    from && to ? `${t.revenue.fromDate} ${from} ${t.revenue.toDate.toLowerCase()} ${to}` : from ? `${t.revenue.fromDate} ${from}` : to ? `${t.revenue.toDate} ${to}` : (language === "vi" ? "Toàn bộ" : "All");
 
   const content = [
-    `"BÁO CÁO DOANH THU - ${period}"`,
+    `"${t.revenue.title.toUpperCase()} - ${period}"`,
     "",
-    "=== DANH SÁCH HÓA ĐƠN ===",
-    `"Mã HĐ","Thời gian","Bàn","Thanh toán","Tổng tiền (VND)","Danh sách món"`,
+    `=== ${t.revenue.invoiceListTitle.toUpperCase()} ===`,
+    `"${t.revenue.headerInvoiceId}","${t.revenue.headerTime}","${t.revenue.headerTable}","${t.revenue.headerStatus}","${t.revenue.headerAmount} (${t.common.currency})","${language === "vi" ? "Danh sách món" : "Items list"}"`,
     ...invoiceRows,
     "",
-    "=== TOP MÓN BÁN CHẠY ===",
-    `"Tên món","Danh mục","Số lượng","Doanh thu (VND)"`,
+    `=== ${t.revenue.topSellingTitle.toUpperCase()} ===`,
+    `"${language === "vi" ? "Tên món" : "Item name"}","${language === "vi" ? "Danh mục" : "Category"}","${t.revenue.receiptQty}","${t.revenue.headerAmount} (${t.common.currency})"`,
     ...topRows,
   ].join("\n");
 
@@ -269,8 +257,8 @@ function exportCSV(records: InvoiceRecord[], from: string, to: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  const suffix = from || to ? `_${from || "start"}_${to || "end"}` : "_tatca";
-  a.download = `doanh_thu${suffix}_${new Date().toISOString().slice(0, 10)}.csv`;
+  const suffix = from || to ? `_${from || "start"}_${to || "end"}` : "_all";
+  a.download = `${language === "vi" ? "doanh_thu" : "revenue"}${suffix}_${new Date().toISOString().slice(0, 10)}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -278,9 +266,27 @@ function exportCSV(records: InvoiceRecord[], from: string, to: string) {
 }
 
 // ─── Invoice Detail Modal ─────────────────────────────────────────────────────
-function InvoiceModal({ inv, onClose }: { inv: InvoiceRecord; onClose: () => void }) {
+function InvoiceModal({ inv, onClose, t, language }: { inv: InvoiceRecord; onClose: () => void; t: any; language: string }) {
   const allItems = inv.orders.flatMap((o) => o.orderItems);
   const storeConfig = useCartStore((state) => state.storeConfig);
+  const locale = language === "vi" ? "vi-VN" : "en-US";
+
+  const formatPrice = (price: number) => {
+    return price.toLocaleString(locale) + `\u00A0${t.common.currency}`;
+  };
+
+  const formatDate = (ts: number) => {
+    return new Date(ts).toLocaleString(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const payLabel = (m?: string) => (m === "QR_TRANSFER" ? t.tables.qrTransfer : t.tables.cashPayment);
+
   return (
     <div
       className="fixed inset-0 z-[200] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
@@ -298,10 +304,10 @@ function InvoiceModal({ inv, onClose }: { inv: InvoiceRecord; onClose: () => voi
         <div className="bg-gray-900 text-white p-6 flex items-start justify-between">
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">
-              Chi tiết hóa đơn
+              {t.revenue.invoiceDetailTitle}
             </p>
-            <h3 className="text-xl font-black">Bàn {inv.tableNumber}</h3>
-            <p className="text-gray-400 text-xs mt-1">{fmtDate(inv.timestamp)}</p>
+            <h3 className="text-xl font-black">{t.common.table} {inv.tableNumber}</h3>
+            <p className="text-gray-400 text-xs mt-1">{formatDate(inv.timestamp)}</p>
           </div>
           <div className="flex items-center gap-3">
             <span
@@ -314,9 +320,9 @@ function InvoiceModal({ inv, onClose }: { inv: InvoiceRecord; onClose: () => voi
               {payLabel(inv.paymentMethod)}
             </span>
             <button
-              onClick={() => handlePrintReceipt(inv, storeConfig)}
+              onClick={() => handlePrintReceipt(inv, storeConfig, t, language)}
               className="p-1.5 hover:bg-white/10 rounded-xl transition-colors text-white"
-              title="In hóa đơn"
+              title={t.revenue.printBtn}
             >
               <Printer size={20} />
             </button>
@@ -335,7 +341,7 @@ function InvoiceModal({ inv, onClose }: { inv: InvoiceRecord; onClose: () => voi
             <div key={ord.id}>
               {inv.orders.length > 1 && (
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mt-4 mb-2">
-                  Đợt gọi #{oi + 1}
+                  {t.revenue.orderBatchIndex.replace("{index}", String(oi + 1))}
                 </p>
               )}
               {ord.orderItems.map((it) => (
@@ -345,7 +351,7 @@ function InvoiceModal({ inv, onClose }: { inv: InvoiceRecord; onClose: () => voi
                 >
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-gray-900 text-sm truncate">
-                      {it.product?.name || "Món ăn"}
+                      {it.product?.name || (language === "vi" ? "Món ăn" : "Dish")}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       {(it.product as any)?.category?.name && (
@@ -362,10 +368,10 @@ function InvoiceModal({ inv, onClose }: { inv: InvoiceRecord; onClose: () => voi
                   </div>
                   <div className="text-right ml-4 shrink-0">
                     <p className="font-black text-gray-900 text-sm">
-                      {fmt(it.quantity * Number(it.priceAtTime))}
+                      {formatPrice(it.quantity * Number(it.priceAtTime))}
                     </p>
                     <p className="text-[10px] text-gray-400 mt-0.5">
-                      {it.quantity} × {fmt(Number(it.priceAtTime))}
+                      {it.quantity} × {formatPrice(Number(it.priceAtTime))}
                     </p>
                   </div>
                 </div>
@@ -377,9 +383,9 @@ function InvoiceModal({ inv, onClose }: { inv: InvoiceRecord; onClose: () => voi
         {/* total */}
         <div className="p-6 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
           <span className="font-black text-gray-400 text-xs uppercase tracking-widest">
-            Tổng cộng ({allItems.reduce((s, i) => s + i.quantity, 0)} món)
+            {t.revenue.invoiceTotal.replace("{count}", String(allItems.reduce((s, i) => s + i.quantity, 0)))}
           </span>
-          <span className="font-black text-2xl text-gray-900">{fmt(inv.totalAmount)}</span>
+          <span className="font-black text-2xl text-gray-900">{formatPrice(inv.totalAmount)}</span>
         </div>
       </motion.div>
     </div>
@@ -387,15 +393,20 @@ function InvoiceModal({ inv, onClose }: { inv: InvoiceRecord; onClose: () => voi
 }
 
 // ─── Top Items Sidebar ────────────────────────────────────────────────────────
-function TopItems({ invoices }: { invoices: InvoiceRecord[] }) {
-  const items = useMemo(() => buildTop(invoices).slice(0, 10), [invoices]);
+function TopItems({ invoices, t, language }: { invoices: InvoiceRecord[]; t: any; language: string }) {
+  const items = useMemo(() => buildTop(invoices, language).slice(0, 10), [invoices, language]);
   const maxQty = items[0]?.qty || 1;
+  const locale = language === "vi" ? "vi-VN" : "en-US";
+
+  const formatPrice = (price: number) => {
+    return price.toLocaleString(locale) + `\u00A0${t.common.currency}`;
+  };
 
   if (!items.length)
     return (
       <div className="bg-white rounded-[2.5rem] shadow-xl border border-gray-100 p-8 flex flex-col items-center justify-center text-center gap-3 min-h-[200px]">
         <Trophy size={32} className="text-gray-200" />
-        <p className="text-gray-300 text-sm font-medium">Chưa có dữ liệu phân tích</p>
+        <p className="text-gray-300 text-sm font-medium">{t.revenue.noAnalysisData}</p>
       </div>
     );
 
@@ -408,8 +419,8 @@ function TopItems({ invoices }: { invoices: InvoiceRecord[] }) {
           <Trophy size={18} />
         </div>
         <div>
-          <h3 className="font-black text-gray-900">Top món bán chạy</h3>
-          <p className="text-gray-400 text-xs font-medium mt-0.5">Theo khoảng thời gian lọc</p>
+          <h3 className="font-black text-gray-900">{t.revenue.topSellingTitle}</h3>
+          <p className="text-gray-400 text-xs font-medium mt-0.5">{t.revenue.topSellingPeriod}</p>
         </div>
       </div>
 
@@ -427,7 +438,7 @@ function TopItems({ invoices }: { invoices: InvoiceRecord[] }) {
               <div className="flex items-center justify-between mb-1.5">
                 <span className="font-bold text-gray-900 text-sm truncate pr-2">{item.name}</span>
                 <span className="text-xs font-black text-gray-600 shrink-0 bg-gray-100 px-2 py-0.5 rounded-lg">
-                  {item.qty} phần
+                  {item.qty} {language === "vi" ? "phần" : "units"}
                 </span>
               </div>
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -441,7 +452,7 @@ function TopItems({ invoices }: { invoices: InvoiceRecord[] }) {
                 />
               </div>
               <p className="text-[10px] text-gray-400 mt-1 font-medium">
-                {item.cat} · {fmt(item.rev)}
+                {item.cat} · {formatPrice(item.rev)}
               </p>
             </div>
           </div>
@@ -453,8 +464,11 @@ function TopItems({ invoices }: { invoices: InvoiceRecord[] }) {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function RevenuePage() {
+  const t = useTranslation();
+  const { language } = useCartStore();
   const { data: apiInvoices = [], isLoading } = useInvoices();
   const storeConfig = useCartStore((state) => state.storeConfig);
+  const locale = language === "vi" ? "vi-VN" : "en-US";
 
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState<FilterType>("ALL_TIME");
@@ -462,6 +476,34 @@ export default function RevenuePage() {
   const [customTo, setCustomTo] = useState("");
   const [selectedInv, setSelectedInv] = useState<InvoiceRecord | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+
+  const formatPrice = (price: number) => {
+    return price.toLocaleString(locale) + `\u00A0${t.common.currency}`;
+  };
+
+  const formatDate = (ts: number) => {
+    return new Date(ts).toLocaleString(locale, {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const payLabel = (m?: string) => (m === "QR_TRANSFER" ? t.tables.qrTransfer : t.tables.cashPayment);
+
+  const getFilterPresetLabel = (id: string) => {
+    switch (id) {
+      case "ALL_TIME": return t.admin.filterAllTime;
+      case "TODAY": return t.admin.filterToday;
+      case "THIS_WEEK": return t.admin.filterThisWeek;
+      case "THIS_MONTH": return t.admin.filterThisMonth;
+      case "THIS_YEAR": return t.admin.filterThisYear;
+      case "CUSTOM": return t.admin.filterCustom;
+      default: return id;
+    }
+  };
 
   // normalise API data
   const revenue: InvoiceRecord[] = useMemo(
@@ -558,11 +600,11 @@ export default function RevenuePage() {
     });
 
   const getExportPeriod = () => {
-    if (filterType === "ALL_TIME") return { from: "Tất cả", to: "" };
-    if (filterType === "TODAY") return { from: "Hôm nay", to: "" };
-    if (filterType === "THIS_WEEK") return { from: "Tuần này", to: "" };
-    if (filterType === "THIS_MONTH") return { from: "Tháng này", to: "" };
-    if (filterType === "THIS_YEAR") return { from: "Năm nay", to: "" };
+    if (filterType === "ALL_TIME") return { from: language === "vi" ? "Tất cả" : "All", to: "" };
+    if (filterType === "TODAY") return { from: language === "vi" ? "Hôm nay" : "Today", to: "" };
+    if (filterType === "THIS_WEEK") return { from: language === "vi" ? "Tuần này" : "This week", to: "" };
+    if (filterType === "THIS_MONTH") return { from: language === "vi" ? "Tháng này" : "This month", to: "" };
+    if (filterType === "THIS_YEAR") return { from: language === "vi" ? "Năm nay" : "This year", to: "" };
     return { from: customFrom, to: customTo };
   };
 
@@ -570,23 +612,23 @@ export default function RevenuePage() {
     {
       icon: <TrendingUp size={18} />,
       color: "bg-primary shadow-primary/30",
-      label: hasFilter ? "Doanh thu (lọc)" : "Tổng doanh thu",
-      value: fmt(totalRev),
+      label: hasFilter ? t.revenue.statRevenueFiltered : t.revenue.statRevenueAll,
+      value: formatPrice(totalRev),
       border: "border-orange-50",
       shadow: "shadow-primary/10",
     },
     {
       icon: <Calendar size={18} />,
       color: "bg-blue-500 shadow-blue-200",
-      label: "Hôm nay",
-      value: fmt(todayRev),
+      label: t.revenue.statToday,
+      value: formatPrice(todayRev),
       border: "border-blue-50",
       shadow: "shadow-blue-100/50",
     },
     {
       icon: <CreditCard size={18} />,
       color: "bg-gray-800 shadow-gray-200",
-      label: hasFilter ? "Số đơn (lọc)" : "Tổng số đơn",
+      label: hasFilter ? t.revenue.statOrdersFiltered : t.revenue.statOrdersAll,
       value: String(filtered.length),
       border: "border-gray-100",
       shadow: "shadow-gray-100/50",
@@ -594,17 +636,25 @@ export default function RevenuePage() {
     {
       icon: <BarChart3 size={18} />,
       color: "bg-purple-500 shadow-purple-200",
-      label: "TB / đơn",
-      value: fmt(avgOrder),
+      label: t.revenue.statAverageBillShort,
+      value: formatPrice(avgOrder),
       border: "border-purple-50",
       shadow: "shadow-purple-100/50",
     },
   ];
 
+  const tableHeaders = [
+    t.revenue.headerTime,
+    t.revenue.headerTable,
+    t.revenue.headerStatus,
+    t.revenue.headerAmount,
+    ""
+  ] as const;
+
   return (
     <>
       <AnimatePresence>
-        {selectedInv && <InvoiceModal inv={selectedInv} onClose={() => setSelectedInv(null)} />}
+        {selectedInv && <InvoiceModal inv={selectedInv} onClose={() => setSelectedInv(null)} t={t} language={language} />}
       </AnimatePresence>
 
       <div className="max-w-7xl mx-auto">
@@ -612,21 +662,21 @@ export default function RevenuePage() {
         <header className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">
-              Quản lý Doanh thu
+              {t.revenue.title}
             </h1>
             <p className="text-gray-500 font-medium italic">
-              Thống kê, chi tiết đơn hàng và phân tích món bán chạy
+              {t.revenue.subtitle}
             </p>
           </div>
           <button
             onClick={() => {
               const { from, to } = getExportPeriod();
-              exportCSV(filtered, from, to);
+              exportCSV(filtered, from, to, t, language);
             }}
             className="flex items-center gap-2 px-5 py-3 bg-green-600 hover:bg-green-700 text-white font-black rounded-xl transition-all shadow-md shadow-green-100 hover:scale-[1.02] active:scale-95 text-sm shrink-0"
           >
             <Download size={18} />
-            Xuất báo cáo{hasFilter ? " (đang lọc)" : " (tất cả)"}
+            {t.revenue.exportBtn}{hasFilter ? t.revenue.filteredSuffix : t.revenue.allSuffix}
           </button>
         </header>
 
@@ -654,7 +704,7 @@ export default function RevenuePage() {
           <div className="flex flex-wrap gap-3 items-center">
             <div className="flex items-center gap-2 text-gray-400 shrink-0">
               <Filter size={15} />
-              <span className="text-[10px] font-black uppercase tracking-widest">Lọc</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">{t.revenue.filterLabel}</span>
             </div>
 
             {/* Search */}
@@ -662,7 +712,7 @@ export default function RevenuePage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={15} />
               <input
                 type="text"
-                placeholder="Bàn / mã HĐ..."
+                placeholder={t.revenue.searchPlaceholder}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-orange-400 focus:outline-none text-sm font-medium transition-all"
@@ -681,7 +731,7 @@ export default function RevenuePage() {
                       : "text-gray-400 hover:text-gray-600"
                   }`}
                 >
-                  {btn.label}
+                  {getFilterPresetLabel(btn.id)}
                 </button>
               ))}
             </div>
@@ -692,7 +742,7 @@ export default function RevenuePage() {
                 className="flex items-center gap-1.5 px-3 py-2 bg-red-50 border border-red-200 text-red-500 text-[11px] font-black rounded-xl hover:bg-red-100 transition-all cursor-pointer"
               >
                 <X size={12} />
-                Xóa lọc
+                {t.revenue.clearFilter}
               </button>
             )}
           </div>
@@ -701,7 +751,7 @@ export default function RevenuePage() {
           {filterType === "CUSTOM" && (
             <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100 flex-wrap">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Từ ngày</span>
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.revenue.fromDate}</span>
                 <input
                   type="date"
                   value={customFrom}
@@ -710,7 +760,7 @@ export default function RevenuePage() {
                 />
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Đến ngày</span>
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.revenue.toDate}</span>
                 <input
                   type="date"
                   value={customTo}
@@ -723,10 +773,10 @@ export default function RevenuePage() {
 
           {hasFilter && (
             <p className="text-xs text-gray-400 font-medium mt-3 pl-1">
-              Đang hiển thị{" "}
-              <span className="font-black text-gray-700">{filtered.length}</span>
-              {" "}/ {revenue.length} đơn ·{" "}
-              <span className="font-black text-gray-700">{fmt(totalRev)}</span>
+              {t.revenue.showingFiltered
+                .replace("{count}", String(filtered.length))
+                .replace("{total}", String(revenue.length))
+                .replace("{amount}", formatPrice(totalRev))}
             </p>
           )}
         </div>
@@ -737,24 +787,24 @@ export default function RevenuePage() {
           <div className="xl:col-span-2 bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 overflow-hidden border border-gray-100">
             <div className="px-8 py-5 border-b border-gray-100 flex items-center gap-3">
               <ShoppingBag size={18} className="text-primary" />
-              <h3 className="font-black text-gray-900">Danh sách hóa đơn</h3>
+              <h3 className="font-black text-gray-900">{t.revenue.invoiceListTitle}</h3>
               <span className="ml-auto text-xs font-black text-gray-400 bg-gray-100 px-2.5 py-1 rounded-lg">
-                {filtered.length} đơn
+                {language === "vi" ? `${filtered.length} đơn` : `${filtered.length} orders`}
               </span>
             </div>
 
             {isLoading ? (
-              <div className="py-20 text-center text-gray-300 font-medium">Đang tải...</div>
+              <div className="py-20 text-center text-gray-300 font-medium">{t.common.loading}</div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-100">
-                      {REVENUE_TABLE_HEADERS.map((h) => (
+                      {tableHeaders.map((h, hi) => (
                         <th
-                          key={h}
+                          key={hi}
                           className={`px-5 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest ${
-                            h === "Tổng tiền" ? "text-right" : h === "" ? "text-center" : ""
+                            h === t.revenue.headerAmount ? "text-right" : h === "" ? "text-center" : ""
                           }`}
                         >
                           {h}
@@ -776,11 +826,11 @@ export default function RevenuePage() {
                               onClick={() => toggleRow(rec.id)}
                             >
                               <td className="px-5 py-4 font-medium text-gray-600 text-sm whitespace-nowrap">
-                                {fmtDate(rec.timestamp)}
+                                {formatDate(rec.timestamp)}
                               </td>
                               <td className="px-5 py-4">
                                 <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-lg font-bold text-[10px] uppercase tracking-wider whitespace-nowrap">
-                                  Bàn {rec.tableNumber}
+                                  {t.common.table} {rec.tableNumber}
                                 </span>
                               </td>
                               <td className="px-5 py-4">
@@ -795,7 +845,7 @@ export default function RevenuePage() {
                                 </span>
                               </td>
                               <td className="px-5 py-4 text-right font-black text-gray-900 whitespace-nowrap">
-                                {fmt(rec.totalAmount)}
+                                {formatPrice(rec.totalAmount)}
                               </td>
                               <td className="px-5 py-4">
                                 <div className="flex items-center justify-center gap-1.5">
@@ -803,12 +853,12 @@ export default function RevenuePage() {
                                     onClick={(e) => { e.stopPropagation(); setSelectedInv(rec); }}
                                     className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-[10px] font-black uppercase tracking-wider hover:bg-primary hover:text-white transition-all whitespace-nowrap"
                                   >
-                                    Xem
+                                    {t.revenue.viewBtn}
                                   </button>
                                   <button
-                                    onClick={(e) => { e.stopPropagation(); handlePrintReceipt(rec, storeConfig); }}
+                                    onClick={(e) => { e.stopPropagation(); handlePrintReceipt(rec, storeConfig, t, language); }}
                                     className="p-1.5 bg-gray-100 text-gray-500 hover:text-primary rounded-lg hover:bg-gray-200 transition-all flex items-center justify-center cursor-pointer"
-                                    title="In hóa đơn"
+                                    title={t.revenue.printBtn}
                                   >
                                     <Printer size={14} />
                                   </button>
@@ -827,14 +877,14 @@ export default function RevenuePage() {
                                 <td colSpan={5} className="px-5 pb-4 pt-1">
                                   <div className="bg-white border border-orange-100 rounded-2xl p-4 ml-2">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">
-                                      {allItems.length} món trong đơn
+                                      {t.revenue.itemsInOrder.replace("{count}", String(allItems.length))}
                                     </p>
                                     <div className="space-y-2">
                                       {allItems.map((it) => (
                                         <div key={it.id} className="flex items-start justify-between gap-3 text-sm">
                                           <div className="min-w-0">
                                             <span className="font-bold text-gray-900">
-                                              {it.quantity}× {it.product?.name || "Món ăn"}
+                                              {it.quantity}× {it.product?.name || (language === "vi" ? "Món ăn" : "Dish")}
                                             </span>
                                             {(it.product as any)?.category?.name && (
                                               <span className="text-[10px] text-gray-400 ml-2">
@@ -848,17 +898,17 @@ export default function RevenuePage() {
                                             )}
                                           </div>
                                           <span className="font-black text-gray-700 shrink-0">
-                                            {fmt(it.quantity * Number(it.priceAtTime))}
+                                            {formatPrice(it.quantity * Number(it.priceAtTime))}
                                           </span>
                                         </div>
                                       ))}
                                     </div>
                                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                                       <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-                                        Tổng
+                                        {t.revenue.totalLabel}
                                       </span>
                                       <span className="font-black text-primary">
-                                        {fmt(rec.totalAmount)}
+                                        {formatPrice(rec.totalAmount)}
                                       </span>
                                     </div>
                                   </div>
@@ -873,7 +923,7 @@ export default function RevenuePage() {
                         <td colSpan={5} className="py-20 text-center">
                           <ShoppingBag size={40} className="mx-auto mb-3 text-gray-200" />
                           <p className="text-gray-300 italic text-sm">
-                            {hasFilter ? "Không có đơn nào trong khoảng lọc" : "Chưa có dữ liệu doanh thu"}
+                            {hasFilter ? t.revenue.noMatchingInvoices : t.revenue.emptyInvoices}
                           </p>
                         </td>
                       </tr>
@@ -886,7 +936,7 @@ export default function RevenuePage() {
 
           {/* Top items sidebar */}
           <div className="xl:col-span-1">
-            <TopItems invoices={filtered} />
+            <TopItems invoices={filtered} t={t} language={language} />
           </div>
         </div>
       </div>

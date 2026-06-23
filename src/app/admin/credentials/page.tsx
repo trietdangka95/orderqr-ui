@@ -6,8 +6,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useChangePassword } from "@/hooks/useAuth";
 import UserPasswordManager from "./components/UserPasswordManager";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CredentialsPage() {
+  const t = useTranslation();
   const { userRole } = useCartStore();
   const changePasswordMutation = useChangePassword();
   
@@ -28,12 +30,12 @@ export default function CredentialsPage() {
     setError(null);
 
     if (passwords.newPassword !== passwords.confirmPassword) {
-      setError("Mật khẩu mới không khớp!");
+      setError(t.credentials.newPasswordMismatch);
       return;
     }
 
     if (passwords.newPassword.length < 4) {
-      setError("Mật khẩu mới phải có ít nhất 4 ký tự!");
+      setError(t.credentials.newPasswordMinLength);
       return;
     }
 
@@ -47,17 +49,17 @@ export default function CredentialsPage() {
         setTimeout(() => setShowSuccess(false), 3000);
       },
       onError: (err: Error) => {
-        setError(err.message || "Mật khẩu cũ không chính xác hoặc có lỗi xảy ra!");
+        setError(err.message || t.credentials.oldPasswordIncorrect);
       }
     });
   };
 
   const getRoleInfo = () => {
     switch (userRole) {
-      case "admin": return { text: "Quản trị viên", color: "bg-gray-900", icon: ShieldCheck };
-      case "kitchen": return { text: "Nhà bếp", color: "bg-primary", icon: ShieldCheck };
-      case "staff": return { text: "Nhân viên", color: "bg-blue-600", icon: ShieldCheck };
-      default: return { text: "Người dùng", color: "bg-gray-500", icon: ShieldCheck };
+      case "admin": return { text: t.common.admin, color: "bg-gray-900", icon: ShieldCheck };
+      case "kitchen": return { text: t.common.kitchen, color: "bg-primary", icon: ShieldCheck };
+      case "staff": return { text: t.common.staff, color: "bg-blue-600", icon: ShieldCheck };
+      default: return { text: t.common.guest, color: "bg-gray-500", icon: ShieldCheck };
     }
   };
 
@@ -66,8 +68,8 @@ export default function CredentialsPage() {
   return (
     <div className="max-w-7xl mx-auto text-center md:text-left">
       <header className="mb-12">
-        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Đổi mật khẩu</h1>
-        <p className="text-gray-500 font-medium italic">Bảo mật tài khoản {roleInfo.text} của bạn</p>
+        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.credentials.title}</h1>
+        <p className="text-gray-500 font-medium italic">{t.credentials.subtitle.replace("{role}", roleInfo.text)}</p>
       </header>
 
       <main className="max-w-4xl mx-auto py-12">
@@ -82,7 +84,7 @@ export default function CredentialsPage() {
             </div>
             <div>
               <h2 className="text-xl font-black text-gray-900">{roleInfo.text}</h2>
-              <p className="text-sm text-gray-400 font-medium">Thay đổi mật khẩu truy cập của bạn</p>
+              <p className="text-sm text-gray-400 font-medium">{t.credentials.description}</p>
             </div>
           </div>
 
@@ -90,7 +92,7 @@ export default function CredentialsPage() {
             <AnimatePresence>
               {error && (
                 <motion.div 
-                  initial={{ opacity: 0, height: 0 }}
+                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   className="bg-red-50 text-red-600 p-4 rounded-2xl flex items-center gap-3 text-sm font-bold border border-red-100"
@@ -102,7 +104,7 @@ export default function CredentialsPage() {
             </AnimatePresence>
 
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Mật khẩu hiện tại</label>
+              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{t.credentials.oldPasswordLabel}</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
                 <input
@@ -111,7 +113,7 @@ export default function CredentialsPage() {
                   value={passwords.oldPassword}
                   onChange={(e) => setPasswords({...passwords, oldPassword: e.target.value})}
                   className="w-full pl-12 pr-12 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:border-orange-500 outline-none transition-all font-mono"
-                  placeholder="••••••••"
+                  placeholder={t.credentials.placeholder}
                 />
                 <button
                   type="button"
@@ -126,7 +128,7 @@ export default function CredentialsPage() {
             <div className="h-px bg-gray-100 my-2"></div>
 
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Mật khẩu mới</label>
+              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{t.credentials.newPasswordLabel}</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
                 <input
@@ -135,7 +137,7 @@ export default function CredentialsPage() {
                   value={passwords.newPassword}
                   onChange={(e) => setPasswords({...passwords, newPassword: e.target.value})}
                   className="w-full pl-12 pr-12 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:border-orange-500 outline-none transition-all font-mono"
-                  placeholder="••••••••"
+                  placeholder={t.credentials.placeholder}
                 />
                 <button
                   type="button"
@@ -148,7 +150,7 @@ export default function CredentialsPage() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Xác nhận mật khẩu mới</label>
+              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{t.credentials.confirmPasswordLabel}</label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
                 <input
@@ -157,7 +159,7 @@ export default function CredentialsPage() {
                   value={passwords.confirmPassword}
                   onChange={(e) => setPasswords({...passwords, confirmPassword: e.target.value})}
                   className="w-full pl-12 pr-12 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:border-orange-500 outline-none transition-all font-mono"
-                  placeholder="••••••••"
+                  placeholder={t.credentials.placeholder}
                 />
                 <button
                   type="button"
@@ -183,10 +185,10 @@ export default function CredentialsPage() {
               ) : showSuccess ? (
                 <>
                   <Check size={24} />
-                  <span>Đã cập nhật mật khẩu!</span>
+                  <span>{t.credentials.successBtn}</span>
                 </>
               ) : (
-                <span>Lưu thay đổi</span>
+                <span>{t.common.save}</span>
               )}
             </button>
           </form>
@@ -204,7 +206,7 @@ export default function CredentialsPage() {
             className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-2xl shadow-2xl z-50 flex items-center gap-3"
           >
             <Check className="text-green-400" />
-            <span className="font-bold">Mật khẩu đã được thay đổi thành công!</span>
+            <span className="font-bold">{t.credentials.successToast}</span>
           </motion.div>
         )}
       </AnimatePresence>

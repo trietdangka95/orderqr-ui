@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { CheckCircle2 as CheckIcon, X as XIcon, AlertCircle, Banknote, QrCode, Printer } from "lucide-react";
 import { Order, useCartStore } from "@/store/cartStore";
 import { showConfirm } from "@/store/dialogStore";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TableStatusCardProps {
   tableNumber: string;
@@ -24,6 +25,8 @@ export default function TableStatusCard({
   onConfirmInvoicePayment,
   onPrintInvoice,
 }: TableStatusCardProps) {
+  const t = useTranslation();
+  const { language } = useCartStore();
   const totalAmount = tableOrders.reduce((sum, order) => sum + order.totalPrice, 0);
   const hasUnconfirmed = tableOrders.some((o) => !o.isConfirmed);
 
@@ -67,11 +70,11 @@ export default function TableStatusCard({
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <h3 className="font-bold text-gray-800 text-sm truncate">Bàn {tableNumber}</h3>
+              <h3 className="font-bold text-gray-800 text-sm truncate">{t.tables.labelTable.replace("{table}", tableNumber)}</h3>
               <button
                 onClick={() => onPrintInvoice(tableNumber)}
                 className="p-1 text-gray-400 hover:text-primary transition-colors hover:bg-gray-100 rounded-lg cursor-pointer flex items-center justify-center"
-                title="In hóa đơn tạm tính"
+                title={t.tables.printTempBill}
               >
                 <Printer size={14} />
               </button>
@@ -80,23 +83,23 @@ export default function TableStatusCard({
               <span className="text-[9px] font-black text-amber-600 uppercase flex items-center gap-1 animate-pulse">
                 {isQrPayment ? (
                   <>
-                    <QrCode size={9} /> Chuyển khoản QR
+                    <QrCode size={9} /> {t.tables.qrTransfer}
                   </>
                 ) : (
                   <>
-                    <Banknote size={9} /> Thu Tiền mặt
+                    <Banknote size={9} /> {t.tables.cashPayment}
                   </>
                 )}
               </span>
             ) : hasUnconfirmed ? (
               <span className="text-[9px] font-black text-red-600 uppercase animate-pulse">
-                Có đơn mới chờ duyệt!
+                {t.tables.newOrderPending}
               </span>
             ) : null}
           </div>
         </div>
         <div className="text-right shrink-0">
-          <div className="text-[10px] text-gray-400 uppercase font-black tracking-wider leading-none mb-1">Tổng cộng</div>
+          <div className="text-[10px] text-gray-400 uppercase font-black tracking-wider leading-none mb-1">{t.cart.total}</div>
           <div className="text-base font-black text-primary leading-none">{formatPrice(totalAmount)}</div>
         </div>
       </div>
@@ -106,8 +109,7 @@ export default function TableStatusCard({
         <div className="bg-amber-50 px-4 py-2 border-b border-amber-100 flex items-center gap-1.5 text-[10px] text-amber-800 font-bold">
           <AlertCircle size={12} className="shrink-0 text-amber-600" />
           <span className="leading-normal">
-            Khách đã yêu cầu thanh toán bằng{" "}
-            {isQrPayment ? "Chuyển khoản VietQR" : "Tiền mặt"}. Vui lòng đối soát.
+            {t.tables.guestRequestPayment.replace("{method}", isQrPayment ? t.tables.qrTransfer : t.tables.cashPayment)}
           </span>
         </div>
       )}
@@ -118,12 +120,12 @@ export default function TableStatusCard({
             <div className="flex items-center justify-between mb-2 gap-1">
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider truncate">
-                  Đơn #{order.id.slice(-4)}
+                  {language === "vi" ? "Đơn" : "Order"} #{order.id.slice(-4)}
                 </span>
                 {!pendingInvoice && (
                   <button
                     onClick={async () => {
-                      if (await showConfirm("Bạn có chắc chắn muốn xóa đơn hàng này?")) {
+                      if (await showConfirm(t.tables.confirmDeleteOrder)) {
                         useCartStore.getState().orders = useCartStore.getState().orders.filter(
                           (o) => o.id !== order.id
                         );
@@ -141,7 +143,7 @@ export default function TableStatusCard({
                   onClick={() => onConfirmOrder(order.id)}
                   className="bg-red-500 text-white text-[9px] px-2 py-0.5 rounded-lg font-black uppercase hover:bg-red-600 transition-colors shrink-0"
                 >
-                  Xác nhận ngay
+                  {t.tables.confirmNow}
                 </button>
               ) : (
                 <span
@@ -153,7 +155,7 @@ export default function TableStatusCard({
                       : "bg-primary-soft text-primary"
                   }`}
                 >
-                  {pendingInvoice ? "Chờ duyệt chi" : order.status === "completed" ? "Đã phục vụ" : "Đang xử lý"}
+                  {pendingInvoice ? t.tables.pendingPayment : order.status === "completed" ? t.tables.served : t.tables.processing}
                 </span>
               )}
             </div>
@@ -178,7 +180,7 @@ export default function TableStatusCard({
             className="w-full bg-amber-500 hover:bg-amber-600 text-white py-3 px-2 rounded-xl font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-amber-200 transition-all active:scale-[0.98] cursor-pointer text-xs sm:text-sm"
           >
             <CheckIcon size={16} />
-            Xác nhận Đã nhận tiền
+            {t.tables.confirmPaymentReceived}
           </button>
         ) : hasUnconfirmed ? (
           <button
@@ -189,7 +191,7 @@ export default function TableStatusCard({
             className="w-full bg-red-500 hover:bg-red-600 text-white py-3 px-2 rounded-xl font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-red-200 transition-all active:scale-95 cursor-pointer text-xs sm:text-sm"
           >
             <CheckIcon size={16} />
-            Xác nhận đơn mới
+            {t.tables.confirmNewOrders}
           </button>
         ) : (
           <button
@@ -197,7 +199,7 @@ export default function TableStatusCard({
             className="w-full bg-primary hover:opacity-90 text-white py-3 px-2 rounded-xl font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-orange-100 transition-all active:scale-95 cursor-pointer text-xs sm:text-sm"
           >
             <CheckIcon size={16} />
-            Thanh toán & Trả bàn
+            {t.tables.checkoutReleaseTable}
           </button>
         )}
       </div>

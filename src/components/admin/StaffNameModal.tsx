@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X, User, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface StaffNameModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface StaffNameModalProps {
 }
 
 export default function StaffNameModal({ isOpen, onClose, canClose = true }: StaffNameModalProps) {
+  const t = useTranslation();
   const { activeStaffName, setActiveStaffName } = useCartStore();
   const [name, setName] = useState("");
   const [error, setError] = useState("");
@@ -27,11 +29,11 @@ export default function StaffNameModal({ isOpen, onClose, canClose = true }: Sta
     e.preventDefault();
     const trimmedName = name.trim();
     if (!trimmedName) {
-      setError("Vui lòng nhập tên của bạn để tiếp tục");
+      setError(t.staffNameModal.staffNameRequired);
       return;
     }
     if (trimmedName.length < 2) {
-      setError("Tên phải có ít nhất 2 ký tự");
+      setError(t.staffNameModal.staffNameMinLength);
       return;
     }
     setActiveStaffName(trimmedName);
@@ -80,10 +82,10 @@ export default function StaffNameModal({ isOpen, onClose, canClose = true }: Sta
               </div>
               
               <h2 className="text-2xl font-black text-gray-900 mb-2 uppercase tracking-tight">
-                {activeStaffName ? "Chỉnh sửa tên trực ca" : "Xác nhận tên trực ca"}
+                {activeStaffName ? t.staffNameModal.editStaffName : t.staffNameModal.confirmStaffName}
               </h2>
               <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-[280px]">
-                Vui lòng nhập tên của bạn để hiển thị chính xác trên nhật ký đơn hàng và hóa đơn.
+                {t.staffNameModal.staffNameDesc}
               </p>
 
               <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
@@ -95,7 +97,7 @@ export default function StaffNameModal({ isOpen, onClose, canClose = true }: Sta
                       setName(e.target.value);
                       if (error) setError("");
                     }}
-                    placeholder="Ví dụ: Nam, Lan, Vũ..."
+                    placeholder={t.staffNameModal.placeholder}
                     autoFocus
                     className={`w-full px-5 py-4 bg-gray-50 border ${
                       error ? "border-red-300 focus:ring-red-200" : "border-gray-200 focus:ring-primary/20 focus:border-primary"
@@ -115,14 +117,14 @@ export default function StaffNameModal({ isOpen, onClose, canClose = true }: Sta
                       onClick={onClose}
                       className="flex-1 py-4 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-600 font-black rounded-2xl transition-all text-sm uppercase tracking-wider cursor-pointer"
                     >
-                      Hủy
+                      {t.common.cancel}
                     </button>
                   )}
                   <button
                     type="submit"
                     className="flex-1 py-4 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-black rounded-2xl transition-all shadow-lg shadow-orange-500/20 text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <span>Xác nhận</span>
+                    <span>{t.common.confirm}</span>
                     <ArrowRight size={16} strokeWidth={2.5} />
                   </button>
                 </div>

@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Lock, Check, Loader2, UserCircle, Key, Eye, EyeOff } from "lucide-react";
 import { useUsers, useUpdateUserPassword } from "@/hooks/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function UserPasswordManager() {
+  const t = useTranslation();
   const { data: users = [], isLoading } = useUsers();
   const updatePasswordMutation = useUpdateUserPassword();
   
@@ -34,7 +36,7 @@ export default function UserPasswordManager() {
     <div className="mt-12 space-y-6">
       <div className="flex items-center gap-3 mb-6 ml-1">
         <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
-        <h2 className="text-lg font-black text-gray-900 uppercase tracking-wider">Quản lý mật khẩu các Role khác</h2>
+        <h2 className="text-lg font-black text-gray-900 uppercase tracking-wider">{t.credentials.manageOtherRoles}</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -65,7 +67,7 @@ export default function UserPasswordManager() {
           ))
         ) : (
           <div className="col-span-full py-12 text-center text-gray-400 italic bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-            Không tìm thấy tài khoản nhân viên hoặc bếp nào khác.
+            {t.credentials.noOtherUsers}
           </div>
         )}
       </div>
@@ -80,7 +82,7 @@ export default function UserPasswordManager() {
           >
             <form onSubmit={handleUpdate} className="space-y-4">
               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                Đặt mật khẩu mới cho {users.find(u => u.id === selectedUserId)?.username.split('_')[0]}
+                {t.credentials.setPasswordFor.replace("{user}", users.find(u => u.id === selectedUserId)?.username.split('_')[0] || "")}
               </label>
               <div className="flex gap-3">
                 <div className="relative flex-1">
@@ -92,7 +94,7 @@ export default function UserPasswordManager() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     className="w-full pl-12 pr-12 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:border-blue-500 outline-none transition-all font-mono"
-                    placeholder="Nhập mật khẩu mới..."
+                    placeholder={t.credentials.newPasswordInputPlaceholder}
                   />
                   <button
                     type="button"
@@ -105,14 +107,14 @@ export default function UserPasswordManager() {
                 <button
                   type="submit"
                   disabled={updatePasswordMutation.isPending || newPassword.length < 4}
-                  className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                  className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                 >
                   {updatePasswordMutation.isPending ? (
                     <Loader2 size={16} className="animate-spin" />
                   ) : (
                     <Check size={16} />
                   )}
-                  <span>Cập nhật</span>
+                  <span>{t.credentials.updateBtn}</span>
                 </button>
               </div>
             </form>
@@ -129,7 +131,7 @@ export default function UserPasswordManager() {
             className="fixed bottom-10 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-8 py-4 rounded-2xl shadow-2xl z-50 flex items-center gap-3"
           >
             <Check size={20} />
-            <span className="font-bold">Đã cập nhật mật khẩu thành công!</span>
+            <span className="font-bold">{t.credentials.successToast}</span>
           </motion.div>
         )}
       </AnimatePresence>

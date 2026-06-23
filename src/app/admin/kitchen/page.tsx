@@ -10,6 +10,8 @@ import useIsMounted from "@/hooks/useIsMounted";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import StaffNameModal from "@/components/admin/StaffNameModal";
+import { useTranslation } from "@/hooks/useTranslation";
+import LanguageSelector from "@/components/ui/LanguageSelector";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -79,6 +81,7 @@ function groupByOrder(items: FlatItem[]): VirtualTicket[] {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function KitchenPage() {
+  const t = useTranslation();
   const { logout, userRole, activeStaffName } = useCartStore();
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
   const { data: apiOrders = [] } = useOrders();
@@ -137,7 +140,7 @@ export default function KitchenPage() {
       items: o.orderItems.map(i => ({
         id: i.productId,
         orderItemId: i.id,
-        name: i.product?.name || "Món ăn",
+        name: i.product?.name || "",
         image: i.product?.image || "",
         price: i.product?.price || 0,
         description: i.product?.description || "",
@@ -191,10 +194,10 @@ export default function KitchenPage() {
   const completedTickets = groupByOrder(allFlatItems.filter(i => i.isServed));
 
   const columns: { key: ColumnType; title: string; color: string; dot: string; tickets: VirtualTicket[] }[] = [
-    { key: "pending",   title: "Chờ chế biến", dot: "bg-red-500",   color: "bg-white border-t-red-500   shadow-xl shadow-red-100",    tickets: pendingTickets   },
-    { key: "cooking",   title: "Đang chế biến", dot: "bg-orange-500",   color: "bg-white border-t-orange-500 shadow-xl shadow-orange-100", tickets: cookingTickets   },
-    { key: "serving",   title: "Chờ phục vụ",  dot: "bg-blue-500",  color: "bg-white border-t-blue-500   shadow-xl shadow-blue-100",   tickets: servingTickets   },
-    { key: "completed", title: "Hoàn thành",   dot: "bg-green-500", color: "bg-white border-t-green-500  shadow-xl shadow-green-100",  tickets: completedTickets },
+    { key: "pending",   title: t.kitchen.columnPending, dot: "bg-red-500",   color: "bg-white border-t-red-500   shadow-xl shadow-red-100",    tickets: pendingTickets   },
+    { key: "cooking",   title: t.kitchen.columnCooking, dot: "bg-orange-500",   color: "bg-white border-t-orange-500 shadow-xl shadow-orange-100", tickets: cookingTickets   },
+    { key: "serving",   title: t.kitchen.columnServing,  dot: "bg-blue-500",  color: "bg-white border-t-blue-500   shadow-xl shadow-blue-100",   tickets: servingTickets   },
+    { key: "completed", title: t.kitchen.columnCompleted,   dot: "bg-green-500", color: "bg-white border-t-green-500  shadow-xl shadow-green-100",  tickets: completedTickets },
   ];
 
   // Summary view (grouped for batch action)
@@ -242,33 +245,35 @@ export default function KitchenPage() {
     <div className="max-w-[1600px] mx-auto w-full h-full flex flex-col min-h-0">
       <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6 shrink-0">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Hệ thống KDS</h1>
-          <p className="text-gray-500 font-medium italic">Kitchen Display System - Quản lý chế biến món ăn</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.kitchen.title}</h1>
+          <p className="text-gray-500 font-medium italic">{t.kitchen.subtitle}</p>
         </div>
 
         <div className="flex items-center gap-4">
+          <LanguageSelector light={true} />
+          
           <div className="flex bg-gray-100/80 backdrop-blur-sm p-1 rounded-2xl border border-gray-200/50 shadow-sm h-fit gap-1">
             <button
               onClick={() => setView("board")}
-              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all duration-200 ${
+              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all duration-200 cursor-pointer ${
                 view === "board"
                   ? "bg-white shadow-sm text-orange-600"
                   : "text-gray-400 hover:text-gray-700 hover:bg-gray-200/30"
               }`}
             >
               <LayoutGrid size={18} />
-              <span className="hidden sm:inline">Kanban</span>
+              <span className="hidden sm:inline">{t.kitchen.viewKanban}</span>
             </button>
             <button
               onClick={() => setView("summary")}
-              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all duration-200 ${
+              className={`flex items-center gap-2 px-6 py-2 rounded-xl font-black transition-all duration-200 cursor-pointer ${
                 view === "summary"
                   ? "bg-white shadow-sm text-orange-600"
                   : "text-gray-400 hover:text-gray-700 hover:bg-gray-200/30"
               }`}
             >
               <List size={18} />
-              <span className="hidden sm:inline">Tổng hợp</span>
+              <span className="hidden sm:inline">{t.kitchen.viewSummary}</span>
             </button>
           </div>
 
@@ -277,13 +282,13 @@ export default function KitchenPage() {
               {activeStaffName && (
                 <div className="flex items-center gap-3 bg-white shadow-sm border border-gray-150 px-4 py-2.5 rounded-2xl">
                   <div className="text-right">
-                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Đang trực bếp</p>
+                    <p className="text-[9px] text-gray-400 font-bold uppercase tracking-wider">{t.kitchen.dutyTitle}</p>
                     <p className="text-sm font-black text-gray-900 leading-none mt-0.5">{activeStaffName}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setIsNameModalOpen(true)}
-                    title="Đổi ca / Sửa tên"
+                    title={t.kitchen.dutyEdit}
                     className="w-8 h-8 rounded-xl bg-gray-50 hover:bg-orange-500 text-gray-400 hover:text-white flex items-center justify-center transition-all shrink-0 cursor-pointer"
                   >
                     <Pencil size={14} />
@@ -293,10 +298,10 @@ export default function KitchenPage() {
 
               <button
                 onClick={() => { logout(); window.location.href = "/"; }}
-                className="flex items-center gap-2 px-6 py-3 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-black rounded-2xl transition-all shadow-md active:scale-95 text-sm"
+                className="flex items-center gap-2 px-6 py-3 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-black rounded-2xl transition-all shadow-md active:scale-95 text-sm cursor-pointer"
               >
                 <LogOut size={18} />
-                <span>Đăng xuất</span>
+                <span>{t.kitchen.logout}</span>
               </button>
             </div>
           )}
@@ -327,7 +332,7 @@ export default function KitchenPage() {
                     />
                   ))}
                   {col.tickets.length === 0 && (
-                    <div className="py-20 text-center text-gray-300 italic text-sm">Trống</div>
+                    <div className="py-20 text-center text-gray-300 italic text-sm">{t.kitchen.emptyColumn}</div>
                   )}
                 </div>
               </section>
@@ -336,8 +341,8 @@ export default function KitchenPage() {
         ) : (
           <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-100 flex-grow min-h-0 w-full flex flex-col">
             <div className="p-8 border-b bg-gray-50/50 shrink-0">
-              <h2 className="text-xl font-black text-gray-800">Danh sách món cần chuẩn bị</h2>
-              <p className="text-sm text-gray-500">Tổng hợp và thao tác chế biến hàng loạt các món đang yêu cầu</p>
+              <h2 className="text-xl font-black text-gray-800">{t.kitchen.summaryTitle}</h2>
+              <p className="text-sm text-gray-500">{t.kitchen.summarySubtitle}</p>
             </div>
             <div className="p-8 overflow-y-auto flex-1 min-h-0">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -356,7 +361,9 @@ export default function KitchenPage() {
                             </div>
                             <div>
                               <h3 className="text-xl font-black text-gray-900 leading-tight">{name}</h3>
-                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Yêu cầu từ {data.tables.size} bàn</p>
+                              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">
+                                {t.kitchen.summaryTablesCount.replace("{count}", String(data.tables.size))}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -366,13 +373,13 @@ export default function KitchenPage() {
                           {totalPending > 0 && (
                             <span className="inline-flex items-center gap-1 text-red-600 bg-red-50 border border-red-100 px-2.5 py-1 rounded-xl">
                               <Clock size={12} />
-                              Chờ nấu: {totalPending}
+                              {t.kitchen.summaryPending.replace("{count}", String(totalPending))}
                             </span>
                           )}
                           {totalCooking > 0 && (
                             <span className="inline-flex items-center gap-1 text-orange-600 bg-orange-50 border border-orange-100 px-2.5 py-1 rounded-xl">
                               <ChefHat size={12} />
-                              Đang nấu: {totalCooking}
+                              {t.kitchen.summaryCooking.replace("{count}", String(totalCooking))}
                             </span>
                           )}
                         </div>
@@ -386,7 +393,7 @@ export default function KitchenPage() {
                               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-red-50 text-red-600 border border-red-200 hover:bg-red-500 hover:text-white hover:border-red-500 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
                             >
                               <ChefHat size={12} />
-                              {updatingBatches.includes(`${name}-startCooking`) ? "Đang xử lý..." : `Nấu ${totalPending} phần`}
+                              {updatingBatches.includes(`${name}-startCooking`) ? "..." : t.kitchen.summaryActionCook.replace("{count}", String(totalPending))}
                             </button>
                           )}
                           {totalCooking > 0 && (
@@ -396,7 +403,7 @@ export default function KitchenPage() {
                               className="flex-1 flex items-center justify-center gap-1.5 py-2.5 bg-orange-500 text-white hover:bg-orange-600 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 disabled:opacity-50 cursor-pointer shadow-md shadow-orange-200/50"
                             >
                               <Check size={12} strokeWidth={3} />
-                              {updatingBatches.includes(`${name}-doneCooking`) ? "Đang xử lý..." : `Xong ${totalCooking} phần`}
+                              {updatingBatches.includes(`${name}-doneCooking`) ? "..." : t.kitchen.summaryActionDone.replace("{count}", String(totalCooking))}
                             </button>
                           )}
                         </div>
@@ -404,7 +411,7 @@ export default function KitchenPage() {
                         <div className="flex flex-wrap gap-2 pt-4 border-t border-dashed border-gray-100">
                           {Array.from(data.tables).sort().map(table => (
                             <span key={table} className="px-3 py-1 bg-gray-50 text-gray-600 rounded-xl text-[10px] font-black border border-gray-100 group-hover:border-gray-200 transition-colors">
-                              Bàn {table}
+                              {t.kitchen.summaryTableLabel.replace("{table}", table)}
                             </span>
                           ))}
                         </div>
@@ -413,7 +420,7 @@ export default function KitchenPage() {
                   })
                 ) : (
                   <div className="col-span-full py-20 text-center text-gray-400 italic">
-                    Hiện không có món nào đang được yêu cầu.
+                    {t.kitchen.summaryEmpty}
                   </div>
                 )}
               </div>

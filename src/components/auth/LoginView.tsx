@@ -7,10 +7,13 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useLogin } from "@/hooks/useAuth";
+import { useTranslation } from "@/hooks/useTranslation";
+import LanguageSelector from "@/components/ui/LanguageSelector";
 
 export default function LoginView({ initialRole = "staff" }: { initialRole?: UserRole }) {
   const { login: storeLogin, storeConfig } = useCartStore();
   const [role, setRole] = useState<UserRole>(initialRole);
+  const t = useTranslation();
 
   const getDefaultUsername = (targetRole: UserRole) => {
     if (targetRole === "superadmin") return "superadmin";
@@ -73,10 +76,10 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
 
   const getRoleTheme = () => {
     switch (role) {
-      case "superadmin": return { color: "bg-gray-900", text: "Super Admin", icon: ShieldAlert, accent: "text-gray-900" };
-      case "admin": return { color: "bg-purple-600", text: "Quản trị viên", icon: ShieldCheck, accent: "text-purple-600" };
-      case "kitchen": return { color: "bg-primary", text: "Bộ phận Bếp", icon: LogIn, accent: "text-orange-500" };
-      default: return { color: "bg-blue-600", text: "Nhân viên phục vụ", icon: UserCheck, accent: "text-blue-600" };
+      case "superadmin": return { color: "bg-gray-900", text: t.auth.superadminRole, icon: ShieldAlert, accent: "text-gray-900" };
+      case "admin": return { color: "bg-purple-600", text: t.auth.adminRole, icon: ShieldCheck, accent: "text-purple-600" };
+      case "kitchen": return { color: "bg-primary", text: t.auth.kitchenRole, icon: LogIn, accent: "text-orange-500" };
+      default: return { color: "bg-blue-600", text: t.auth.staffRole, icon: UserCheck, accent: "text-blue-600" };
     }
   };
 
@@ -99,12 +102,16 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
               <ChevronLeft size={24} />
             </Link>
 
+            <div className="absolute top-6 right-6">
+              <LanguageSelector light={false} />
+            </div>
+
             <div className="w-20 h-20 bg-white/20 rounded-3xl flex items-center justify-center mb-4 backdrop-blur-md">
               <theme.icon size={40} />
             </div>
 
             <h1 className="text-2xl font-black tracking-tight">{theme.text}</h1>
-            <p className="opacity-80 text-sm font-medium mt-1">Hệ thống {storeConfig?.name || "Menu Việt"}</p>
+            <p className="opacity-80 text-sm font-medium mt-1">{t.auth.systemTitle.replace("{name}", storeConfig?.name || "Menu Việt")}</p>
           </div>
 
           <div className="p-8">
@@ -114,45 +121,45 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
                 onClick={() => handleRoleChange("staff")}
                 className={`flex-1 py-3 px-4 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${role === "staff" ? "bg-white shadow-sm text-blue-600" : "text-gray-400 hover:text-gray-600"}`}
               >
-                Phục vụ
+                {t.common.staff}
               </button>
               <button
                 onClick={() => handleRoleChange("kitchen")}
                 className={`flex-1 py-3 px-4 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${role === "kitchen" ? "bg-white shadow-sm text-orange-500" : "text-gray-400 hover:text-gray-600"}`}
               >
-                Bếp
+                {t.common.kitchen}
               </button>
               <button
                 onClick={() => handleRoleChange("admin")}
                 className={`flex-1 py-3 px-4 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${role === "admin" ? "bg-white shadow-sm text-purple-600" : "text-gray-400 hover:text-gray-600"}`}
               >
-                Quản trị
+                {t.common.admin}
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-4 mb-2 block text-center">
-                  Tên đăng nhập
+                  {t.auth.usernameLabel}
                 </label>
                 <input
                   required
                   disabled={role === "staff" || role === "kitchen" || role === "superadmin"}
                   type="text"
-                  placeholder="Tên đăng nhập..."
+                  placeholder={t.auth.usernamePlaceholder}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full px-6 py-4 bg-gray-50 border-2 border-gray-50 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5 rounded-2xl outline-none transition-all text-center font-bold text-gray-700 mb-4 disabled:opacity-75 disabled:cursor-not-allowed"
                 />
 
                 <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-4 mb-2 block text-center">
-                  Mật khẩu truy cập
+                  {t.auth.passwordLabel}
                 </label>
                 <div className="relative">
                   <input
                     autoFocus={role === "staff" || role === "kitchen"}
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder={t.auth.passwordPlaceholder}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className={`w-full pl-6 pr-12 py-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all text-center text-xl font-bold tracking-widest ${error ? "border-red-500 animate-shake" : `border-gray-50 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5`}`}
@@ -173,7 +180,7 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
                       exit={{ opacity: 0, height: 0 }}
                       className="text-red-500 text-[10px] font-black text-center mt-3 uppercase tracking-wider"
                     >
-                      Thông tin đăng nhập không chính xác!
+                      {t.auth.invalidCredentials}
                     </motion.p>
                   )}
                 </AnimatePresence>
@@ -189,7 +196,7 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
                 ) : (
                   <>
                     <LogIn size={20} strokeWidth={3} />
-                    ĐĂNG NHẬP
+                    {t.auth.loginButton}
                   </>
                 )}
               </button>

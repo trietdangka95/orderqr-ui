@@ -14,9 +14,13 @@ import { useOrders, useClearTable, useConfirmOrder, useConfirmInvoicePayment } f
 import useIsMounted from "@/hooks/useIsMounted";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function AdminTablesPage() {
   const { tables, addTable, addMultipleTables, removeTable, storeConfig } = useCartStore();
+  const language = useCartStore((s) => s.language) || "vi";
+  const t = useTranslation();
+
   const { data: apiOrders = [] } = useOrders();
   const clearTableMutation = useClearTable();
   const confirmOrderMutation = useConfirmOrder();
@@ -83,7 +87,7 @@ export default function AdminTablesPage() {
       return {
         ...i,
         id: i.productId,
-        name: i.product?.name || 'Món ăn',
+        name: i.product?.name || (language === "vi" ? 'Món ăn' : 'Dish'),
         image: i.product?.image || '',
         price,
         originalPrice,
@@ -118,10 +122,8 @@ export default function AdminTablesPage() {
   }, {} as Record<string, Order[]>);
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
+    const locale = language === "vi" ? "vi-VN" : "en-US";
+    return price.toLocaleString(locale) + `\u00A0${t.common.currency}`;
   };
 
   const handleCheckout = (tableNumber: string) => {
@@ -179,10 +181,12 @@ export default function AdminTablesPage() {
     const doc = iframe.contentWindow?.document;
     if (!doc) return;
 
+    const locale = language === "vi" ? "vi-VN" : "en-US";
+
     doc.write(`
       <html>
         <head>
-          <title>In hóa đơn Bàn ${printingTable}</title>
+          <title>${t.tables.qrPrint} - ${t.common.table} ${printingTable}</title>
           <style>
             @page {
               size: 80mm auto;
@@ -266,12 +270,14 @@ export default function AdminTablesPage() {
 
   if (!isMounted) return null;
 
+  const locale = language === "vi" ? "vi-VN" : "en-US";
+
   return (
     <div className="max-w-7xl mx-auto">
       <header className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 print:hidden">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Quản lý Bàn</h1>
-          <p className="text-gray-500 font-medium italic">Theo dõi trạng thái và in mã QR cho từng bàn tại quán</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.tables.title}</h1>
+          <p className="text-gray-500 font-medium italic">{t.tables.subtitle}</p>
         </div>
 
         <div className="flex bg-gray-100/80 backdrop-blur-sm p-1 rounded-2xl border border-gray-200/50 shadow-sm h-fit gap-1">
@@ -283,7 +289,7 @@ export default function AdminTablesPage() {
                 : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/30"
             }`}
           >
-            Trạng thái
+            {t.tables.tabStatus}
           </button>
           <button
             onClick={() => setActiveTab("qr")}
@@ -293,7 +299,7 @@ export default function AdminTablesPage() {
                 : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/30"
             }`}
           >
-            Mã QR
+            {t.tables.tabQr}
           </button>
         </div>
       </header>
@@ -304,7 +310,7 @@ export default function AdminTablesPage() {
           Object.keys(tableStatus).length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-gray-400">
               <ReceiptIcon size={64} className="mb-4 opacity-20" />
-              <p className="text-lg italic">Hiện không có bàn nào đang sử dụng.</p>
+              <p className="text-lg italic">{t.tables.emptyTables}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -327,15 +333,15 @@ export default function AdminTablesPage() {
           <div className="space-y-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 print:hidden">
               <div>
-                <h2 className="text-2xl font-black text-gray-900 tracking-tight">Danh sách mã QR Bàn</h2>
-                <p className="text-sm text-gray-500 font-medium">In mã này để dán lên từng bàn tại quán.</p>
+                <h2 className="text-2xl font-black text-gray-900 tracking-tight">{t.tables.tabQr}</h2>
+                <p className="text-sm text-gray-500 font-medium">{t.tables.subtitle}</p>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
                 <form onSubmit={handleAddTable} className="flex bg-white p-1.5 rounded-2xl border-2 border-gray-100 focus-within:border-orange-500 transition-all shadow-sm">
                   <input
                     type="text"
-                    placeholder="Số bàn (vd: 06)"
+                    placeholder={t.tables.tableNamePlaceholder}
                     value={newTableNum}
                     onChange={(e) => setNewTableNum(e.target.value)}
                     className="w-40 px-4 outline-none text-sm font-bold"
@@ -344,7 +350,7 @@ export default function AdminTablesPage() {
                     type="submit"
                     className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary transition-all active:scale-95"
                   >
-                    Thêm bàn
+                    {t.tables.addTable}
                   </button>
                 </form>
 
@@ -353,7 +359,7 @@ export default function AdminTablesPage() {
                   className="flex items-center gap-2 bg-blue-500 text-white px-5 py-3 rounded-2xl font-bold hover:bg-blue-600 transition-all shadow-lg shadow-blue-100 active:scale-95"
                 >
                   <QrCodeIcon size={18} />
-                  Thêm nhanh 10 bàn
+                  {t.tables.quickAddTenTables}
                 </button>
 
                 <button
@@ -361,17 +367,17 @@ export default function AdminTablesPage() {
                   className="flex items-center gap-2 bg-gray-900 text-white px-5 py-3 rounded-2xl font-bold hover:bg-black transition-all shadow-xl shadow-gray-200 active:scale-95"
                 >
                   <PrinterIcon size={18} />
-                  In tất cả
+                  {t.tables.printAll}
                 </button>
               </div>
             </div>
 
             <div className="print-qr-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {tables.map((t) => (
+              {tables.map((tNum) => (
                 <QRCodeCard
-                  key={t}
-                  tableNum={t}
-                  qrLink={`${baseUrl}/?table=${t}`}
+                  key={tNum}
+                  tableNum={tNum}
+                  qrLink={`${baseUrl}/?table=${tNum}`}
                   onRemove={removeTable}
                 />
               ))}
@@ -383,7 +389,7 @@ export default function AdminTablesPage() {
       {printingTable && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm print:hidden">
           <div className="bg-white rounded-[2rem] p-6 max-w-sm w-full shadow-2xl relative">
-            <h3 className="font-bold text-gray-800 text-lg mb-4 text-center">Xem trước Hóa đơn</h3>
+            <h3 className="font-bold text-gray-800 text-lg mb-4 text-center">{t.tables.previewInvoice}</h3>
 
             {/* Thermal Receipt Box */}
             <div className="border border-gray-200 rounded-2xl p-4 max-h-[60vh] overflow-y-auto bg-gray-50/50 mb-6 no-scrollbar">
@@ -394,20 +400,20 @@ export default function AdminTablesPage() {
                   {storeConfig?.description && (
                     <p className="text-[9px] text-gray-500 font-bold leading-normal">{storeConfig.description}</p>
                   )}
-                  <p className="text-[9px] text-gray-400 font-medium">Hệ thống Order QR</p>
+                  <p className="text-[9px] text-gray-400 font-medium">{t.revenue.receiptSystemHint}</p>
                   <div className="border-t border-dashed border-gray-400 my-2"></div>
-                  <h3 className="text-xs font-black uppercase tracking-wider">HÓA ĐƠN TẠM TÍNH</h3>
-                  <p className="text-sm font-black text-primary">BÀN: {printingTable}</p>
-                  <p className="text-[9px] text-gray-500 font-medium mt-1">Giờ vào: {receiptOrders[0] ? new Date(receiptOrders[receiptOrders.length - 1].timestamp).toLocaleTimeString("vi-VN") : ""}</p>
-                  <p className="text-[9px] text-gray-500 font-medium">Giờ in: {new Date().toLocaleTimeString("vi-VN")} {new Date().toLocaleDateString("vi-VN")}</p>
+                  <h3 className="text-xs font-black uppercase tracking-wider">{t.tables.printTempBill.toUpperCase()}</h3>
+                  <p className="text-sm font-black text-primary">{t.common.table.toUpperCase()}: {printingTable}</p>
+                  <p className="text-[9px] text-gray-500 font-medium mt-1">{t.revenue.receiptTimeIn.replace("{time}", receiptOrders[0] ? new Date(receiptOrders[receiptOrders.length - 1].timestamp).toLocaleTimeString(locale) : "")}</p>
+                  <p className="text-[9px] text-gray-500 font-medium">{t.revenue.receiptTimePrint.replace("{time}", new Date().toLocaleTimeString(locale) + " " + new Date().toLocaleDateString(locale))}</p>
                 </div>
 
                 <table className="w-full text-[10px] border-collapse">
                   <thead>
                     <tr className="border-b border-dashed border-black text-left font-black">
-                      <th className="py-1">Món ăn</th>
-                      <th className="py-1 text-center">SL</th>
-                      <th className="py-1 text-right">T.Tiền</th>
+                      <th className="py-1">{t.revenue.itemDish}</th>
+                      <th className="py-1 text-center">{t.revenue.receiptQty}</th>
+                      <th className="py-1 text-right">{t.revenue.receiptSubtotal}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -423,10 +429,10 @@ export default function AdminTablesPage() {
                         </td>
                         <td className="py-1 text-center font-bold">{item.quantity}</td>
                         <td className="py-1 text-right font-bold">
-                          {(item.price * item.quantity).toLocaleString("vi-VN")}
+                          {(item.price * item.quantity).toLocaleString(locale)}
                           {item.discountPercent > 0 && (
                             <span style={{ fontSize: '8px', textDecoration: 'line-through', color: '#9ca3af', display: 'block' }}>
-                              {(item.originalPrice * item.quantity).toLocaleString("vi-VN")}
+                              {(item.originalPrice * item.quantity).toLocaleString(locale)}
                             </span>
                           )}
                         </td>
@@ -439,25 +445,25 @@ export default function AdminTablesPage() {
 
                 <div className="space-y-1 text-[11px] font-bold">
                   <div className="flex justify-between">
-                    <span>Tạm tính:</span>
-                    <span>{receiptOriginalTotal.toLocaleString("vi-VN")} ₫</span>
+                    <span>{t.revenue.receiptOriginalTotal}</span>
+                    <span>{receiptOriginalTotal.toLocaleString(locale)} {t.common.currency}</span>
                   </div>
                   {receiptSavedAmount > 0 && (
                     <div className="flex justify-between" style={{ color: '#dc2626' }}>
-                      <span>Giảm giá:</span>
-                      <span>-{receiptSavedAmount.toLocaleString("vi-VN")} ₫</span>
+                      <span>{t.revenue.receiptSaved}</span>
+                      <span>-{receiptSavedAmount.toLocaleString(locale)} {t.common.currency}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-black text-xs border-t border-black pt-1.5 mt-1">
-                    <span>TỔNG CỘNG:</span>
-                    <span className="text-primary">{receiptTotal.toLocaleString("vi-VN")} ₫</span>
+                    <span>{t.revenue.receiptTotal}</span>
+                    <span className="text-primary">{receiptTotal.toLocaleString(locale)} {t.common.currency}</span>
                   </div>
                 </div>
 
                 <div className="border-t border-dashed border-gray-400 my-4"></div>
 
                 <div className="text-center text-[9px] font-bold space-y-1">
-                  <p className="text-gray-900 uppercase">CẢM ƠN QUÝ KHÁCH & HẸN GẶP LẠI!</p>
+                  <p className="text-gray-900 uppercase">{t.revenue.receiptThankYou}</p>
                   <p className="italic text-gray-400 font-medium">Powered by orderqr.id.vn</p>
                 </div>
               </div>
@@ -468,14 +474,14 @@ export default function AdminTablesPage() {
                 onClick={() => setPrintingTable(null)}
                 className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-black rounded-xl text-sm transition-all"
               >
-                Đóng
+                {t.tables.closeBtn}
               </button>
               <button
                 onClick={handlePrintReceipt}
                 className="flex-[2] py-3 bg-primary hover:bg-primary/95 text-white font-black rounded-xl text-sm shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 active:scale-95"
               >
                 <PrinterIcon size={16} />
-                In Hóa Đơn
+                {t.revenue.printBtn}
               </button>
             </div>
           </div>
@@ -495,9 +501,9 @@ export default function AdminTablesPage() {
               <div className="w-16 h-16 bg-orange-50 rounded-2xl flex items-center justify-center text-primary mx-auto mb-4 text-2xl font-black">
                 💳
               </div>
-              <h3 className="font-black text-gray-950 text-lg mb-2 text-center">Xác nhận thanh toán</h3>
+              <h3 className="font-black text-gray-950 text-lg mb-2 text-center">{t.tables.paymentConfirmation}</h3>
               <p className="text-gray-500 text-xs text-center font-bold leading-relaxed mb-6 px-4">
-                Bạn có chắc chắn muốn thanh toán và giải phóng <span className="text-primary font-black">Bàn {checkoutConfirmTable}</span>? Hành động này sẽ hoàn tất tất cả đơn hàng hiện tại của bàn này.
+                {t.tables.paymentConfirmDesc.replace("{table}", checkoutConfirmTable)}
               </p>
 
               <div className="flex gap-3">
@@ -505,7 +511,7 @@ export default function AdminTablesPage() {
                   onClick={() => setCheckoutConfirmTable(null)}
                   className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer animate-none"
                 >
-                  Hủy bỏ
+                  {t.common.cancel}
                 </button>
                 <button
                   onClick={() => {
@@ -514,7 +520,7 @@ export default function AdminTablesPage() {
                   className="flex-1 py-3 bg-gray-900 hover:bg-black text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1"
                 >
                   <PrinterIcon size={12} />
-                  In HĐ
+                  {t.revenue.printBtn}
                 </button>
                 <button
                   onClick={() => {
@@ -523,7 +529,7 @@ export default function AdminTablesPage() {
                   }}
                   className="flex-1 py-3 bg-primary hover:opacity-90 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-orange-100 transition-all cursor-pointer"
                 >
-                  Xác nhận
+                  {t.common.confirm}
                 </button>
               </div>
             </motion.div>
@@ -544,9 +550,12 @@ export default function AdminTablesPage() {
               <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500 mx-auto mb-4 text-2xl font-black">
                 💰
               </div>
-              <h3 className="font-black text-gray-950 text-lg mb-2 text-center">Đã nhận đủ tiền?</h3>
+              <h3 className="font-black text-gray-950 text-lg mb-2 text-center">{t.tables.receivedMoneyTitle}</h3>
               <p className="text-gray-500 text-xs text-center font-bold leading-relaxed mb-6 px-4">
-                Xác nhận đã nhận số tiền <span className="text-primary font-black">{formatPrice(paymentConfirmInvoice.amount)}</span> ({paymentConfirmInvoice.paymentMethod === "QR_TRANSFER" ? "Chuyển khoản QR" : "Tiền mặt"}) từ <span className="text-amber-500 font-black">Bàn {paymentConfirmInvoice.tableNumber}</span>? Trạng thái bàn sẽ được cập nhật.
+                {t.tables.receivedMoneyDesc
+                  .replace("{amount}", formatPrice(paymentConfirmInvoice.amount))
+                  .replace("{method}", paymentConfirmInvoice.paymentMethod === "QR_TRANSFER" ? t.tables.qrTransfer : t.tables.cashPayment)
+                  .replace("{table}", paymentConfirmInvoice.tableNumber)}
               </p>
 
               <div className="flex gap-3">
@@ -554,7 +563,7 @@ export default function AdminTablesPage() {
                   onClick={() => setPaymentConfirmInvoice(null)}
                   className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer"
                 >
-                  Hủy bỏ
+                  {t.common.cancel}
                 </button>
                 <button
                   onClick={() => {
@@ -563,7 +572,7 @@ export default function AdminTablesPage() {
                   className="flex-1 py-3 bg-gray-900 hover:bg-black text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg transition-all cursor-pointer flex items-center justify-center gap-1"
                 >
                   <PrinterIcon size={12} />
-                  In HĐ
+                  {t.revenue.printBtn}
                 </button>
                 <button
                   onClick={() => {
@@ -572,7 +581,7 @@ export default function AdminTablesPage() {
                   }}
                   className="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg shadow-amber-100 transition-all cursor-pointer"
                 >
-                  Đồng ý
+                  {t.common.confirm}
                 </button>
               </div>
             </motion.div>
