@@ -295,7 +295,6 @@ export function StoreFormModal({
                       onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                       className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
                       placeholder="VND"
-                      placeholder="USD"
                     />
                   </div>
                 </div>

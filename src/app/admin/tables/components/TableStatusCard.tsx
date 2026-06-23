@@ -26,7 +26,6 @@ export default function TableStatusCard({
   onPrintInvoice,
 }: TableStatusCardProps) {
   const t = useTranslation();
-  const { language } = useCartStore();
   const totalAmount = tableOrders.reduce((sum, order) => sum + order.totalPrice, 0);
   const hasUnconfirmed = tableOrders.some((o) => !o.isConfirmed);
 

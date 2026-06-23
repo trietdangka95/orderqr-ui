@@ -87,7 +87,7 @@ export default function AdminTablesPage() {
       return {
         ...i,
         id: i.productId,
-        name: i.product?.name || (language === "vi" ? 'Món ăn' : 'Dish'),
+        name: i.product?.name || 'Dish',
         image: i.product?.image || '',
         price,
         originalPrice,
@@ -396,7 +396,7 @@ export default function AdminTablesPage() {
               {/* This is the printable area */}
               <div className="thermal-receipt-print-area font-mono text-[11px] leading-relaxed text-black bg-white p-4 shadow-sm w-full max-w-[80mm] mx-auto border">
                 <div className="text-center space-y-1 mb-4">
-                  <h2 className="text-base font-black uppercase tracking-tight">{storeConfig?.name || "MENU VIỆT"}</h2>
+                  <h2 className="text-base font-black uppercase tracking-tight">{storeConfig?.name || "MENU"}</h2>
                   {storeConfig?.description && (
                     <p className="text-[9px] text-gray-500 font-bold leading-normal">{storeConfig.description}</p>
                   )}
