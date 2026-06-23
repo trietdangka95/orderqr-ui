@@ -8,6 +8,7 @@ import { useCartStore } from "@/store/cartStore";
 import { getImageUrl } from "@/utils/image";
 import { showAlert } from "@/store/dialogStore";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/currency";
 
 interface Product {
   id: string;
@@ -28,7 +29,7 @@ interface ProductDetailModalProps {
 }
 
 export default function ProductDetailModal({ product, isOpen, onClose }: ProductDetailModalProps) {
-  const { addItem, selectedTable } = useCartStore();
+  const { addItem, selectedTable, storeConfig, language } = useCartStore();
   const [note, setNote] = useState("");
   const t = useTranslation();
 
@@ -125,12 +126,12 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
                 </h2>
                 <div className="flex items-center gap-2.5 mb-4 flex-wrap">
                   <div className="inline-block px-3 py-1 bg-primary-soft text-primary rounded-full text-xs md:text-sm font-extrabold whitespace-nowrap">
-                    {finalPrice.toLocaleString("vi-VN")}&nbsp;{t.common.currency}
+                    {formatPrice(finalPrice, storeConfig, language)}
                   </div>
                   {hasDiscount && (
                     <>
                       <span className="text-xs md:text-sm text-gray-400 line-through font-semibold whitespace-nowrap">
-                        {product.price.toLocaleString("vi-VN")}&nbsp;{t.common.currency}
+                        {formatPrice(product.price, storeConfig, language)}
                       </span>
                       <span className="bg-red-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1 animate-pulse shrink-0">
                         -{discountPercent}%

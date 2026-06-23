@@ -22,6 +22,7 @@ export interface TranslationSchema {
     labelNew: string;
     labelHot: string;
     soldOut: string;
+    notice: string;
   };
   page: {
     storeSuspendedTitle: string;

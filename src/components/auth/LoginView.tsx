@@ -97,12 +97,12 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
           <div className={`p-8 transition-colors duration-500 flex flex-col items-center justify-center text-white relative ${theme.color}`}>
             <Link
               href="/"
-              className="absolute top-6 left-6 p-2 hover:bg-white/20 rounded-full transition-colors"
+              className="absolute top-4 left-4 p-2 hover:bg-white/20 rounded-full transition-colors"
             >
               <ChevronLeft size={24} />
             </Link>
 
-            <div className="absolute top-6 right-6">
+            <div className="absolute top-4 right-4">
               <LanguageSelector light={false} />
             </div>
 
@@ -162,7 +162,7 @@ export default function LoginView({ initialRole = "staff" }: { initialRole?: Use
                     placeholder={t.auth.passwordPlaceholder}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full pl-6 pr-12 py-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all text-center text-xl font-bold tracking-widest ${error ? "border-red-500 animate-shake" : `border-gray-50 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5`}`}
+                    className={`w-full pl-12 pr-12 py-4 bg-gray-50 border-2 rounded-2xl outline-none transition-all text-center text-xl font-bold tracking-widest ${error ? "border-red-500 animate-shake" : `border-gray-50 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/5`}`}
                   />
                   <button
                     type="button"

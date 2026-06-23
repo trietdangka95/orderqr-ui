@@ -52,7 +52,7 @@ export default function AdminMenuPage() {
         onAddNew={handleAddNew}
       />
 
-      <main className="py-8">
+      <main className="pt-2 pb-8">
         <CategoryManager
           categories={categoriesData}
         />

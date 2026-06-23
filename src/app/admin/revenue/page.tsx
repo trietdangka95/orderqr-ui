@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCartStore } from "@/store/cartStore";
 import { FILTER_PRESETS, FilterType } from "@/constants/filters";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice as utilsFormatPrice } from "@/utils/currency";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface OrderItemDetail {
@@ -272,7 +273,7 @@ function InvoiceModal({ inv, onClose, t, language }: { inv: InvoiceRecord; onClo
   const locale = language === "vi" ? "vi-VN" : "en-US";
 
   const formatPrice = (price: number) => {
-    return price.toLocaleString(locale) + `\u00A0${t.common.currency}`;
+    return utilsFormatPrice(price, storeConfig, language as "vi" | "en");
   };
 
   const formatDate = (ts: number) => {
@@ -398,8 +399,9 @@ function TopItems({ invoices, t, language }: { invoices: InvoiceRecord[]; t: any
   const maxQty = items[0]?.qty || 1;
   const locale = language === "vi" ? "vi-VN" : "en-US";
 
+  const storeConfig = useCartStore((state) => state.storeConfig);
   const formatPrice = (price: number) => {
-    return price.toLocaleString(locale) + `\u00A0${t.common.currency}`;
+    return utilsFormatPrice(price, storeConfig, language as "vi" | "en");
   };
 
   if (!items.length)
@@ -478,7 +480,7 @@ export default function RevenuePage() {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const formatPrice = (price: number) => {
-    return price.toLocaleString(locale) + `\u00A0${t.common.currency}`;
+    return utilsFormatPrice(price, storeConfig, language);
   };
 
   const formatDate = (ts: number) => {
@@ -659,7 +661,7 @@ export default function RevenuePage() {
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <header className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <header className="mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">
               {t.revenue.title}
@@ -720,7 +722,7 @@ export default function RevenuePage() {
             </div>
 
             {/* Filter Preset Toolbar */}
-            <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200">
+            <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200 w-fit self-start">
               {FILTER_PRESETS.map((btn) => (
                 <button
                   key={btn.id}

@@ -8,10 +8,11 @@ import { useCreateOrder } from "@/hooks/useOrders";
 import { getImageUrl } from "@/utils/image";
 import { showAlert } from "@/store/dialogStore";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice } from "@/utils/currency";
 
 export default function CartDrawer() {
   const t = useTranslation();
-  const { items, isOpen, toggleCart, removeItem, updateQuantity, updateNote, getTotalItems, getTotalPrice, clearCart, toggleOrders, selectedTable } = useCartStore();
+  const { items, isOpen, toggleCart, removeItem, updateQuantity, updateNote, getTotalItems, getTotalPrice, clearCart, toggleOrders, selectedTable, storeConfig, language } = useCartStore();
   const createOrder = useCreateOrder();
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
 
@@ -129,7 +130,7 @@ export default function CartDrawer() {
                   </div>
 
                   <div className="flex items-center justify-between mt-2">
-                    <span className="font-bold text-primary text-sm">{(item.price * item.quantity).toLocaleString("vi-VN")} ₫</span>
+                    <span className="font-bold text-primary text-sm">{formatPrice(item.price * item.quantity, storeConfig, language)}</span>
 
                     <div className="flex items-center gap-3 bg-gray-50 rounded-full px-2 py-1 border border-gray-100">
                       <button
@@ -158,7 +159,7 @@ export default function CartDrawer() {
           <div className="p-4 bg-white border-t border-gray-100 shadow-[0_-4px_6px_-1px_rgb(0,0,0,0.05)] pb-safe">
             <div className="flex justify-between items-center mb-4">
               <span className="text-gray-600 font-medium">{t.cart.total}</span>
-              <span className="text-xl font-bold text-primary">{getTotalPrice().toLocaleString("vi-VN")} ₫</span>
+              <span className="text-xl font-bold text-primary">{formatPrice(getTotalPrice(), storeConfig, language)}</span>
             </div>
             <button
               onClick={handleCheckout}

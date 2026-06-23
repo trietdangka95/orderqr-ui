@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { getImageUrl } from "@/utils/image";
 import { showAlert } from "@/store/dialogStore";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice as utilsFormatPrice } from "@/utils/currency";
 
 type Product = {
   id: string;
@@ -23,7 +24,7 @@ type Product = {
 };
 
 export default function ProductCard({ product, viewMode = "list" }: { product: Product, viewMode?: "grid" | "list" }) {
-  const { addItem, selectedTable } = useCartStore();
+  const { addItem, selectedTable, storeConfig, language } = useCartStore();
   const t = useTranslation();
 
   const discountPercent = product.discountPercent || 0;
@@ -51,7 +52,7 @@ export default function ProductCard({ product, viewMode = "list" }: { product: P
   };
 
   const formatPrice = (price: number) => {
-    return price.toLocaleString("vi-VN") + `\u00A0${t.common.currency}`;
+    return utilsFormatPrice(price, storeConfig, language);
   };
 
   if (viewMode === "grid") {

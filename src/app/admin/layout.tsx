@@ -105,7 +105,7 @@ export default function AdminLayout({
     <AdminGuard>
       <div className="h-screen overflow-hidden bg-gray-50 flex flex-col md:flex-row">
         {/* Mobile Header */}
-        <div className="md:hidden bg-gray-900 text-white p-4 flex items-center justify-between sticky top-0 z-50">
+        <div className="md:hidden bg-gray-900 text-white p-4 flex items-center justify-between relative z-50 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Store size={20} className="text-white" />
@@ -119,7 +119,7 @@ export default function AdminLayout({
 
         {/* Sidebar */}
         <aside className={`
-          fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white p-6 flex flex-col transition-transform duration-300 transform
+          fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white p-6 pb-24 md:pb-6 flex flex-col overflow-y-auto no-scrollbar transition-transform duration-300 transform
           md:relative md:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}>
           <div className="flex items-center gap-3 mb-10 px-2">

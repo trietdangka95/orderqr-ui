@@ -23,7 +23,8 @@ export const en: TranslationSchema = {
     selectTable: "Select Table",
     labelNew: "NEW",
     labelHot: "HOT",
-    soldOut: "SOLD OUT"
+    soldOut: "SOLD OUT",
+    notice: "Notification"
   },
   page: {
     storeSuspendedTitle: "Store Temporarily Suspended",

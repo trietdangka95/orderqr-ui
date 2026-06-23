@@ -4,8 +4,10 @@ import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDialogStore } from "@/store/dialogStore";
 import { AlertTriangle, CheckCircle2, HelpCircle, Info, X } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function GlobalDialog() {
+  const t = useTranslation();
   const {
     isOpen,
     type,
@@ -15,6 +17,21 @@ export default function GlobalDialog() {
     cancelText,
     close,
   } = useDialogStore();
+
+  const displayTitle = 
+    title === "Xác nhận" 
+      ? t.common.confirm 
+      : (title === "Thông báo" ? t.common.notice : title);
+  
+  const displayConfirmText = 
+    confirmText === "Xác nhận" 
+      ? t.common.confirm 
+      : confirmText;
+      
+  const displayCancelText = 
+    cancelText === "Hủy" 
+      ? t.common.cancel 
+      : cancelText;
 
   // Listen to Escape & Enter keys
   useEffect(() => {
@@ -120,7 +137,7 @@ export default function GlobalDialog() {
 
             {/* Title */}
             <h3 className="text-lg font-black text-gray-900 leading-tight mb-2">
-              {title}
+              {displayTitle}
             </h3>
 
             {/* Message */}
@@ -136,7 +153,7 @@ export default function GlobalDialog() {
                   onClick={() => close(false)}
                   className="flex-1 py-3 px-4 bg-gray-50 hover:bg-gray-100 text-gray-500 border border-gray-100 font-bold rounded-xl transition-all active:scale-[0.97] text-sm"
                 >
-                  {cancelText}
+                  {displayCancelText}
                 </button>
               )}
               <button
@@ -148,7 +165,7 @@ export default function GlobalDialog() {
                     : "bg-primary hover:bg-[#E06C00] shadow-orange-100"
                 } text-white font-black rounded-xl shadow-md transition-all active:scale-[0.97] text-sm`}
               >
-                {confirmText}
+                {displayConfirmText}
               </button>
             </div>
           </motion.div>

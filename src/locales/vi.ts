@@ -23,7 +23,8 @@ export const vi: TranslationSchema = {
     selectTable: "Chọn bàn",
     labelNew: "MỚI",
     labelHot: "HOT",
-    soldOut: "TẠM HẾT"
+    soldOut: "TẠM HẾT",
+    notice: "Thông báo"
   },
   page: {
     storeSuspendedTitle: "Cửa Hàng Tạm Ngưng Hoạt Động",

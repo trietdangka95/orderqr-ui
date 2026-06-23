@@ -19,10 +19,13 @@ import { useProducts } from "@/hooks/useProducts";
 import { useOrders } from "@/hooks/useOrders";
 import { useInvoices } from "@/hooks/useInvoices";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useCartStore } from "@/store/cartStore";
+import { formatPrice } from "@/utils/currency";
 
 function RevenueLineChart({ invoices }: { invoices: any[] }) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const t = useTranslation();
+  const { storeConfig, language } = useCartStore();
 
   const chartData = useMemo(() => {
     if (invoices.length === 0) {
@@ -223,7 +226,7 @@ function RevenueLineChart({ invoices }: { invoices: any[] }) {
                 {t.admin.chartPoint.replace("{date}", points[hoveredIdx].date)}
               </span>
               <span className="font-black text-orange-400 text-sm mt-1">
-                {points[hoveredIdx].revenue.toLocaleString("vi-VN")} {t.common.currency}
+                {formatPrice(points[hoveredIdx].revenue, storeConfig, language)}
               </span>
             </motion.div>
           )}
@@ -361,6 +364,7 @@ export default function AdminDashboard() {
   const { data: orders = [] } = useOrders();
   const { data: invoices = [] } = useInvoices();
   const t = useTranslation();
+  const { storeConfig, language } = useCartStore();
 
   const [filterType, setFilterType] = useState<FilterType>("ALL_TIME");
   const [customFrom, setCustomFrom] = useState("");
@@ -427,14 +431,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <header className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <header className="mb-6 md:mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.admin.systemTitle}</h1>
           <p className="text-gray-500 font-medium italic">{t.admin.systemSubtitle}</p>
         </div>
 
         {/* Filter Toolbar */}
-        <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200">
+        <div className="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-2xl border border-gray-200 w-fit self-start">
           {FILTER_PRESETS.map((btn) => {
             const getFilterLabel = (id: typeof btn.id) => {
               if (id === "ALL_TIME") return t.admin.filterAllTime;
@@ -487,11 +491,11 @@ export default function AdminDashboard() {
       )}
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 md:mb-12">
         <AdminStatCard
           href="/admin/revenue"
           icon={TrendingUp}
-          value={new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(totalRevenue)}
+          value={formatPrice(totalRevenue, storeConfig, language)}
           label={t.admin.totalRevenue}
           colorClass="text-green-500"
           bgClass="bg-green-50"

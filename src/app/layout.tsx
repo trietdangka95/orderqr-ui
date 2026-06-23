@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "Order QR - Online Ordering",
@@ -24,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className="bg-[#fdfbf7]">
-      <body className={`${inter.className} min-h-screen text-gray-900`} suppressHydrationWarning={true}>
+    <html lang="vi" className={`bg-[#fdfbf7] ${inter.variable}`}>
+      <body className="min-h-screen text-gray-900" suppressHydrationWarning={true}>
         <Providers>
           <Suspense fallback={null}>
             <StoreInitializer />

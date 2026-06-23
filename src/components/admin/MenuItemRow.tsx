@@ -61,18 +61,16 @@ const ActionButtons = ({ item, isGrid, onEdit, onToggleAvailability, onDelete }:
   );
 };
 
+import { formatPrice as utilsFormatPrice } from "@/utils/currency";
+
 export default function MenuItemRow({ item, onEdit, viewMode = "list" }: MenuItemRowProps) {
   const t = useTranslation();
-  const { language } = useCartStore();
+  const { language, storeConfig } = useCartStore();
   const deleteProduct = useDeleteProduct();
   const updateProduct = useUpdateProduct();
 
   const formatPrice = (price: number) => {
-    const locale = language === "vi" ? "vi-VN" : "en-US";
-    return new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
+    return utilsFormatPrice(price, storeConfig, language);
   };
 
   const handleToggleAvailability = (e: React.MouseEvent) => {

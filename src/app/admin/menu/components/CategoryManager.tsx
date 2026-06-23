@@ -53,7 +53,7 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
         <div className="flex items-center gap-3">
           <div className="w-1.5 h-6 bg-primary rounded-full"></div>
           <h2 className="text-sm font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
-            {t.menuAdmin.manageCategories} <span className="text-xs font-bold text-gray-400 normal-case bg-gray-50 px-2 py-0.5 rounded-lg">{t.menuAdmin.categoriesCount.replace("{count}", String(categories.length))}</span>
+            {t.menuAdmin.manageCategories} <span className="text-xs font-bold text-gray-400 normal-case bg-gray-50 px-2 py-0.5 rounded-lg whitespace-nowrap">{t.menuAdmin.categoriesCount.replace("{count}", String(categories.length))}</span>
           </h2>
         </div>
         <div className="flex items-center gap-1.5 text-xs font-black text-primary uppercase tracking-widest hover:text-orange-600 transition-colors">

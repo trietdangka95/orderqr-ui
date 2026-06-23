@@ -15,6 +15,7 @@ import useIsMounted from "@/hooks/useIsMounted";
 import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "@/hooks/useTranslation";
+import { formatPrice as utilsFormatPrice } from "@/utils/currency";
 
 export default function AdminTablesPage() {
   const { tables, addTable, addMultipleTables, removeTable, storeConfig } = useCartStore();
@@ -122,8 +123,7 @@ export default function AdminTablesPage() {
   }, {} as Record<string, Order[]>);
 
   const formatPrice = (price: number) => {
-    const locale = language === "vi" ? "vi-VN" : "en-US";
-    return price.toLocaleString(locale) + `\u00A0${t.common.currency}`;
+    return utilsFormatPrice(price, storeConfig, language);
   };
 
   const handleCheckout = (tableNumber: string) => {
@@ -274,13 +274,13 @@ export default function AdminTablesPage() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <header className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 print:hidden">
+      <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-12 gap-4 md:gap-6 print:hidden">
         <div>
           <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.tables.title}</h1>
           <p className="text-gray-500 font-medium italic">{t.tables.subtitle}</p>
         </div>
 
-        <div className="flex bg-gray-100/80 backdrop-blur-sm p-1 rounded-2xl border border-gray-200/50 shadow-sm h-fit gap-1">
+        <div className="flex bg-gray-100/80 backdrop-blur-sm p-1 rounded-2xl border border-gray-200/50 shadow-sm h-fit gap-1 w-fit self-start">
           <button
             onClick={() => setActiveTab("status")}
             className={`px-6 py-2 rounded-xl text-sm font-black transition-all duration-200 ${
@@ -446,17 +446,17 @@ export default function AdminTablesPage() {
                 <div className="space-y-1 text-[11px] font-bold">
                   <div className="flex justify-between">
                     <span>{t.revenue.receiptOriginalTotal}</span>
-                    <span>{receiptOriginalTotal.toLocaleString(locale)} {t.common.currency}</span>
+                    <span>{formatPrice(receiptOriginalTotal)}</span>
                   </div>
                   {receiptSavedAmount > 0 && (
                     <div className="flex justify-between" style={{ color: '#dc2626' }}>
                       <span>{t.revenue.receiptSaved}</span>
-                      <span>-{receiptSavedAmount.toLocaleString(locale)} {t.common.currency}</span>
+                      <span>-{formatPrice(receiptSavedAmount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-black text-xs border-t border-black pt-1.5 mt-1">
                     <span>{t.revenue.receiptTotal}</span>
-                    <span className="text-primary">{receiptTotal.toLocaleString(locale)} {t.common.currency}</span>
+                    <span className="text-primary">{formatPrice(receiptTotal)}</span>
                   </div>
                 </div>
 

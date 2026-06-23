@@ -200,25 +200,27 @@ export default function LandingPage() {
             </a>
           </nav>
 
-          {/* CTAs */}
-          <div className="hidden md:flex items-center gap-4">
+          {/* CTAs & Language Selector */}
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Always visible Language Selector */}
             <LanguageSelector />
+
             <a
               href="#contact"
-              className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl text-sm font-black shadow-lg shadow-orange-950/30 hover:scale-102 transition-all flex items-center gap-1"
+              className="hidden md:flex px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl text-sm font-black shadow-lg shadow-orange-950/30 hover:scale-102 transition-all items-center gap-1"
             >
               {t.landing.contactUs}
               <ArrowRight size={16} />
             </a>
-          </div>
 
-          {/* Mobile Menu Toggle */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-gray-400 hover:text-white transition-colors"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-gray-400 hover:text-white transition-colors"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -255,9 +257,6 @@ export default function LandingPage() {
               </a>
             </div>
             <div className="flex flex-col gap-3 pt-2">
-              <div className="flex justify-end py-1">
-                <LanguageSelector />
-              </div>
               <a
                 href="#contact"
                 onClick={() => setMobileMenuOpen(false)}
@@ -889,7 +888,7 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <div className="lg:col-span-7 aspect-[16/10] bg-gray-900/30 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-2xl flex items-center justify-center min-h-[360px]">
+          <div className="lg:col-span-7 lg:aspect-[16/10] bg-gray-900/30 border border-white/5 rounded-3xl p-6 relative overflow-hidden backdrop-blur-2xl flex items-center justify-center min-h-[360px] w-full">
             {/* Background glowing sphere inside box */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
 
