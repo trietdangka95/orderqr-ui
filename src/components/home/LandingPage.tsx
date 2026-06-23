@@ -202,8 +202,10 @@ export default function LandingPage() {
 
           {/* CTAs & Language Selector */}
           <div className="flex items-center gap-2 md:gap-4">
-            {/* Always visible Language Selector */}
-            <LanguageSelector />
+            {/* Desktop-only Language Selector */}
+            <div className="hidden md:block">
+              <LanguageSelector />
+            </div>
 
             <a
               href="#contact"
@@ -264,6 +266,11 @@ export default function LandingPage() {
               >
                 {t.landing.contactUs}
               </a>
+            </div>
+
+            <div className="flex justify-between items-center pt-4 border-t border-white/5">
+              <span className="text-sm font-semibold text-gray-400">Language</span>
+              <LanguageSelector />
             </div>
           </motion.div>
         )}

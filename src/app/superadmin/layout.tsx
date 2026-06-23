@@ -73,7 +73,6 @@ export default function SuperAdminLayout({
         </div>
  
         <div className="flex items-center gap-3">
-          <LanguageSelector light={false} />
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
             className="p-1 text-gray-400 hover:text-white transition-colors"
