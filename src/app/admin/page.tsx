@@ -431,7 +431,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="max-w-5xl mx-auto">
-      <header className="mb-6 md:mb-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <header className="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.admin.systemTitle}</h1>
           <p className="text-gray-500 font-medium italic">{t.admin.systemSubtitle}</p>
@@ -468,7 +468,7 @@ export default function AdminDashboard() {
 
       {/* Custom Date Inputs if CUSTOM filter type is active */}
       {filterType === "CUSTOM" && (
-        <div className="bg-white p-4 border border-gray-100 rounded-2xl shadow-sm mb-12 flex items-center gap-4 flex-wrap">
+        <div className="bg-white p-4 border border-gray-100 rounded-2xl shadow-sm mb-4 flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{t.admin.fromDate}</span>
             <input
@@ -491,7 +491,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 md:mb-12">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <AdminStatCard
           href="/admin/revenue"
           icon={TrendingUp}
@@ -527,9 +527,9 @@ export default function AdminDashboard() {
       </div>
 
       {/* Quick Info / Store Status - Full Width Row */}
-      <div className="mb-12">
+      <div className="mb-4">
         <Link href="/admin/kitchen" className="block group">
-          <div className="flex items-center justify-between mb-6 px-4">
+          <div className="flex items-center justify-between mb-4 px-4">
             <div className="flex items-center gap-3">
               <div className="w-2 h-6 bg-purple-600 rounded-full"></div>
               <h2 className="text-lg font-black text-gray-900 uppercase tracking-wider">{t.admin.storeStatusTitle}</h2>
@@ -559,11 +559,11 @@ export default function AdminDashboard() {
       </div>
 
       {/* Revenue Chart - Full Width Row */}
-      <div className="mb-12">
+      <div className="mb-4">
         <RevenueLineChart invoices={filteredInvoices} />
       </div>
 
-      <div className="mt-12 text-center pb-12">
+      <div className="mt-6 text-center pb-6">
         <Link
           href="/"
           className="text-gray-400 hover:text-gray-600 font-bold text-sm flex items-center justify-center gap-2 transition-colors"

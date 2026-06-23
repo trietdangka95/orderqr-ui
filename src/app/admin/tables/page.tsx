@@ -274,7 +274,7 @@ export default function AdminTablesPage() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-12 gap-4 md:gap-6 print:hidden">
+      <header className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4 md:gap-6 print:hidden">
         <div>
           <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.tables.title}</h1>
           <p className="text-gray-500 font-medium italic">{t.tables.subtitle}</p>
@@ -304,7 +304,7 @@ export default function AdminTablesPage() {
         </div>
       </header>
 
-      <main className="py-2">
+      <main className="pt-0 pb-4">
         {activeTab === "status" ? (
           /* Table Status View */
           Object.keys(tableStatus).length === 0 ? (

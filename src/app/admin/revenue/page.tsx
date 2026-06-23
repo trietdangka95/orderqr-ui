@@ -661,7 +661,7 @@ export default function RevenuePage() {
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <header className="mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <header className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">
               {t.revenue.title}
@@ -683,7 +683,7 @@ export default function RevenuePage() {
         </header>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-4">
           {statCards.map((c, i) => (
             <motion.div
               key={c.label}
@@ -702,7 +702,7 @@ export default function RevenuePage() {
         </div>
 
         {/* Filter bar */}
-        <div className="bg-white rounded-[2rem] border border-gray-100 shadow-lg shadow-gray-100/50 p-5 mb-6">
+        <div className="bg-white rounded-[2rem] border border-gray-100 shadow-lg shadow-gray-100/50 p-5 mb-4">
           <div className="flex flex-wrap gap-3 items-center">
             <div className="flex items-center gap-2 text-gray-400 shrink-0">
               <Filter size={15} />

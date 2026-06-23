@@ -19,7 +19,7 @@ export default function MenuHeader({
   const t = useTranslation();
 
   return (
-    <header className="flex flex-col md:flex-row md:items-center justify-between mb-6 md:mb-12 gap-4 md:gap-6">
+    <header className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4 md:gap-6">
       <div>
         <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.menuAdmin.title}</h1>
         <p className="text-gray-500 font-medium italic">{t.menuAdmin.subtitle.replace("{count}", String(itemCount))}</p>

@@ -52,13 +52,13 @@ export default function AdminMenuPage() {
         onAddNew={handleAddNew}
       />
 
-      <main className="pt-2 pb-8">
+      <main className="pt-0 pb-6">
         <CategoryManager
           categories={categoriesData}
         />
 
         {/* Search & Filters */}
-        <div className="mb-8 flex flex-col md:flex-row gap-4">
+        <div className="mb-4 flex flex-col md:flex-row gap-4">
           <div className="relative flex-1 group">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors" size={20} />
             <input

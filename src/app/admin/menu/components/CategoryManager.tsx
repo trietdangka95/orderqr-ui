@@ -44,7 +44,7 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
   };
 
   return (
-    <div className="bg-white rounded-[2rem] p-5 shadow-xl shadow-gray-200/50 border border-gray-100 mb-8 transition-all">
+    <div className="bg-white rounded-[2rem] p-5 shadow-xl shadow-gray-200/50 border border-gray-100 mb-4 transition-all">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
