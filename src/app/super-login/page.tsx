@@ -192,7 +192,7 @@ export default function SuperAdminLogin() {
                       exit={{ opacity: 0, y: -5 }}
                       className="text-center"
                     >
-                      <span className="text-red-500 text-[10px] font-black uppercase tracking-wider">Mã Không Hợp Lệ</span>
+                      <span className="text-red-500 text-[10px] font-black uppercase tracking-wider">Invalid Code</span>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -223,7 +223,7 @@ export default function SuperAdminLogin() {
                 }}
                 className="text-gray-500 hover:text-gray-300 text-xs font-bold transition-colors uppercase tracking-widest mt-4 block mx-auto"
               >
-                Quay lại
+                Go Back
               </button>
             </motion.form>
           )}

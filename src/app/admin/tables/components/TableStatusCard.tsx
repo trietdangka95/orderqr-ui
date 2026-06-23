@@ -120,7 +120,7 @@ export default function TableStatusCard({
             <div className="flex items-center justify-between mb-2 gap-1">
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider truncate">
-                  {language === "vi" ? "Đơn" : "Order"} #{order.id.slice(-4)}
+                  Order #{order.id.slice(-4)}
                 </span>
                 {!pendingInvoice && (
                   <button

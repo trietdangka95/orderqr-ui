@@ -160,7 +160,7 @@ export default function LogsPage() {
                             <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 shadow-inner">
                               <User size={14} />
                             </div>
-                            <span className="font-bold text-gray-800 text-sm">{log.user?.username || "Hệ thống"}</span>
+                            <span className="font-bold text-gray-800 text-sm">{log.user?.username || "System"}</span>
                           </div>
                         </td>
                         <td className="px-8 py-6 whitespace-nowrap">

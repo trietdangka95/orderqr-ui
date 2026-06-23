@@ -6,16 +6,16 @@ import { showAlert } from "@/store/dialogStore";
 import { getImageUrl, compressImage } from "@/utils/image";
 
 export const THEME_PALETTES = [
-  { name: "Hỏa - Cam Tiêu Chuẩn", color: "#f97316", bgClass: "bg-primary", element: "Hỏa" },
-  { name: "Hỏa - Đỏ Nồng Nhiệt", color: "#dc2626", bgClass: "bg-red-600", element: "Hỏa" },
-  { name: "Kim - Vàng Hoàng Kim", color: "#d4af37", bgClass: "bg-[#d4af37]", element: "Kim" },
-  { name: "Mộc - Xanh Lá Mạ", color: "#22c55e", bgClass: "bg-green-500", element: "Mộc" },
-  { name: "Mộc - Xanh Đại Ngàn", color: "#0f766e", bgClass: "bg-teal-700", element: "Mộc" },
-  { name: "Thủy - Xanh Đại Dương", color: "#1d4ed8", bgClass: "bg-blue-700", element: "Thủy" },
-  { name: "Thủy - Xanh Lam Ngọc", color: "#06b6d4", bgClass: "bg-cyan-500", element: "Thủy" },
-  { name: "Thổ - Nâu Đất", color: "#78350f", bgClass: "bg-amber-900", element: "Thổ" },
-  { name: "Thổ - Vàng Đất", color: "#ca8a04", bgClass: "bg-yellow-600", element: "Thổ" },
-  { name: "Kim - Xám Bạc", color: "#94a3b8", bgClass: "bg-slate-400", element: "Kim" },
+  { name: "Fire - Standard Orange", color: "#f97316", bgClass: "bg-primary", element: "Fire" },
+  { name: "Fire - Hot Red", color: "#dc2626", bgClass: "bg-red-600", element: "Fire" },
+  { name: "Metal - Golden Yellow", color: "#d4af37", bgClass: "bg-[#d4af37]", element: "Metal" },
+  { name: "Wood - Lime Green", color: "#22c55e", bgClass: "bg-green-500", element: "Wood" },
+  { name: "Wood - Forest Green", color: "#0f766e", bgClass: "bg-teal-700", element: "Wood" },
+  { name: "Water - Ocean Blue", color: "#1d4ed8", bgClass: "bg-blue-700", element: "Water" },
+  { name: "Water - Cyan Blue", color: "#06b6d4", bgClass: "bg-cyan-500", element: "Water" },
+  { name: "Earth - Brown", color: "#78350f", bgClass: "bg-amber-900", element: "Earth" },
+  { name: "Earth - Amber", color: "#ca8a04", bgClass: "bg-yellow-600", element: "Earth" },
+  { name: "Metal - Silver Gray", color: "#94a3b8", bgClass: "bg-slate-400", element: "Metal" },
 ];
 
 interface StoreFormModalProps {
@@ -74,7 +74,7 @@ export function StoreFormModal({
       const res = await superAdminApi.uploadLogo(compressedFile);
       setFormData((prev) => ({ ...prev, logo: res.url }));
     } catch (err: any) {
-      showAlert("Lỗi khi tải lên logo: " + (err.message || "Không xác định"));
+      showAlert("Error uploading logo: " + (err.message || "Unknown error"));
     } finally {
       setIsUploading(false);
     }
@@ -105,9 +105,9 @@ export function StoreFormModal({
             {/* Modal Header */}
             <div className="flex items-center gap-3.5 mb-5">
               <div>
-                <h2 className="text-xl font-black text-gray-900">{editingStoreId ? "Cập Nhật Cửa Hàng" : "Thêm Cửa Hàng Mới"}</h2>
+                <h2 className="text-xl font-black text-gray-900">{editingStoreId ? "Update Store" : "Add New Store"}</h2>
                 <p className="text-gray-400 text-[9px] font-black uppercase tracking-wider mt-0.5">
-                  {editingStoreId ? "Chỉnh sửa thông tin & tài khoản admin" : "Khởi tạo thông tin cửa hàng & tài khoản"}
+                  {editingStoreId ? "Edit information & admin account" : "Initialize store information & account"}
                 </p>
               </div>
             </div>
@@ -129,7 +129,7 @@ export function StoreFormModal({
                     )}
                   </div>
                   <div className="flex-1">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Logo cửa hàng</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Store Logo</label>
                     <input
                       type="file"
                       accept="image/*"
@@ -152,12 +152,12 @@ export function StoreFormModal({
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Mô tả quán</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Store Description</label>
                   <textarea
                     value={formData.description || ""}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none h-20 resize-none"
-                    placeholder="e.g. Chào mừng quý khách đến với cửa hàng!"
+                    placeholder="E.g. Welcome to our store!"
                   />
                 </div>
                 <div>
@@ -176,13 +176,13 @@ export function StoreFormModal({
                   </div>
                   {editingStoreId && (
                     <div className="mt-2.5">
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Tên đăng nhập Admin</label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Admin Username (Read Only)</label>
                       <input
                         type="text"
                         readOnly
                         value={currentEditingStore?.users?.[0]?.username || "admin"}
                         className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl font-mono text-sm uppercase text-gray-500 cursor-not-allowed outline-none opacity-75"
-                        title="Tên đăng nhập quản trị của cửa hàng"
+                        title="Store admin login username"
                       />
                     </div>
                   )}
@@ -191,28 +191,28 @@ export function StoreFormModal({
                 {editingStoreId ? (
                   <>
                     <div className="h-px bg-gray-100 my-1"></div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-purple-600">Đổi tài khoản Admin (Không bắt buộc)</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-purple-600">Change Admin Account (Optional)</p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                       <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Tên đăng nhập Admin mới</label>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">New Admin Username</label>
                         <input
                           type="text"
                           value={formData.adminUsername}
                           onChange={(e) => setFormData({ ...formData, adminUsername: e.target.value })}
                           className="w-full h-12 px-5 bg-gray-50 border-2 border-purple-50 focus:border-purple-500 rounded-xl outline-none focus:ring-2 focus:ring-purple-500/20 text-sm"
-                          placeholder="Để trống nếu không đổi"
+                          placeholder="Leave empty to keep unchanged"
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Mật khẩu Admin mới</label>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">New Admin Password</label>
                         <div className="relative">
                           <input
                             type={showPassword ? "text" : "password"}
                             value={formData.adminPassword}
                             onChange={(e) => setFormData({ ...formData, adminPassword: e.target.value })}
                             className="w-full h-12 pl-5 pr-11 bg-gray-50 border-2 border-purple-50 focus:border-purple-500 rounded-xl outline-none focus:ring-2 focus:ring-purple-500/20 text-sm"
-                            placeholder="Để trống nếu không đổi"
+                            placeholder="Leave empty to keep unchanged"
                           />
                           <button
                             type="button"
@@ -228,11 +228,11 @@ export function StoreFormModal({
                 ) : (
                   <>
                     <div className="h-px bg-gray-100 my-1"></div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tài khoản quản trị cửa hàng</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Store Admin Account</p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                       <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Tên đăng nhập Admin</label>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Admin Username</label>
                         <input
                           required
                           type="text"
@@ -243,7 +243,7 @@ export function StoreFormModal({
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Mật khẩu Admin</label>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Admin Password</label>
                         <div className="relative">
                           <input
                             required
@@ -270,7 +270,7 @@ export function StoreFormModal({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Màu chủ đạo (Phong thủy)</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Theme Color</label>
                     <div className="grid grid-cols-5 gap-2 bg-gray-50 p-3 rounded-2xl border border-gray-100">
                       {THEME_PALETTES.map((palette) => (
                         <button
@@ -295,42 +295,43 @@ export function StoreFormModal({
                       onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                       className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
                       placeholder="VND"
+                      placeholder="USD"
                     />
                   </div>
                 </div>
 
                 <div className="h-px bg-gray-100 my-1"></div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-blue-600">Quản lý Gói dịch vụ & Hạn dùng</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-blue-600">Subscription Plan Management</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Gói cước</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Plan</label>
                     <select
                       value={formData.subscriptionPlan}
                       onChange={(e) => setFormData({ ...formData, subscriptionPlan: e.target.value as "FREE" | "PREMIUM" })}
                       className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none cursor-pointer"
                     >
-                      <option value="FREE">Gói FREE (Hạn dùng ngắn)</option>
-                      <option value="PREMIUM">Gói PREMIUM (Vô thời hạn)</option>
+                      <option value="FREE">FREE Plan (Short duration)</option>
+                      <option value="PREMIUM">PREMIUM Plan (Unlimited)</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Trạng thái thuê</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Subscription Status</label>
                     <select
                       value={formData.subscriptionStatus}
                       onChange={(e) => setFormData({ ...formData, subscriptionStatus: e.target.value })}
                       className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none cursor-pointer"
                     >
-                      <option value="ACTIVE">Hoạt động (Active)</option>
-                      <option value="EXPIRED">Đã hết hạn (Expired)</option>
-                      <option value="PENDING_PAYMENT">Chờ thanh toán</option>
+                      <option value="ACTIVE">Active</option>
+                      <option value="EXPIRED">Expired</option>
+                      <option value="PENDING_PAYMENT">Pending Payment</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Ngày bắt đầu</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Start Date</label>
                     <input
                       type="date"
                       value={formData.subscriptionStart}
@@ -339,35 +340,35 @@ export function StoreFormModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Ngày hết hạn</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Expiry Date</label>
                     <input
                       type="date"
                       value={formData.subscriptionEnd}
                       onChange={(e) => setFormData({ ...formData, subscriptionEnd: e.target.value })}
                       className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
-                      placeholder="Không giới hạn"
+                      placeholder="Unlimited"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-3.5">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Số tiền thanh toán (VND)</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Payment Amount (VND)</label>
                     <input
                       type="number"
                       value={formData.subscriptionPrice}
                       onChange={(e) => setFormData({ ...formData, subscriptionPrice: Number(e.target.value) })}
                       className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none font-mono"
-                      placeholder="Ví dụ: 199000"
+                      placeholder="E.g. 199000"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Ghi chú gói dịch vụ</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Subscription Notes</label>
                     <textarea
                       value={formData.subscriptionNotes}
                       onChange={(e) => setFormData({ ...formData, subscriptionNotes: e.target.value })}
                       className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none h-20 resize-none"
-                      placeholder="Ghi chú thêm về thông tin thanh toán, gia hạn..."
+                      placeholder="Additional notes about payment, renewals..."
                     />
                   </div>
                 </div>

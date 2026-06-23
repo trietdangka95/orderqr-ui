@@ -32,7 +32,7 @@ export default function StoreManagementPage() {
     subscriptionEnd: "",
     subscriptionPrice: 0,
     subscriptionNotes: "",
-    description: "Chào mừng quý khách đến với cửa hàng!",
+    description: "Welcome to our store!",
   });
 
   const [editingStoreId, setEditingStoreId] = useState<string | null>(null);
@@ -80,7 +80,7 @@ export default function StoreManagementPage() {
           resetForm();
         },
         onError: (err: any) => {
-          showAlert("Gặp lỗi khi cập nhật cửa hàng: " + (err.message || "Lỗi không xác định"));
+          showAlert("Error updating store: " + (err.message || "Unknown error"));
         }
       });
     } else {
@@ -96,7 +96,7 @@ export default function StoreManagementPage() {
           resetForm();
         },
         onError: (err: any) => {
-          showAlert("Gặp lỗi khi tạo cửa hàng: " + (err.message || "Lỗi không xác định"));
+          showAlert("Error creating store: " + (err.message || "Unknown error"));
         }
       });
     }
@@ -117,7 +117,7 @@ export default function StoreManagementPage() {
       subscriptionEnd: "",
       subscriptionPrice: 0,
       subscriptionNotes: "",
-      description: "Chào mừng quý khách đến với cửa hàng!",
+      description: "Welcome to our store!",
     });
   };
 
@@ -137,7 +137,7 @@ export default function StoreManagementPage() {
       subscriptionEnd: store.subscriptionEnd ? new Date(store.subscriptionEnd).toISOString().split("T")[0] : "",
       subscriptionPrice: store.subscriptionPrice ? Number(store.subscriptionPrice) : 0,
       subscriptionNotes: store.subscriptionNotes || "",
-      description: store.description || "Chào mừng quý khách đến với cửa hàng!",
+      description: store.description || "Welcome to our store!",
     });
     setIsModalOpen(true);
   };
@@ -145,7 +145,7 @@ export default function StoreManagementPage() {
   const toggleStoreStatus = (id: string, currentStatus: boolean) => {
     updateStoreMutation.mutate({ id, data: { isActive: !currentStatus } }, {
       onError: (err: any) => {
-        showAlert("Gặp lỗi khi thay đổi trạng thái hoạt động: " + (err.message || "Lỗi không xác định"));
+        showAlert("Error toggling store status: " + (err.message || "Unknown error"));
       }
     });
   };
@@ -153,7 +153,7 @@ export default function StoreManagementPage() {
   const handleDelete = (id: string) => {
     deleteStoreMutation.mutate(id, {
       onError: (err: any) => {
-        showAlert("Gặp lỗi khi xóa cửa hàng: " + (err.message || "Lỗi không xác định"));
+        showAlert("Error deleting store: " + (err.message || "Unknown error"));
       }
     });
   };
@@ -190,8 +190,8 @@ export default function StoreManagementPage() {
           </div>
         ) : isError ? (
           <div className="bg-red-50 p-12 rounded-[3rem] text-center border-2 border-dashed border-red-200">
-            <p className="text-xl font-bold text-red-600 mb-2">Không thể tải danh sách cửa hàng</p>
-            <p className="text-sm text-red-500">{(error as any)?.message || "Vui lòng kiểm tra lại chứng chỉ SSL hoặc kết nối với server."}</p>
+            <p className="text-xl font-bold text-red-600 mb-2">Unable to load store list</p>
+            <p className="text-sm text-red-500">{(error as any)?.message || "Please check SSL certificate or server connection."}</p>
           </div>
         ) : filteredStores.length === 0 ? (
           <div className="bg-white p-20 rounded-[3rem] text-center border-2 border-dashed border-gray-200">

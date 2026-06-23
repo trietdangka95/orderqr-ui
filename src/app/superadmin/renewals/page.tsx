@@ -17,10 +17,10 @@ import {
 import useIsMounted from "@/hooks/useIsMounted";
  
 const RENEWAL_STATUS_TABS = [
-  { id: "PENDING", label: "Chờ duyệt" },
-  { id: "APPROVED", label: "Đã duyệt" },
-  { id: "REJECTED", label: "Đã từ chối" },
-  { id: "ALL", label: "Tất cả" },
+  { id: "PENDING", label: "Pending" },
+  { id: "APPROVED", label: "Approved" },
+  { id: "REJECTED", label: "Rejected" },
+  { id: "ALL", label: "All" },
 ] as const;
 
 export default function SuperAdminRenewalsPage() {
@@ -48,13 +48,13 @@ export default function SuperAdminRenewalsPage() {
   });
  
   const handleApprove = async (id: string, storeName: string, months: number) => {
-    if (await showConfirm(`Bạn có chắc chắn muốn DUYỆT yêu cầu gia hạn ${months} tháng cho cửa hàng "${storeName}"?`)) {
+    if (await showConfirm(`Are you sure you want to APPROVE the ${months}-month renewal request for store "${storeName}"?`)) {
       approveMutation.mutate(id, {
         onSuccess: () => {
-          showAlert("Đã phê duyệt yêu cầu gia hạn thành công!");
+          showAlert("Renewal request approved successfully!");
         },
         onError: (err: any) => {
-          showAlert(err.message || "Phê duyệt thất bại!");
+          showAlert(err.message || "Approval failed!");
         }
       });
     }
@@ -68,7 +68,7 @@ export default function SuperAdminRenewalsPage() {
   const submitReject = async () => {
     if (!rejectingId) return;
     if (!rejectReason.trim()) {
-      showAlert("Vui lòng nhập lý do từ chối!");
+      showAlert("Please enter a reason for rejection!");
       return;
     }
  
@@ -79,10 +79,10 @@ export default function SuperAdminRenewalsPage() {
       onSuccess: () => {
         setRejectingId(null);
         setRejectReason("");
-        showAlert("Đã từ chối yêu cầu gia hạn!");
+        showAlert("Renewal request rejected!");
       },
       onError: (err: any) => {
-        showAlert(err.message || "Từ chối yêu cầu thất bại!");
+        showAlert(err.message || "Rejection failed!");
       }
     });
   };
@@ -99,15 +99,15 @@ export default function SuperAdminRenewalsPage() {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Yêu cầu gia hạn</h1>
-          <p className="text-gray-500 font-medium italic">Đối soát tiền về tài khoản hệ thống và duyệt gói dịch vụ cho các store</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Renewal Requests</h1>
+          <p className="text-gray-500 font-medium italic">Verify incoming payments and approve service plans for stores</p>
         </div>
         <button
           onClick={handleOpenBankModal}
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-2xl text-sm transition-all active:scale-95 shadow-lg shadow-blue-100 flex items-center gap-2"
         >
           <CreditCard size={18} />
-          Cấu hình TK Nhận Tiền
+          Configure Receiving Account
         </button>
       </div>
  
@@ -142,11 +142,11 @@ export default function SuperAdminRenewalsPage() {
  
       {isLoading ? (
         <div className="text-center font-bold text-gray-400 py-20 animate-pulse">
-          Đang tải danh sách yêu cầu gia hạn...
+          Loading renewal requests...
         </div>
       ) : filteredRequests.length === 0 ? (
         <div className="bg-white rounded-3xl border border-gray-100 p-20 text-center text-gray-400 italic">
-          Không tìm thấy yêu cầu gia hạn nào ở mục này.
+          No renewal requests found in this section.
         </div>
       ) : (
         <>
@@ -161,7 +161,7 @@ export default function SuperAdminRenewalsPage() {
                     </div>
                     <div className="text-left">
                       <h4 className="font-bold text-gray-900 leading-tight">
-                        {req.store?.name || "Cửa hàng ẩn"}
+                        {req.store?.name || "Hidden Store"}
                       </h4>
                       <p className="text-[10px] text-gray-400 font-mono mt-0.5">
                         slug: {req.store?.slug || "N/A"}
@@ -176,21 +176,21 @@ export default function SuperAdminRenewalsPage() {
                       ? "bg-red-100 text-red-700" 
                       : "bg-amber-100 text-amber-700 animate-pulse"
                   }`}>
-                    {req.status === "APPROVED" ? "Đã duyệt" : req.status === "REJECTED" ? "Từ chối" : "Chờ duyệt"}
+                    {req.status === "APPROVED" ? "Approved" : req.status === "REJECTED" ? "Rejected" : "Pending"}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-50 text-left text-xs font-semibold">
                   <div>
-                    <span className="text-gray-400 block mb-0.5">Gói cước</span>
-                    <span className="text-gray-800 font-bold">Premium (+{req.months} {req.notes?.includes('[TEST_MINUTES]') ? 'phút' : 'tháng'})</span>
+                    <span className="text-gray-400 block mb-0.5">Plan</span>
+                    <span className="text-gray-800 font-bold">Premium (+{req.months} {req.notes?.includes('[TEST_MINUTES]') ? 'mins' : 'months'})</span>
                   </div>
                   <div>
-                    <span className="text-gray-400 block mb-0.5">Số tiền chuyển</span>
+                    <span className="text-gray-400 block mb-0.5">Amount Transferred</span>
                     <span className="text-primary font-black">{Number(req.price).toLocaleString("vi-VN")} ₫</span>
                   </div>
                   <div className="col-span-2">
-                    <span className="text-gray-400 block mb-0.5">Thời gian gửi</span>
+                    <span className="text-gray-400 block mb-0.5">Date Sent</span>
                     <span className="text-gray-600 flex items-center gap-1">
                       <Calendar size={12} className="text-gray-400 shrink-0" />
                       {new Date(req.createdAt).toLocaleDateString("vi-VN")} {new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -198,7 +198,7 @@ export default function SuperAdminRenewalsPage() {
                   </div>
                   {req.notes && (
                     <div className="col-span-2">
-                      <span className="text-gray-400 block mb-0.5">Ghi chú yêu cầu</span>
+                      <span className="text-gray-400 block mb-0.5">Request Notes</span>
                       <span className="text-gray-500 italic block bg-gray-50 p-2.5 rounded-xl border border-gray-100/60 leading-normal">{req.notes}</span>
                     </div>
                   )}
@@ -212,7 +212,7 @@ export default function SuperAdminRenewalsPage() {
                       className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 text-xs shadow-md shadow-green-100"
                     >
                       <Check size={16} />
-                      Duyệt
+                      Approve
                     </button>
                     <button
                       disabled={approveMutation.isPending || rejectMutation.isPending}
@@ -220,12 +220,12 @@ export default function SuperAdminRenewalsPage() {
                       className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 text-xs shadow-md shadow-red-100"
                     >
                       <X size={16} />
-                      Từ chối
+                      Reject
                     </button>
                   </div>
                 ) : (
                   <div className="text-center pt-2 border-t border-gray-50 text-xs text-gray-400 italic">
-                    Đã xử lý
+                    Processed
                   </div>
                 )}
               </div>
@@ -238,13 +238,13 @@ export default function SuperAdminRenewalsPage() {
               <table className="w-full text-left text-sm font-medium">
                 <thead className="bg-gray-50 text-[10px] font-black uppercase text-gray-400 border-b border-gray-100">
                   <tr>
-                    <th className="px-6 py-4">Cửa hàng</th>
-                    <th className="px-6 py-4">Gói & Số tháng</th>
-                    <th className="px-6 py-4">Số tiền</th>
-                    <th className="px-6 py-4">Ngày gửi</th>
-                    <th className="px-6 py-4">Ghi chú yêu cầu</th>
-                    <th className="px-6 py-4">Trạng thái</th>
-                    <th className="px-6 py-4 text-right">Thao tác</th>
+                    <th className="px-6 py-4">Store</th>
+                    <th className="px-6 py-4">Plan & Duration</th>
+                    <th className="px-6 py-4">Amount</th>
+                    <th className="px-6 py-4">Date Sent</th>
+                    <th className="px-6 py-4">Request Notes</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50 text-gray-700">
@@ -257,7 +257,7 @@ export default function SuperAdminRenewalsPage() {
                           </div>
                           <div>
                             <p className="font-bold text-gray-900 leading-tight">
-                              {req.store?.name || "Cửa hàng ẩn"}
+                              {req.store?.name || "Hidden Store"}
                             </p>
                             <p className="text-[10px] text-gray-400 font-mono mt-0.5">
                               slug: {req.store?.slug || "N/A"}
@@ -268,7 +268,7 @@ export default function SuperAdminRenewalsPage() {
                       <td className="px-6 py-4">
                         <div>
                           <span className="font-bold text-gray-800">Premium</span>
-                          <span className="text-xs text-gray-400 block font-bold mt-0.5">+{req.months} {req.notes?.includes('[TEST_MINUTES]') ? 'phút' : 'tháng'} sử dụng</span>
+                          <span className="text-xs text-gray-400 block font-bold mt-0.5">+{req.months} {req.notes?.includes('[TEST_MINUTES]') ? 'mins' : 'months'} of usage</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -288,7 +288,7 @@ export default function SuperAdminRenewalsPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-start gap-1.5 max-w-xs text-xs italic text-gray-500">
                           <MessageSquare size={13} className="text-gray-400 shrink-0 mt-0.5" />
-                          <span className="line-clamp-2">{req.notes || "Không có ghi chú"}</span>
+                          <span className="line-clamp-2">{req.notes || "No notes"}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -299,7 +299,7 @@ export default function SuperAdminRenewalsPage() {
                             ? "bg-red-100 text-red-700" 
                             : "bg-amber-100 text-amber-700 animate-pulse"
                         }`}>
-                          {req.status === "APPROVED" ? "Đã duyệt" : req.status === "REJECTED" ? "Từ chối" : "Chờ duyệt"}
+                          {req.status === "APPROVED" ? "Approved" : req.status === "REJECTED" ? "Rejected" : "Pending"}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -309,23 +309,23 @@ export default function SuperAdminRenewalsPage() {
                               disabled={approveMutation.isPending || rejectMutation.isPending}
                               onClick={() => handleApprove(req.id, req.store?.name || "Store", req.months)}
                               className="bg-green-500 hover:bg-green-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-green-100"
-                              title="Phê duyệt gia hạn"
+                              title="Approve renewal"
                             >
                               <Check size={16} />
-                              Duyệt
+                              Approve
                             </button>
                             <button
                               disabled={approveMutation.isPending || rejectMutation.isPending}
                               onClick={() => handleReject(req.id)}
                               className="bg-red-500 hover:bg-red-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-red-100"
-                              title="Từ chối yêu cầu"
+                              title="Reject request"
                             >
                               <X size={16} />
-                              Từ chối
+                              Reject
                             </button>
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-400 italic">Đã xử lý</span>
+                          <span className="text-xs text-gray-400 italic">Processed</span>
                         )}
                       </td>
                     </tr>
@@ -344,7 +344,7 @@ export default function SuperAdminRenewalsPage() {
             <div className="p-6 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AlertCircle className="text-red-500" />
-                <h3 className="font-bold text-lg text-gray-900">Từ chối yêu cầu gia hạn</h3>
+                <h3 className="font-bold text-lg text-gray-900">Reject Renewal Request</h3>
               </div>
               <button 
                 onClick={() => setRejectingId(null)} 
@@ -355,9 +355,9 @@ export default function SuperAdminRenewalsPage() {
             </div>
  
             <div className="p-6 space-y-4">
-              <label className="text-xs font-black text-gray-500 uppercase block">Nhập lý do từ chối</label>
+              <label className="text-xs font-black text-gray-500 uppercase block">Enter reason for rejection</label>
               <textarea
-                placeholder="Ví dụ: Chưa nhận được tiền, Sai nội dung chuyển khoản..."
+                placeholder="E.g. Payment not received, incorrect transfer content..."
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-red-500 focus:outline-none transition-colors"
@@ -370,7 +370,7 @@ export default function SuperAdminRenewalsPage() {
                 onClick={() => setRejectingId(null)}
                 className="flex-1 py-3 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-100 transition-all active:scale-[0.98]"
               >
-                Hủy bỏ
+                Cancel
               </button>
               <button
                 disabled={rejectMutation.isPending}
@@ -382,7 +382,7 @@ export default function SuperAdminRenewalsPage() {
                 ) : (
                   <>
                     <X size={16} />
-                    Xác nhận Từ chối
+                    Confirm Rejection
                   </>
                 )}
               </button>
@@ -398,7 +398,7 @@ export default function SuperAdminRenewalsPage() {
             <div className="p-6 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <CreditCard className="text-blue-500" />
-                <h3 className="font-bold text-lg text-gray-900">Cấu hình Tài khoản Nhận tiền</h3>
+                <h3 className="font-bold text-lg text-gray-900">Configure Receiving Account</h3>
               </div>
               <button 
                 onClick={() => setIsBankModalOpen(false)} 
@@ -410,10 +410,10 @@ export default function SuperAdminRenewalsPage() {
  
             <div className="p-6 space-y-4 text-left">
               <div className="space-y-1">
-                <label className="text-xs font-black text-gray-500 uppercase block">Mã Ngân Hàng (VietQR ID)</label>
+                <label className="text-xs font-black text-gray-500 uppercase block">Bank ID (VietQR ID)</label>
                 <input
                   type="text"
-                  placeholder="Ví dụ: MB, VCB, BIDV..."
+                  placeholder="E.g. MB, VCB, BIDV..."
                   value={bankId}
                   onChange={(e) => setBankId(e.target.value.toUpperCase())}
                   className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
@@ -421,10 +421,10 @@ export default function SuperAdminRenewalsPage() {
               </div>
  
               <div className="space-y-1">
-                <label className="text-xs font-black text-gray-500 uppercase block">Số Tài Khoản</label>
+                <label className="text-xs font-black text-gray-500 uppercase block">Account Number</label>
                 <input
                   type="text"
-                  placeholder="Nhập số tài khoản ngân hàng..."
+                  placeholder="Enter bank account number..."
                   value={bankAccountNo}
                   onChange={(e) => setBankAccountNo(e.target.value)}
                   className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
@@ -432,10 +432,10 @@ export default function SuperAdminRenewalsPage() {
               </div>
  
               <div className="space-y-1">
-                <label className="text-xs font-black text-gray-500 uppercase block">Tên Chủ Tài Khoản</label>
+                <label className="text-xs font-black text-gray-500 uppercase block">Account Holder Name</label>
                 <input
                   type="text"
-                  placeholder="Nhập tên không dấu..."
+                  placeholder="Enter name (no accents)..."
                   value={bankAccountName}
                   onChange={(e) => setBankAccountName(e.target.value)}
                   className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
@@ -443,10 +443,10 @@ export default function SuperAdminRenewalsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-black text-gray-500 uppercase block">Đơn giá gói Premium / Tháng (₫)</label>
+                <label className="text-xs font-black text-gray-500 uppercase block">Premium Plan Price / Month (₫)</label>
                 <input
                   type="number"
-                  placeholder="Nhập đơn giá (ví dụ: 599000)..."
+                  placeholder="Enter price (e.g. 599000)..."
                   value={premiumPrice}
                   onChange={(e) => setPremiumPrice(Math.max(0, parseInt(e.target.value) || 0))}
                   className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
@@ -459,13 +459,13 @@ export default function SuperAdminRenewalsPage() {
                 onClick={() => setIsBankModalOpen(false)}
                 className="flex-1 py-3 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-100 transition-all active:scale-[0.98]"
               >
-                Hủy bỏ
+                Cancel
               </button>
               <button
                 disabled={saveBankConfigMutation.isPending}
                 onClick={async () => {
                   if (!bankId.trim() || !bankAccountNo.trim() || !bankAccountName.trim()) {
-                    showAlert("Vui lòng điền đầy đủ thông tin tài khoản!");
+                    showAlert("Please fill in all account details!");
                     return;
                   }
                   saveBankConfigMutation.mutate({
@@ -476,10 +476,10 @@ export default function SuperAdminRenewalsPage() {
                   }, {
                     onSuccess: () => {
                       setIsBankModalOpen(false);
-                      showAlert("Đã cập nhật cấu hình hệ thống thành công!");
+                      showAlert("System configuration updated successfully!");
                     },
                     onError: (err: any) => {
-                      showAlert(err.message || "Cập nhật thất bại!");
+                      showAlert(err.message || "Update failed!");
                     }
                   });
                 }}
@@ -490,7 +490,7 @@ export default function SuperAdminRenewalsPage() {
                 ) : (
                   <>
                     <Check size={16} />
-                    Lưu Cấu Hình
+                    Save Configuration
                   </>
                 )}
               </button>

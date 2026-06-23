@@ -31,7 +31,7 @@ export default function SecuritySettingsPage() {
       setIsSettingUp(true);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      setError(error?.response?.data?.message || "Không thể khởi tạo cấu hình 2FA");
+      setError(error?.response?.data?.message || "Failed to initialize 2FA configuration");
     }
   };
 
@@ -60,14 +60,14 @@ export default function SecuritySettingsPage() {
         code: verificationCode,
         secret: setupData.secret
       });
-      setSuccess("Kích hoạt bảo mật 2 lớp (2FA) thành công!");
+      setSuccess("Two-factor authentication (2FA) enabled successfully!");
       setIsSettingUp(false);
       setSetupData(null);
       setVerificationCode("");
       refetch();
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      setError(error?.response?.data?.message || "Mã xác thực không đúng. Vui lòng thử lại.");
+      setError(error?.response?.data?.message || "Verification code is incorrect. Please try again.");
     }
   };
 
@@ -79,13 +79,13 @@ export default function SecuritySettingsPage() {
 
     try {
       await disableMutation.mutateAsync(confirmPassword);
-      setSuccess("Hủy bảo mật 2 lớp (2FA) thành công!");
+      setSuccess("Two-factor authentication (2FA) disabled successfully!");
       setIsDisabling(false);
       setConfirmPassword("");
       refetch();
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      setError(error?.response?.data?.message || "Mật khẩu xác nhận không chính xác.");
+      setError(error?.response?.data?.message || "Confirmation password is incorrect.");
     }
   };
 
@@ -104,9 +104,9 @@ export default function SecuritySettingsPage() {
       <header className="mb-10">
         <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2 flex items-center gap-3">
           <KeyRound className="text-blue-600" size={32} />
-          Bảo mật tài khoản
+          Account Security
         </h1>
-        <p className="text-gray-500 font-medium italic">Quản lý các lớp bảo mật bảo vệ tài khoản Super Admin</p>
+        <p className="text-gray-500 font-medium italic">Manage security layers protecting your Super Admin account</p>
       </header>
 
       {/* Notifications */}
@@ -144,12 +144,12 @@ export default function SecuritySettingsPage() {
           </div>
           <div>
             <h3 className="text-lg font-black text-gray-900 leading-tight">
-              Mật khẩu hai lớp (2FA / TOTP)
+              Two-Factor Authentication (2FA / TOTP)
             </h3>
             <p className="text-xs text-gray-500 font-semibold mt-1">
-              Trạng thái:{" "}
+              Status:{" "}
               <span className={`font-bold ${isEnabled ? "text-green-600" : "text-amber-500"}`}>
-                {isEnabled ? "Đang bật" : "Đang tắt"}
+                {isEnabled ? "Enabled" : "Disabled"}
               </span>
             </p>
           </div>
@@ -160,7 +160,7 @@ export default function SecuritySettingsPage() {
           {!isSettingUp && !isDisabling && (
             <div>
               <p className="text-gray-600 text-sm leading-relaxed mb-6 font-medium">
-                Xác thực 2 lớp (2FA) thêm một lớp bảo mật quan trọng cho tài khoản Super Admin bằng cách yêu cầu mã bảo mật 6 số từ ứng dụng Google Authenticator hoặc Authy khi đăng nhập.
+                Two-factor authentication (2FA) adds an important security layer to your Super Admin account by requiring a 6-digit security code from Google Authenticator or Authy when logging in.
               </p>
 
               {isEnabled ? (
@@ -172,7 +172,7 @@ export default function SecuritySettingsPage() {
                   }}
                   className="px-6 py-3.5 bg-red-50 text-red-600 font-black rounded-2xl hover:bg-red-100 hover:text-red-700 active:scale-95 transition-all text-xs tracking-wider uppercase border border-red-200/50"
                 >
-                  Tắt xác thực 2 lớp
+                  Disable Two-Factor Auth
                 </button>
               ) : (
                 <button
@@ -185,7 +185,7 @@ export default function SecuritySettingsPage() {
                   ) : (
                     <>
                       <QrCode size={16} />
-                      <span>Kích hoạt bảo mật 2 lớp</span>
+                      <span>Enable Two-Factor Auth</span>
                     </>
                   )}
                 </button>
@@ -211,21 +211,21 @@ export default function SecuritySettingsPage() {
                       includeMargin={false}
                     />
                   </div>
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-4">Quét mã QR bằng Authenticator</span>
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-4">Scan QR code with Authenticator app</span>
                 </div>
 
                 {/* Setup Instructions */}
                 <div className="space-y-4 flex flex-col justify-center">
-                  <h4 className="font-black text-gray-900 uppercase tracking-widest text-xs">Các bước cài đặt:</h4>
+                  <h4 className="font-black text-gray-900 uppercase tracking-widest text-xs">Setup Steps:</h4>
                   <ol className="text-sm text-gray-600 space-y-3 font-medium list-decimal pl-4">
-                    <li>Mở ứng dụng Google Authenticator hoặc Authy trên điện thoại của bạn.</li>
-                    <li>Chọn quét mã QR và hướng camera vào hình bên cạnh.</li>
-                    <li>Nếu không quét được, hãy sao chép mã khóa bí mật ở dưới để cấu hình thủ công.</li>
+                    <li>Open Google Authenticator or Authy on your phone.</li>
+                    <li>Choose to scan QR code and point the camera at the image on the left.</li>
+                    <li>If you cannot scan, copy the secret key below to configure manually.</li>
                   </ol>
 
                   {/* Secret Copy Key */}
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider block mb-1.5">Mã khóa bí mật (Secret Key)</span>
+                    <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider block mb-1.5">Secret Key</span>
                     <div className="flex items-center gap-2 bg-gray-900 text-gray-100 p-3 rounded-xl font-mono text-sm break-all select-all justify-between border border-gray-800">
                       <span className="tracking-wider text-xs">{setupData.secret}</span>
                       <button
@@ -244,7 +244,7 @@ export default function SecuritySettingsPage() {
               <form onSubmit={handleVerifyAndEnable} className="pt-6 border-t border-gray-100 space-y-4">
                 <div>
                   <label htmlFor="verify-code" className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
-                    Nhập mã xác thực 6 số để kích hoạt
+                    Enter 6-digit verification code to activate
                   </label>
                   <input
                     id="verify-code"
@@ -267,7 +267,7 @@ export default function SecuritySettingsPage() {
                     {enableMutation.isPending ? (
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     ) : (
-                      "Xác nhận kích hoạt"
+                      "Confirm Activation"
                     )}
                   </button>
                   <button
@@ -275,7 +275,7 @@ export default function SecuritySettingsPage() {
                     onClick={handleCancelSetup}
                     className="px-6 py-3.5 bg-gray-100 text-gray-600 font-black rounded-2xl hover:bg-gray-200 active:scale-95 transition-all text-xs tracking-wider uppercase"
                   >
-                    Hủy bỏ
+                    Cancel
                   </button>
                 </div>
               </form>
@@ -290,19 +290,19 @@ export default function SecuritySettingsPage() {
               className="space-y-6"
             >
               <div className="p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl text-xs font-semibold leading-relaxed">
-                Cảnh báo: Việc tắt mật khẩu hai lớp sẽ làm giảm độ an toàn của tài khoản Super Admin. Vui lòng xác nhận mật khẩu hiện tại để tiếp tục.
+                Warning: Disabling two-factor authentication will reduce the security of your Super Admin account. Please confirm your current password to continue.
               </div>
 
               <form onSubmit={handleDisable2FA} className="space-y-4">
                 <div>
                   <label htmlFor="confirm-pass" className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
-                    Nhập mật khẩu hiện tại
+                    Enter current password
                   </label>
                   <input
                     id="confirm-pass"
                     autoFocus
                     type="password"
-                    placeholder="Mật khẩu của bạn..."
+                    placeholder="Your password..."
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="max-w-md w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-red-500 focus:bg-white transition-all text-sm font-semibold"
@@ -318,7 +318,7 @@ export default function SecuritySettingsPage() {
                     {disableMutation.isPending ? (
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     ) : (
-                      "Xác nhận hủy 2FA"
+                      "Confirm Disable 2FA"
                     )}
                   </button>
                   <button
@@ -330,7 +330,7 @@ export default function SecuritySettingsPage() {
                     }}
                     className="px-6 py-3.5 bg-gray-100 text-gray-600 font-black rounded-2xl hover:bg-gray-200 active:scale-95 transition-all text-xs tracking-wider uppercase"
                   >
-                    Hủy bỏ
+                    Cancel
                   </button>
                 </div>
               </form>

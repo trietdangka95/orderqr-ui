@@ -86,7 +86,7 @@ const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any, t: any, langua
   });
   const receiptItems = Object.values(itemMap);
   
-  const storeName = storeConfig?.name || (language === "vi" ? "MENU VIỆT" : "MENU VIET");
+  const storeName = storeConfig?.name || (language === "vi" ? "MENU" : "MENU");
   const storeDesc = storeConfig?.description || "";
   const locale = language === "vi" ? "vi-VN" : "en-US";
   

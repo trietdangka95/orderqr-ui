@@ -17,10 +17,10 @@ import {
 import useIsMounted from "@/hooks/useIsMounted";
 
 const CONTACT_STATUS_TABS = [
-  { id: "PENDING", label: "Chờ liên hệ" },
-  { id: "CONTACTED", label: "Đã liên hệ" },
-  { id: "COMPLETED", label: "Hoàn tất" },
-  { id: "ALL", label: "Tất cả" },
+  { id: "PENDING", label: "Pending" },
+  { id: "CONTACTED", label: "Contacted" },
+  { id: "COMPLETED", label: "Completed" },
+  { id: "ALL", label: "All" },
 ] as const;
 
 export default function SuperAdminContactsPage() {
@@ -51,21 +51,21 @@ export default function SuperAdminContactsPage() {
   const handleUpdateStatus = async (id: string, name: string, status: "PENDING" | "CONTACTED" | "COMPLETED") => {
     const statusText =
       status === "PENDING"
-        ? "Chờ liên hệ"
+        ? "Pending"
         : status === "CONTACTED"
-        ? "Đã liên hệ"
-        : "Hoàn tất";
+        ? "Contacted"
+        : "Completed";
 
-    if (await showConfirm(`Bạn có chắc muốn đổi trạng thái yêu cầu của "${name}" thành "${statusText}"?`)) {
+    if (await showConfirm(`Are you sure you want to change the status of "${name}"'s request to "${statusText}"?`)) {
       updateStatusMutation.mutate(
         { id, status },
         {
           onSuccess: () => {
-            showAlert("Đã cập nhật trạng thái thành công!");
+            showAlert("Status updated successfully!");
           },
           onError: (err: unknown) => {
             const error = err as { message?: string };
-            showAlert(error.message || "Cập nhật trạng thái thất bại!");
+            showAlert(error.message || "Failed to update status!");
           }
         }
       );
@@ -73,14 +73,14 @@ export default function SuperAdminContactsPage() {
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (await showConfirm(`CẢNH BÁO: Bạn có chắc chắn muốn XÓA yêu cầu đăng ký của "${name}"? Thao tác này không thể hoàn tác.`)) {
+    if (await showConfirm(`WARNING: Are you sure you want to DELETE the registration request from "${name}"? This action cannot be undone.`)) {
       deleteMutation.mutate(id, {
         onSuccess: () => {
-          showAlert("Đã xóa yêu cầu thành công!");
+          showAlert("Request deleted successfully!");
         },
         onError: (err: unknown) => {
           const error = err as { message?: string };
-          showAlert(error.message || "Xóa yêu cầu thất bại!");
+          showAlert(error.message || "Failed to delete request!");
         }
       });
     }
@@ -89,8 +89,8 @@ export default function SuperAdminContactsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Yêu cầu đăng ký</h1>
-        <p className="text-gray-500 font-medium italic">Quản lý danh sách các quán đăng ký mở dịch vụ từ Landing page</p>
+        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Registration Requests</h1>
+        <p className="text-gray-500 font-medium italic">Manage the list of restaurants that registered for the service from the landing page</p>
       </div>
 
       {/* Controls: Tab and Search */}
@@ -130,7 +130,7 @@ export default function SuperAdminContactsPage() {
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
-            placeholder="Tìm theo tên, số điện thoại, ghi chú..."
+            placeholder="Search by name, phone, notes..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white border border-gray-200 rounded-2xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:border-blue-600 transition-colors font-medium text-gray-800 placeholder-gray-400"
@@ -140,11 +140,11 @@ export default function SuperAdminContactsPage() {
 
       {isLoading ? (
         <div className="text-center font-bold text-gray-400 py-20 animate-pulse">
-          Đang tải danh sách đăng ký...
+          Loading registration list...
         </div>
       ) : filteredContacts.length === 0 ? (
         <div className="bg-white rounded-3xl border border-gray-100 p-20 text-center text-gray-400 italic">
-          Không tìm thấy yêu cầu đăng ký nào ở mục này.
+          No registration requests found in this section.
         </div>
       ) : (
         <>
@@ -183,16 +183,16 @@ export default function SuperAdminContactsPage() {
                     }`}
                   >
                     {contact.status === "COMPLETED"
-                      ? "Hoàn tất"
+                      ? "Completed"
                       : contact.status === "CONTACTED"
-                      ? "Đã liên hệ"
-                      : "Chờ liên hệ"}
+                      ? "Contacted"
+                      : "Pending"}
                   </span>
                 </div>
 
                 <div className="pt-3 border-t border-gray-50 text-left text-xs font-semibold space-y-2">
                   <div>
-                    <span className="text-gray-400 block mb-0.5">Thời gian đăng ký</span>
+                    <span className="text-gray-400 block mb-0.5">Registration Time</span>
                     <span className="text-gray-600 flex items-center gap-1">
                       <Calendar size={12} className="text-gray-400 shrink-0" />
                       {new Date(contact.createdAt).toLocaleDateString("vi-VN")}{" "}
@@ -201,7 +201,7 @@ export default function SuperAdminContactsPage() {
                   </div>
                   {contact.note && (
                     <div>
-                      <span className="text-gray-400 block mb-0.5">Ghi chú bổ sung</span>
+                      <span className="text-gray-400 block mb-0.5">Additional Notes</span>
                       <span className="text-gray-500 italic block bg-gray-50 p-2.5 rounded-xl border border-gray-100/65 leading-normal">
                         {contact.note}
                       </span>
@@ -217,7 +217,7 @@ export default function SuperAdminContactsPage() {
                       className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1 text-[11px] shadow-sm"
                     >
                       <PhoneCall size={14} />
-                      Đã liên hệ
+                      Contacted
                     </button>
                   )}
                   {contact.status !== "COMPLETED" && (
@@ -227,14 +227,14 @@ export default function SuperAdminContactsPage() {
                       className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1 text-[11px] shadow-sm"
                     >
                       <CheckCircle size={14} />
-                      Hoàn tất
+                      Completed
                     </button>
                   )}
                   <button
                     disabled={updateStatusMutation.isPending || deleteMutation.isPending}
                     onClick={() => handleDelete(contact.id, contact.name)}
                     className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center"
-                    title="Xóa yêu cầu"
+                    title="Delete request"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -249,11 +249,11 @@ export default function SuperAdminContactsPage() {
               <table className="w-full text-left text-sm font-medium">
                 <thead className="bg-gray-50 text-[10px] font-black uppercase text-gray-400 border-b border-gray-100">
                   <tr>
-                    <th className="px-6 py-4">Khách hàng / Liên hệ</th>
-                    <th className="px-6 py-4">Ghi chú bổ sung</th>
-                    <th className="px-6 py-4">Thời gian gửi</th>
-                    <th className="px-6 py-4">Trạng thái</th>
-                    <th className="px-6 py-4 text-right">Thao tác</th>
+                    <th className="px-6 py-4">Customer / Contact</th>
+                    <th className="px-6 py-4">Additional Notes</th>
+                    <th className="px-6 py-4">Date Sent</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50 text-gray-700">
@@ -286,7 +286,7 @@ export default function SuperAdminContactsPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-start gap-1.5 max-w-sm text-xs italic text-gray-600">
                           <MessageSquare size={13} className="text-gray-400 shrink-0 mt-0.5" />
-                          <span className="line-clamp-3">{contact.note || "Không có ghi chú"}</span>
+                          <span className="line-clamp-3">{contact.note || "No notes"}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -311,10 +311,10 @@ export default function SuperAdminContactsPage() {
                           }`}
                         >
                           {contact.status === "COMPLETED"
-                            ? "Hoàn tất"
+                            ? "Completed"
                             : contact.status === "CONTACTED"
-                            ? "Đã liên hệ"
-                            : "Chờ liên hệ"}
+                            ? "Contacted"
+                            : "Pending"}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -324,10 +324,10 @@ export default function SuperAdminContactsPage() {
                               disabled={updateStatusMutation.isPending || deleteMutation.isPending}
                               onClick={() => handleUpdateStatus(contact.id, contact.name, "CONTACTED")}
                               className="bg-blue-500 hover:bg-blue-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-blue-100"
-                              title="Đánh dấu đã liên hệ"
+                              title="Mark as Contacted"
                             >
                               <PhoneCall size={15} />
-                              Liên hệ
+                              Contact
                             </button>
                           )}
                           {contact.status !== "COMPLETED" && (
@@ -335,17 +335,17 @@ export default function SuperAdminContactsPage() {
                               disabled={updateStatusMutation.isPending || deleteMutation.isPending}
                               onClick={() => handleUpdateStatus(contact.id, contact.name, "COMPLETED")}
                               className="bg-green-500 hover:bg-green-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-green-100"
-                              title="Đánh dấu hoàn tất"
+                              title="Mark as Completed"
                             >
                               <CheckCircle size={15} />
-                              Xong
+                              Done
                             </button>
                           )}
                           <button
                             disabled={updateStatusMutation.isPending || deleteMutation.isPending}
                             onClick={() => handleDelete(contact.id, contact.name)}
                             className="bg-red-50 hover:bg-red-100 text-red-600 font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center"
-                            title="Xóa yêu cầu"
+                            title="Delete request"
                           >
                             <Trash2 size={15} />
                           </button>
