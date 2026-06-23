@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useCartStore } from "@/store/cartStore";
 import LanguageSelector from "@/components/ui/LanguageSelector";
 import {
   ChefHat,
@@ -35,6 +36,7 @@ const MOCK_WEEKLY_HEIGHTS = [30, 50, 45, 65, 80, 55, 95] as const;
 
 export default function LandingPage() {
   const t = useTranslation();
+  const { language } = useCartStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
   const [showcaseTab, setShowcaseTab] = useState<"menu" | "kitchen" | "admin">(
@@ -90,7 +92,7 @@ export default function LandingPage() {
       setSubmitError(
         error.response?.data?.message ||
         error.message ||
-        "Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại!",
+        t.landing.formError,
       );
     } finally {
       setIsSubmitting(false);
@@ -109,62 +111,60 @@ export default function LandingPage() {
         console.error("Failed to load premium price", err);
       });
   }, []);
-
   const features = [
     {
       icon: <QrCode className="w-6 h-6 text-orange-500" />,
-      title: "Menu QR Linh Hoạt",
-      desc: "Tạo menu số chỉ trong vài phút. Khách hàng quét mã tại bàn, xem thực đơn sinh động, sắc nét và gọi món ngay lập tức.",
+      title: t.landing.featuresList[0].title,
+      desc: t.landing.featuresList[0].desc,
     },
     {
       icon: <ChefHat className="w-6 h-6 text-orange-500" />,
-      title: "Đơn Bếp Tức Thời (Real-time)",
-      desc: "Đơn hàng tự động gửi trực tiếp đến màn hình bếp của nhân viên qua kết nối thời gian thực. Giảm thiểu sai sót tối đa.",
+      title: t.landing.featuresList[1].title,
+      desc: t.landing.featuresList[1].desc,
     },
     {
       icon: <Layers className="w-6 h-6 text-orange-500" />,
-      title: "Quản Lý Đa Cửa Hàng",
-      desc: "Hệ thống hỗ trợ phân quyền multi-tenancy. Mỗi cửa hàng hoạt động riêng biệt trên subdomain riêng cực kỳ chuyên nghiệp.",
+      title: t.landing.featuresList[2].title,
+      desc: t.landing.featuresList[2].desc,
     },
     {
       icon: <TrendingUp className="w-6 h-6 text-orange-500" />,
-      title: "Thống Kê Doanh Thu trực quan",
-      desc: "Theo dõi doanh số bán hàng, số lượng đơn hàng, món ăn bán chạy nhất theo ngày, tuần, tháng với giao diện dashboard chi tiết.",
+      title: t.landing.featuresList[3].title,
+      desc: t.landing.featuresList[3].desc,
     },
     {
       icon: <Smartphone className="w-6 h-6 text-orange-500" />,
-      title: "Tương Thích Mọi Thiết Bị",
-      desc: "Giao diện được thiết kế tối ưu hóa cho di động (Mobile First), mang lại trải nghiệm mượt mà, trực quan như ứng dụng gốc.",
+      title: t.landing.featuresList[4].title,
+      desc: t.landing.featuresList[4].desc,
     },
     {
       icon: <Sparkles className="w-6 h-6 text-orange-500" />,
-      title: "Tùy Biến Giao Diện Độc Bản",
-      desc: "Thay đổi màu sắc chủ đạo (Theme), Logo, và cấu hình danh sách bàn ăn tương thích chính xác với sơ đồ quán thực tế.",
+      title: t.landing.featuresList[5].title,
+      desc: t.landing.featuresList[5].desc,
     },
   ];
 
   const steps = [
     {
-      title: "Quét Mã QR",
-      desc: "Khách hàng quét mã QR độc bản được dán tại bàn ăn bằng điện thoại để truy cập thực đơn trực tuyến tức thì.",
+      title: t.landing.stepsList[0].title,
+      desc: t.landing.stepsList[0].desc,
     },
     {
-      title: "Chọn Món & Đặt Hàng",
-      desc: "Xem món ăn kèm hình ảnh sống động, lọc theo danh mục, thêm ghi chú và bấm đặt món không cần đợi nhân viên.",
+      title: t.landing.stepsList[1].title,
+      desc: t.landing.stepsList[1].desc,
     },
     {
-      title: "Bếp Chế Biến",
-      desc: "Bếp nhận thông tin đặt món theo thời gian thực và tiến hành chuẩn bị món ăn nhanh chóng, chính xác.",
+      title: t.landing.stepsList[2].title,
+      desc: t.landing.stepsList[2].desc,
     },
     {
-      title: "Phục Vụ & Thanh Toán",
-      desc: "Nhân viên phục vụ món ăn đúng số bàn đã đặt. Sau khi dùng bữa xong, khách yêu cầu thanh toán nhanh chóng.",
+      title: t.landing.stepsList[3].title,
+      desc: t.landing.stepsList[3].desc,
     },
   ];
 
   return (
     <div className="min-h-screen bg-gray-950 text-white font-sans overflow-x-hidden relative selection:bg-primary selection:text-white">
-      {/* Background Glowing Blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary/10 blur-[120px] pointer-events-none animate-pulse"></div>
       <div className="absolute top-[30%] right-[-10%] w-[600px] h-[600px] rounded-full bg-red-600/5 blur-[150px] pointer-events-none animate-pulse delay-1000"></div>
       <div className="absolute bottom-[10%] left-[20%] w-[500px] h-[500px] rounded-full bg-amber-600/5 blur-[120px] pointer-events-none animate-pulse delay-700"></div>
@@ -332,16 +332,16 @@ export default function LandingPage() {
 
       {/* System Experience Showcase Section */}
       <section className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10">
+
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">
-            Trải Nghiệm Thực Tế
+            {t.landing.showcaseTitle}
           </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3">
-            Hệ Thống Vận Hành Toàn Diện
+            {t.landing.showcaseSubtitle}
           </h2>
           <p className="text-gray-400 text-sm md:text-base font-medium mt-4">
-            Khám phá quy trình tương tác và quản lý khép kín được thiết kế tối
-            ưu, giúp vận hành quán ăn chuyên nghiệp và tinh gọn.
+            {t.landing.showcaseDesc}
           </p>
         </div>
 
@@ -351,19 +351,19 @@ export default function LandingPage() {
             onClick={() => setShowcaseTab("menu")}
             className={`flex-1 py-2.5 px-3 sm:py-3 sm:px-4 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "menu" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
           >
-            Khách Gọi Món
+            {t.landing.showcaseTabCustomer}
           </button>
           <button
             onClick={() => setShowcaseTab("kitchen")}
             className={`flex-1 py-2.5 px-3 sm:py-3 sm:px-4 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "kitchen" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
           >
-            Nhà Bếp
+            {t.landing.showcaseTabKitchen}
           </button>
           <button
             onClick={() => setShowcaseTab("admin")}
             className={`flex-1 py-2.5 px-3 sm:py-3 sm:px-4 rounded-xl font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 whitespace-nowrap ${showcaseTab === "admin" ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-950/20" : "text-gray-400 hover:text-white"}`}
           >
-            Quản Lý Admin
+            {t.landing.showcaseTabAdmin}
           </button>
         </div>
 
@@ -376,9 +376,9 @@ export default function LandingPage() {
           className="relative max-w-5xl w-full border border-white/10 bg-gray-900/40 rounded-[2rem] p-4 md:p-6 backdrop-blur-2xl shadow-3xl shadow-black/80 mx-auto"
         >
           <div className="absolute top-[-10px] left-1/2 transform -translate-x-1/2 px-4 py-1.5 bg-gray-950 border border-white/10 text-gray-400 rounded-full text-[10px] font-black uppercase tracking-widest z-20">
-            {showcaseTab === "menu" && "Giao Diện Khách Gọi Món"}
-            {showcaseTab === "kitchen" && "Màn Hình Phân Đơn Nhà Bếp"}
-            {showcaseTab === "admin" && "Hệ Thống Admin & Doanh Thu"}
+            {showcaseTab === "menu" && t.landing.showcaseCustomerInterface}
+            {showcaseTab === "kitchen" && t.landing.showcaseKitchenScreen}
+            {showcaseTab === "admin" && t.landing.showcaseAdminSystem}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
             {/* Left Column: Device Mockup */}
@@ -407,7 +407,7 @@ export default function LandingPage() {
                               Bun Bo 97
                             </h5>
                             <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider block mt-0.5">
-                              Bàn 01
+                              {t.landing.showcaseTableNo} 01
                             </span>
                           </div>
                         </div>
@@ -417,13 +417,13 @@ export default function LandingPage() {
                       {/* Category tabs */}
                       <div className="flex gap-1.5 overflow-x-auto py-1 scrollbar-none text-[8px] font-black uppercase tracking-wider">
                         <span className="px-2 py-1 bg-primary text-white rounded-full">
-                          Món chính
+                          {t.landing.showcaseMainDish}
                         </span>
                         <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
-                          Nước uống
+                          {t.landing.showcaseDrinks}
                         </span>
                         <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
-                          Tráng miệng
+                          {t.landing.showcaseDesserts}
                         </span>
                       </div>
                     </div>
@@ -436,7 +436,7 @@ export default function LandingPage() {
                             src={getImageUrl(
                               "/public/uploads/1778770335484-images.jpeg",
                             )}
-                            alt="Bún Bò"
+                            alt={t.landing.showcaseDish1Name}
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               (e.target as HTMLElement).style.display = "none";
@@ -447,10 +447,10 @@ export default function LandingPage() {
                         <div className="text-left flex-1 flex flex-col justify-between py-0.5">
                           <div>
                             <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">
-                              Bún Bò Đặc Biệt
+                              {t.landing.showcaseDish1Name}
                             </p>
                             <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">
-                              Bún bò nạm, chả bò, nước dùng ngọt đậm đà
+                              {t.landing.showcaseDish1Desc}
                             </p>
                           </div>
                           <div className="flex items-end justify-between mt-1">
@@ -471,11 +471,10 @@ export default function LandingPage() {
                         <div className="text-left flex-1 flex flex-col justify-between py-0.5">
                           <div>
                             <p className="text-[10px] font-bold text-gray-900 leading-tight line-clamp-1">
-                              Trà Đào Cam Sả
+                              {t.landing.showcaseDish2Name}
                             </p>
                             <p className="text-[8px] text-gray-400 line-clamp-1 mt-0.5">
-                              Hương vị sả thơm mát hòa quyện cùng đào miếng giòn
-                              ngọt
+                              {t.landing.showcaseDish2Desc}
                             </p>
                           </div>
                           <div className="flex items-end justify-between mt-1">
@@ -493,7 +492,7 @@ export default function LandingPage() {
                     {/* Order button */}
                     <div className="pt-2 border-t border-gray-100 bg-white p-3 shrink-0">
                       <div className="w-full py-2 bg-primary rounded-xl text-[10px] font-black text-white flex items-center justify-center gap-1 shadow-lg shadow-primary active:scale-98">
-                        Gửi Đơn Vào Bếp (2 Món)
+                        {t.landing.showcaseSendToKitchen}
                       </div>
                     </div>
                   </motion.div>
@@ -509,7 +508,7 @@ export default function LandingPage() {
                   >
                     <div className="bg-gray-800 px-4 py-2.5 border-b border-gray-700 flex justify-between items-center text-[10px] shrink-0">
                       <span className="font-black tracking-wider text-orange-500">
-                        KITCHEN BOARD • MÀN BẾP
+                        {t.landing.showcaseKitchenBoard}
                       </span>
                       <span className="bg-green-500/20 text-green-400 font-bold px-2 py-0.5 rounded-full">
                         Connected ✔
@@ -520,27 +519,27 @@ export default function LandingPage() {
                         <div>
                           <div className="flex justify-between items-center mb-1.5">
                             <span className="font-black text-xs text-orange-400">
-                              BÀN SỐ: 01
+                              {t.landing.showcaseTableNo.toUpperCase()}: 01
                             </span>
                             <span className="text-[8px] text-gray-500">
-                              Vừa xong
+                              {t.landing.showcaseJustNow}
                             </span>
                           </div>
                           <div className="space-y-1.5 text-[10px] text-left">
                             <div className="flex justify-between font-bold text-gray-300">
-                              <span>1x Bún Bò Đặc Biệt</span>
+                              <span>1x {t.landing.showcaseDish1Name}</span>
                               <span className="text-orange-500 font-black animate-pulse">
-                                Chờ nấu
+                                {t.landing.showcaseCooking}
                               </span>
                             </div>
                             <div className="flex justify-between font-bold text-gray-300">
-                              <span>1x Trà Đào Cam Sả</span>
-                              <span className="text-green-500">Xong ✔</span>
+                              <span>1x {t.landing.showcaseDish2Name}</span>
+                              <span className="text-green-500">{t.ordersDrawer.done} ✔</span>
                             </div>
                           </div>
                         </div>
                         <button className="w-full mt-3 py-1.5 bg-primary text-white rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-primary transition-all">
-                          Xong Hết Món
+                          {t.landing.showcaseDoneAll}
                         </button>
                       </div>
 
@@ -548,23 +547,23 @@ export default function LandingPage() {
                         <div>
                           <div className="flex justify-between items-center mb-1.5">
                             <span className="font-black text-xs text-gray-400">
-                              BÀN SỐ: 03
+                              {t.landing.showcaseTableNo.toUpperCase()}: 03
                             </span>
                             <span className="text-[8px] text-gray-500">
-                              5 phút trước
+                              5 {t.landing.showcaseMinsAgo}
                             </span>
                           </div>
                           <div className="space-y-1.5 text-[10px] text-left">
                             <div className="flex justify-between font-bold text-gray-300">
-                              <span>2x Phở Bò Tái</span>
+                              <span>2x {t.landing.showcaseDish3Name}</span>
                               <span className="text-orange-500 font-black animate-pulse">
-                                Chờ nấu
+                                {t.landing.showcaseCooking}
                               </span>
                             </div>
                           </div>
                         </div>
                         <button className="w-full mt-3 py-1.5 bg-primary text-white rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-primary transition-all">
-                          Xong Hết Món
+                          {t.landing.showcaseDoneAll}
                         </button>
                       </div>
                     </div>
@@ -593,23 +592,23 @@ export default function LandingPage() {
                     <div className="flex-grow flex bg-gray-950 text-left">
                       <div className="w-24 bg-gray-900/60 border-r border-white/5 p-2 space-y-1 font-bold shrink-0">
                         <div className="px-2 py-1 bg-primary/10 text-orange-500 rounded flex items-center gap-1">
-                          📊 Dashboard
+                          📊 {t.landing.showcaseDashboard}
                         </div>
                         <div className="px-2 py-1 text-gray-500 hover:text-gray-300 rounded flex items-center gap-1">
-                          🍲 Thực đơn
+                          🍲 {t.landing.showcaseMenuTitle}
                         </div>
                         <div className="px-2 py-1 text-gray-500 hover:text-gray-300 rounded flex items-center gap-1">
-                          🪑 Bản đồ bàn
+                          🪑 {t.landing.showcaseTableMap}
                         </div>
                         <div className="px-2 py-1 text-gray-500 hover:text-gray-300 rounded flex items-center gap-1">
-                          📈 Doanh thu
+                          📈 {t.landing.showcaseRevenue}
                         </div>
                       </div>
                       <div className="flex-grow p-3 space-y-3 overflow-y-auto">
                         <div className="grid grid-cols-3 gap-2">
                           <div className="bg-gray-900 p-2 rounded-lg border border-white/5">
                             <span className="text-[7px] text-gray-500 uppercase block font-black">
-                              Hôm nay
+                              {t.landing.showcaseToday}
                             </span>
                             <span className="text-[10px] font-black text-white mt-0.5 block">
                               2.350.000 đ
@@ -617,24 +616,24 @@ export default function LandingPage() {
                           </div>
                           <div className="bg-gray-900 p-2 rounded-lg border border-white/5">
                             <span className="text-[7px] text-gray-500 uppercase block font-black">
-                              Số đơn
+                              {t.landing.showcaseOrdersCount}
                             </span>
                             <span className="text-[10px] font-black text-white mt-0.5 block">
-                              36 đơn
+                              36 {t.landing.showcaseOrdersUnit}
                             </span>
                           </div>
                           <div className="bg-gray-900 p-2 rounded-lg border border-white/5">
                             <span className="text-[7px] text-gray-500 uppercase block font-black">
-                              Chạy nhất
+                              {t.landing.showcaseTopSelling}
                             </span>
                             <span className="text-[8px] font-black text-orange-500 mt-0.5 block truncate">
-                              Bún Bò ĐB
+                              {t.landing.showcaseDishShort}
                             </span>
                           </div>
                         </div>
                         <div className="bg-gray-900/40 border border-white/5 rounded-lg p-2">
                           <p className="text-[7px] text-gray-500 uppercase font-black mb-1.5">
-                            Doanh số tuần này
+                            {t.landing.showcaseWeeklyRevenue}
                           </p>
                           <div className="h-24 flex items-end justify-between px-1 gap-1 pt-2">
                             {MOCK_WEEKLY_HEIGHTS.map((val, idx) => (
@@ -647,7 +646,7 @@ export default function LandingPage() {
                                   style={{ height: `${val * 0.5}px` }}
                                 ></div>
                                 <span className="text-[6px] text-gray-600">
-                                  Th {idx + 2}
+                                  {[t.landing.showcaseMon, t.landing.showcaseTue, t.landing.showcaseWed, t.landing.showcaseThu, t.landing.showcaseFri, t.landing.showcaseSat, t.landing.showcaseSun][idx]}
                                 </span>
                               </div>
                             ))}
@@ -664,7 +663,7 @@ export default function LandingPage() {
             <div className="md:col-span-7 space-y-6 text-left p-2 md:p-6">
               <div className="inline-flex items-center gap-2 text-xs font-black text-orange-500 uppercase tracking-widest">
                 <Zap size={14} className="fill-orange-500/20" />
-                Vận Hành Tiện Lợi
+                {t.landing.showcaseRightTag}
               </div>
 
               <AnimatePresence mode="wait">
@@ -677,14 +676,10 @@ export default function LandingPage() {
                     className="space-y-4"
                   >
                     <h3 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
-                      Khách hàng chủ động chọn món và gửi bếp tức thì
+                      {t.landing.showcaseCustomerTitle}
                     </h3>
                     <p className="text-gray-400 text-sm font-medium leading-relaxed">
-                      Thực khách chỉ cần quét mã QR đặt tại bàn bằng camera điện
-                      thoại để truy cập ngay menu điện tử sinh động, chi tiết mà
-                      không cần tải ứng dụng. Việc đặt món trở nên dễ dàng, tự
-                      động điền số bàn và chuyển đơn thẳng vào bếp chỉ với vài
-                      cú chạm.
+                      {t.landing.showcaseCustomerDesc}
                     </p>
                   </motion.div>
                 )}
@@ -698,14 +693,10 @@ export default function LandingPage() {
                     className="space-y-4"
                   >
                     <h3 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
-                      Nhà bếp xử lý đơn chuyên nghiệp, không sợ nhầm món
+                      {t.landing.showcaseKitchenTitle}
                     </h3>
                     <p className="text-gray-400 text-sm font-medium leading-relaxed">
-                      Khi khách đặt món, màn hình bếp sẽ lập tức phát cảnh báo
-                      và hiển thị đầy đủ thông tin: số lượng món, số bàn và các
-                      ghi chú đặc biệt (ví dụ: ít cay, nhiều rau). Trạng thái
-                      nấu được đồng bộ hóa tức thì giúp tối ưu hóa tiến độ chuẩn
-                      bị món ăn.
+                      {t.landing.showcaseKitchenDesc}
                     </p>
                   </motion.div>
                 )}
@@ -719,14 +710,10 @@ export default function LandingPage() {
                     className="space-y-4"
                   >
                     <h3 className="text-2xl md:text-3xl font-black tracking-tight text-white leading-tight">
-                      Kiểm soát doanh thu chặt chẽ, thay đổi thực đơn linh hoạt
+                      {t.landing.showcaseAdminTitle}
                     </h3>
                     <p className="text-gray-400 text-sm font-medium leading-relaxed">
-                      Trang quản lý admin cung cấp hệ thống báo cáo doanh thu
-                      trực quan theo ngày/tuần/tháng, số lượng hóa đơn phát
-                      sinh. Đồng thời, chủ quán dễ dàng thêm bớt món ăn, thay
-                      đổi giá, tạo bàn ăn mới hay cấu hình logo và màu sắc quán
-                      chỉ trong tích tắc.
+                      {t.landing.showcaseAdminDesc}
                     </p>
                   </motion.div>
                 )}
@@ -740,7 +727,7 @@ export default function LandingPage() {
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">
-                        Không lo trễ đơn, nhầm bàn ăn trong giờ cao điểm
+                        {t.landing.checkCustomer1}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -748,7 +735,7 @@ export default function LandingPage() {
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">
-                        Tiết kiệm chi phí in ấn và thiết kế thực đơn giấy
+                        {t.landing.checkCustomer2}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -756,8 +743,7 @@ export default function LandingPage() {
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">
-                        Hình ảnh món ăn sinh động giúp kích thích gọi món nhiều
-                        hơn
+                        {t.landing.checkCustomer3}
                       </span>
                     </div>
                   </>
@@ -769,7 +755,7 @@ export default function LandingPage() {
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">
-                        Đồng bộ tức thời theo thời gian thực từ bàn đến bếp
+                        {t.landing.checkKitchen1}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -777,8 +763,7 @@ export default function LandingPage() {
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">
-                        Hiển thị rõ ràng các ghi chú đặc biệt (ít cay, không
-                        hành...)
+                        {t.landing.checkKitchen2}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -786,7 +771,7 @@ export default function LandingPage() {
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">
-                        Quản lý và cập nhật trạng thái chế biến món ăn dễ dàng
+                        {t.landing.checkKitchen3}
                       </span>
                     </div>
                   </>
@@ -798,8 +783,7 @@ export default function LandingPage() {
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">
-                        Báo cáo doanh số trực quan bằng biểu đồ chi tiết theo
-                        ngày/tuần
+                        {t.landing.checkAdmin1}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -807,8 +791,7 @@ export default function LandingPage() {
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">
-                        Chỉnh sửa thực đơn, món ăn và giá bán linh hoạt chỉ
-                        trong 3 giây
+                        {t.landing.checkAdmin2}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -816,8 +799,7 @@ export default function LandingPage() {
                         <CheckCircle2 size={12} />
                       </div>
                       <span className="text-sm font-bold text-gray-300">
-                        Quản lý sơ đồ bàn ăn thực tế tương thích với hoạt động
-                        của quán
+                        {t.landing.checkAdmin3}
                       </span>
                     </div>
                   </>
@@ -835,14 +817,13 @@ export default function LandingPage() {
       >
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">
-            Đầy Đủ Công Cụ
+            {t.landing.featuresSectionTag}
           </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3">
-            Tính Năng Vượt Trội Nhất
+            {t.landing.featuresSectionTitle}
           </h2>
           <p className="text-gray-400 text-sm md:text-base font-medium mt-4">
-            Được thiết kế chuyên biệt dựa trên các nghiên cứu vận hành của hàng
-            ngàn quán ăn, nhà hàng, tiệm cà phê tại Việt Nam.
+            {t.landing.featuresSectionDesc}
           </p>
         </div>
 
@@ -874,10 +855,10 @@ export default function LandingPage() {
       >
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">
-            Vận Hành Đơn Giản
+            {t.landing.workflowSectionTag}
           </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3">
-            Hoạt Động Như Thế Nào?
+            {t.landing.workflowSectionTitle}
           </h2>
         </div>
 
@@ -928,23 +909,21 @@ export default function LandingPage() {
                       className="bg-white p-5 rounded-2xl shadow-2xl border border-gray-100 flex flex-col items-center justify-center w-[160px] h-[220px] text-gray-900 relative shrink-0"
                     >
                       <div className="w-full py-1 bg-primary text-white text-[7px] font-black rounded uppercase mb-2">
-                        QUÉT MÃ GỌI MÓN
+                        {t.tables.scanToOrder.toUpperCase()}
                       </div>
                       <div className="p-1.5 border border-gray-100 rounded-xl bg-gray-50 flex items-center justify-center mb-2">
                         <QrCode size={70} className="text-gray-900" />
                       </div>
                       <span className="text-[9px] font-black text-gray-800 bg-gray-100 px-2 py-0.5 rounded-full">
-                        BÀN SỐ 01
+                        {t.landing.showcaseTableNo.toUpperCase()} 01
                       </span>
                     </motion.div>
                     <div className="text-center space-y-2">
                       <h4 className="text-lg font-black text-white">
-                        Bước 1: Thực Khách Quét Mã QR
+                        {t.landing.stepsList?.[0]?.title}
                       </h4>
                       <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
-                        Khi ngồi vào bàn, khách dùng camera điện thoại quét mã
-                        QR. Mỗi bàn sẽ tương ứng một mã duy nhất để tự động ghi
-                        nhận số bàn chính xác.
+                        {t.landing.stepsList?.[0]?.desc}
                       </p>
                     </div>
                   </div>
@@ -954,15 +933,15 @@ export default function LandingPage() {
                   <div className="flex flex-col items-center gap-6">
                     <div className="bg-gray-50 border-4 border-gray-900 rounded-[1.75rem] w-[180px] h-[240px] overflow-hidden text-gray-900 flex flex-col justify-between shadow-2xl shrink-0 text-left">
                       <div className="bg-white p-2 border-b border-gray-100 flex justify-between items-center text-[7px] font-black text-gray-700">
-                        <span>BÀN 01</span>
-                        <span className="text-orange-500">🛒 2 món</span>
+                        <span>{t.landing.showcaseTableNo.toUpperCase()} 01</span>
+                        <span className="text-orange-500">🛒 2 {t.landing.showcaseItemsUnit}</span>
                       </div>
                       <div className="p-2 space-y-1.5 flex-grow overflow-y-auto">
                         <div className="bg-white p-1.5 rounded-xl border border-gray-100 flex gap-2 items-center">
                           <span className="text-xs">🥣</span>
                           <div className="text-[7px]">
                             <p className="font-bold text-gray-900">
-                              Bún Bò Đặc Biệt
+                              {t.landing.showcaseDish1Name}
                             </p>
                             <p className="font-bold text-orange-500">65.000đ</p>
                           </div>
@@ -971,7 +950,7 @@ export default function LandingPage() {
                           <span className="text-xs">🍹</span>
                           <div className="text-[7px]">
                             <p className="font-bold text-gray-900">
-                              Trà Đào Cam Sả
+                              {t.landing.showcaseDish2Name}
                             </p>
                             <p className="font-bold text-orange-500">30.000đ</p>
                           </div>
@@ -979,18 +958,16 @@ export default function LandingPage() {
                       </div>
                       <div className="p-2 bg-white border-t border-gray-100">
                         <div className="w-full py-1.5 bg-primary text-white rounded-lg text-[7px] font-black uppercase tracking-wider text-center animate-pulse">
-                          Xác Nhận Đặt Món
+                          {t.cart.checkoutButton.toUpperCase()}
                         </div>
                       </div>
                     </div>
                     <div className="text-center space-y-2">
                       <h4 className="text-lg font-black text-white">
-                        Bước 2: Xem Thực Đơn & Đặt Món
+                        {t.landing.stepsList?.[1]?.title}
                       </h4>
                       <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
-                        Thực khách duyệt danh mục, thêm ghi chú và tự xác nhận
-                        gửi đơn. Trải nghiệm gọi món mượt mà, trực quan mà không
-                        cần gọi phục vụ.
+                        {t.landing.stepsList?.[1]?.desc}
                       </p>
                     </div>
                   </div>
@@ -1001,36 +978,34 @@ export default function LandingPage() {
                     <div className="bg-gray-900 rounded-2xl border border-white/10 w-[240px] p-3 text-left shadow-2xl shrink-0">
                       <div className="flex justify-between items-center border-b border-white/5 pb-1.5 mb-2">
                         <span className="text-[8px] font-black text-orange-500">
-                          BẾP CHẾ BIẾN
+                          {t.landing.stepsList?.[2]?.title.toUpperCase()}
                         </span>
-                        <span className="text-[7px] text-gray-500">Bàn 01</span>
+                        <span className="text-[7px] text-gray-500">{t.landing.showcaseTableNo} 01</span>
                       </div>
                       <div className="space-y-1 text-[9px] font-bold text-gray-300">
                         <div className="flex justify-between">
-                          <span>1x Bún Bò Đặc Biệt</span>
+                          <span>1x {t.landing.showcaseDish1Name}</span>
                           <span className="text-orange-500 font-black animate-pulse">
-                            Chờ nấu...
+                            {t.landing.showcaseCooking}...
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span>1x Trà Đào Cam Sả</span>
-                          <span className="text-green-500">Xong ✔</span>
+                          <span>1x {t.landing.showcaseDish2Name}</span>
+                          <span className="text-green-500">{t.ordersDrawer.done} ✔</span>
                         </div>
                       </div>
                       <div className="mt-3 pt-2 border-t border-white/5">
                         <div className="w-full py-1 bg-green-600 text-white text-center rounded text-[7px] font-black uppercase tracking-wider">
-                          Hoàn Tất
+                          {t.orders.statusCompleted.toUpperCase()}
                         </div>
                       </div>
                     </div>
                     <div className="text-center space-y-2">
                       <h4 className="text-lg font-black text-white">
-                        Bước 3: Nhà Bếp Tự Động Nhận Đơn
+                        {t.landing.stepsList?.[2]?.title}
                       </h4>
                       <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
-                        Đầu bếp lập tức nhìn thấy danh sách gọi món trên màn
-                        hình bếp. Phân chia chuẩn xác, chế biến nhanh và không
-                        lo thất lạc thông tin.
+                        {t.landing.stepsList?.[2]?.desc}
                       </p>
                     </div>
                   </div>
@@ -1041,38 +1016,36 @@ export default function LandingPage() {
                     <div className="bg-white p-4 rounded-xl shadow-2xl border border-gray-100 text-gray-800 w-[180px] text-left relative overflow-hidden shrink-0">
                       <div className="text-center border-b border-dashed border-gray-200 pb-2 mb-2">
                         <h5 className="font-black text-[10px] text-gray-900">
-                          HÓA ĐƠN TẠM TÍNH
+                          {t.revenue.tempReceiptTitle.toUpperCase()}
                         </h5>
                         <span className="text-[7px] text-gray-400">
-                          Bàn 01 • Order QR
+                          {t.landing.showcaseTableNo} 01 • Order QR
                         </span>
                       </div>
                       <div className="space-y-1 text-[8px] font-bold text-gray-600 border-b border-dashed border-gray-200 pb-2 mb-2">
                         <div className="flex justify-between">
-                          <span>1x Bún Bò Đặc Biệt</span>
+                          <span>1x {t.landing.showcaseDish1Name}</span>
                           <span>65k</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>1x Trà Đào Cam Sả</span>
+                          <span>1x {t.landing.showcaseDish2Name}</span>
                           <span>30k</span>
                         </div>
                       </div>
                       <div className="flex justify-between text-[9px] font-black text-gray-900 mb-2">
-                        <span>TỔNG CỘNG:</span>
+                        <span>{t.cart.total.toUpperCase()}:</span>
                         <span className="text-orange-500">95.000đ</span>
                       </div>
                       <div className="bg-green-500 text-white text-center py-1 rounded text-[7px] font-black uppercase tracking-wider">
-                        ĐÃ THANH TOÁN
+                        {t.revenue.statusPaid.toUpperCase()}
                       </div>
                     </div>
                     <div className="text-center space-y-2">
                       <h4 className="text-lg font-black text-white">
-                        Bước 4: Phục Vụ & Thu Ngân
+                        {t.landing.stepsList?.[3]?.title}
                       </h4>
                       <p className="text-gray-400 text-xs font-medium leading-relaxed max-w-sm">
-                        Nhân viên bưng bê món ăn đến bàn tương ứng. Thu ngân in
-                        hóa đơn và hoàn tất giao dịch tự động nhanh chóng và
-                        chính xác.
+                        {t.landing.stepsList?.[3]?.desc}
                       </p>
                     </div>
                   </div>
@@ -1090,13 +1063,13 @@ export default function LandingPage() {
       >
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">
-            Triển Khai Nhanh Chóng
+            {t.landing.regSectionTag}
           </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3">
-            Quy Trình Đăng Ký Siêu Đơn Giản
+            {t.landing.regSectionTitle}
           </h2>
           <p className="text-gray-400 text-sm md:text-base font-medium mt-4">
-            Bắt đầu số hóa quán ăn của bạn chỉ với vài thao tác dễ dàng. Chúng tôi đồng hành cùng bạn từ lúc đăng ký đến khi vận hành trơn tru.
+            {t.landing.regSectionDesc}
           </p>
         </div>
 
@@ -1113,10 +1086,10 @@ export default function LandingPage() {
               <Store size={24} />
             </div>
             <h4 className="text-xl font-black text-white group-hover:text-orange-500 transition-colors">
-              1. Cung Cấp Thông Tin & Nhu Cầu
+              {t.landing.step1Title}
             </h4>
             <p className="text-gray-400 text-sm font-medium mt-4 leading-relaxed">
-              Chủ quán chỉ cần điền thông tin mô hình kinh doanh (quán ăn, cafe, nhà hàng) và nhu cầu sử dụng thông qua biểu mẫu đăng ký tiện lợi.
+              {t.landing.step1Desc}
             </p>
             <div className="space-y-3 mt-6 text-left">
               <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center gap-3 hover:bg-white/10 transition-colors">
@@ -1124,8 +1097,8 @@ export default function LandingPage() {
                   <Store size={16} />
                 </div>
                 <div>
-                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">Thông tin liên hệ</h6>
-                  <p className="text-[10px] text-gray-400 font-medium">Số điện thoại, tên quán và địa chỉ để chúng tôi liên lạc.</p>
+                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">{t.landing.step1ContactInfo}</h6>
+                  <p className="text-[10px] text-gray-400 font-medium">{t.landing.step1ContactInfoDesc}</p>
                 </div>
               </div>
               <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center gap-3 hover:bg-white/10 transition-colors">
@@ -1133,8 +1106,8 @@ export default function LandingPage() {
                   <Layers size={16} />
                 </div>
                 <div>
-                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">Mô tả menu & quy mô</h6>
-                  <p className="text-[10px] text-gray-400 font-medium">Danh sách các món ăn chính, số lượng bàn hiện có của quán.</p>
+                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">{t.landing.step1MenuScale}</h6>
+                  <p className="text-[10px] text-gray-400 font-medium">{t.landing.step1MenuScaleDesc}</p>
                 </div>
               </div>
             </div>
@@ -1155,39 +1128,39 @@ export default function LandingPage() {
               <Layers size={24} />
             </div>
             <h4 className="text-xl font-black text-white group-hover:text-blue-400 transition-colors">
-              2. Tạo Hệ Thống 4 Phân Hệ
+              {t.landing.step2Title}
             </h4>
             <p className="text-gray-400 text-sm font-medium mt-4 leading-relaxed mb-6">
-              Sau khi xác thực thông tin thành công, hệ thống tự động khởi tạo ngay lập tức một bộ giải pháp toàn diện gồm 4 trang web chuyên biệt hoạt động đồng bộ:
+              {t.landing.step2Desc}
             </p>
             <div className="grid grid-cols-2 gap-3 text-left">
               <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex flex-col gap-1 hover:bg-white/10 transition-colors">
                 <div className="flex items-center gap-1.5 text-orange-400 font-bold text-xs">
                   <QrCode size={14} />
-                  <span>1. Cho Khách</span>
+                  <span>{t.landing.step2Customer}</span>
                 </div>
-                <span className="text-[10px] text-gray-400 font-medium">Quét QR xem menu & gọi món tại bàn.</span>
+                <span className="text-[10px] text-gray-400 font-medium">{t.landing.step2CustomerDesc}</span>
               </div>
               <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex flex-col gap-1 hover:bg-white/10 transition-colors">
                 <div className="flex items-center gap-1.5 text-green-400 font-bold text-xs">
                   <ChefHat size={14} />
-                  <span>2. Cho Bếp</span>
+                  <span>{t.landing.step2Kitchen}</span>
                 </div>
-                <span className="text-[10px] text-gray-400 font-medium">Nhận món thời gian thực, chế biến chính xác.</span>
+                <span className="text-[10px] text-gray-400 font-medium">{t.landing.step2KitchenDesc}</span>
               </div>
               <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex flex-col gap-1 hover:bg-white/10 transition-colors">
                 <div className="flex items-center gap-1.5 text-blue-400 font-bold text-xs">
                   <Smartphone size={14} />
-                  <span>3. Cho Nhân Viên</span>
+                  <span>{t.landing.step2Staff}</span>
                 </div>
-                <span className="text-[10px] text-gray-400 font-medium">Theo dõi bàn ăn, phục vụ & gọi thêm món.</span>
+                <span className="text-[10px] text-gray-400 font-medium">{t.landing.step2StaffDesc}</span>
               </div>
               <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex flex-col gap-1 hover:bg-white/10 transition-colors">
                 <div className="flex items-center gap-1.5 text-purple-400 font-bold text-xs">
                   <ShieldCheck size={14} />
-                  <span>4. Cho Admin</span>
+                  <span>{t.landing.step2Admin}</span>
                 </div>
-                <span className="text-[10px] text-gray-400 font-medium">Xem doanh số, quản lý menu & nhân sự.</span>
+                <span className="text-[10px] text-gray-400 font-medium">{t.landing.step2AdminDesc}</span>
               </div>
             </div>
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -1207,10 +1180,10 @@ export default function LandingPage() {
               <Sparkles size={24} />
             </div>
             <h4 className="text-xl font-black text-white group-hover:text-green-400 transition-colors">
-              3. Hỗ Trợ Sử Dụng Tại Quán
+              {t.landing.step3Title}
             </h4>
             <p className="text-gray-400 text-sm font-medium mt-4 leading-relaxed">
-              Đội ngũ nhân viên sẽ trực tiếp đến quán của bạn để hỗ trợ dán mã QR, hướng dẫn sử dụng chi tiết cho từng bộ phận (bếp, nhân viên) giúp vận hành trơn tru.
+              {t.landing.step3Desc}
             </p>
             <div className="space-y-3 mt-6 text-left">
               <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center gap-3 hover:bg-white/10 transition-colors">
@@ -1218,8 +1191,8 @@ export default function LandingPage() {
                   <QrCode size={16} />
                 </div>
                 <div>
-                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">Thiết lập QR & menu</h6>
-                  <p className="text-[10px] text-gray-400 font-medium">Bàn giao & dán tem QR chất lượng cao tại mỗi vị trí bàn.</p>
+                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">{t.landing.step3Setup}</h6>
+                  <p className="text-[10px] text-gray-400 font-medium">{t.landing.step3SetupDesc}</p>
                 </div>
               </div>
               <div className="bg-white/5 border border-white/5 p-3 rounded-xl flex items-center gap-3 hover:bg-white/10 transition-colors">
@@ -1227,14 +1200,14 @@ export default function LandingPage() {
                   <Sparkles size={16} />
                 </div>
                 <div>
-                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">Đào tạo nhân sự và bếp</h6>
-                  <p className="text-[10px] text-gray-400 font-medium">Hướng dẫn cụ thể cho nhân viên phục vụ và tổ chế biến.</p>
+                  <h6 className="text-[11px] font-black text-white uppercase tracking-wider">{t.landing.step3Training}</h6>
+                  <p className="text-[10px] text-gray-400 font-medium">{t.landing.step3TrainingDesc}</p>
                 </div>
               </div>
             </div>
             <div className="mt-6 flex-grow flex items-end">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 rounded-full text-xs font-black uppercase tracking-wider">
-                Hoàn toàn miễn phí
+                {t.landing.step3Free}
               </span>
             </div>
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -1247,19 +1220,17 @@ export default function LandingPage() {
       {/* Pricing Section */}
       <section
         id="pricing"
-
         className="max-w-7xl mx-auto px-4 md:px-8 py-20 border-t border-white/5 relative z-10 scroll-mt-20"
       >
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase">
-            Chi Phí Tối Ưu
+            {t.landing.pricingSectionTag}
           </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3">
-            Bảng Giá Dịch Vụ
+            {t.landing.pricingSectionTitle}
           </h2>
           <p className="text-gray-400 text-sm md:text-base font-medium mt-4">
-            Lựa chọn gói dịch vụ phù hợp để khởi động hành trình chuyển đổi số
-            của nhà hàng bạn ngay hôm nay.
+            {t.landing.pricingSectionDesc}
           </p>
         </div>
 
@@ -1268,72 +1239,72 @@ export default function LandingPage() {
           <div className="bg-gray-900/10 border border-white/5 rounded-[2rem] p-8 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden group hover:border-white/10 transition-all duration-300">
             <div>
               <span className="text-xs font-black text-gray-500 uppercase tracking-widest">
-                GÓI TRẢI NGHIỆM
+                {t.landing.pricingFreePackageName}
               </span>
               <h3 className="text-2xl font-black text-white mt-2">
-                Dùng Thử Miễn Phí
+                {t.landing.pricingFreeTrial}
               </h3>
               <p className="text-gray-400 text-xs font-bold mt-2">
-                Trải nghiệm đầy đủ tính năng trong 2 tháng
+                {t.landing.pricingFreeTrialDesc}
               </p>
-
+ 
               <div className="flex items-baseline gap-1 mt-6 border-b border-white/5 pb-6">
-                <span className="text-4xl font-black text-white">0đ</span>
-                <span className="text-gray-500 text-sm font-bold">/ 2 tháng</span>
+                <span className="text-4xl font-black text-white">{t.landing.pricingFreePrice}</span>
+                <span className="text-gray-500 text-sm font-bold">{t.landing.pricingFreeUnit}</span>
               </div>
-
+ 
               <ul className="space-y-4 mt-6 text-left">
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-300 font-bold">
                   <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
-                  Đầy đủ tính năng gói Chuyên Nghiệp
+                  {t.landing.pricingFreeFeature1}
                 </li>
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-300 font-bold">
                   <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
-                  Không giới hạn số bàn ăn & thực đơn
+                  {t.landing.pricingFreeFeature2}
                 </li>
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-300 font-bold">
                   <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
-                  Tùy chỉnh subdomain theo ý muốn
+                  {t.landing.pricingFreeFeature3}
                 </li>
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-300 font-bold">
                   <CheckCircle2 size={16} className="text-orange-500 shrink-0" />
-                  Báo cáo doanh số & phân tích nâng cao
+                  {t.landing.pricingFreeFeature4}
                 </li>
               </ul>
             </div>
-
+ 
             <div className="mt-8">
               <a
                 href="#contact"
                 className="w-full py-3.5 border border-white/10 hover:border-white/20 rounded-xl text-xs font-black uppercase tracking-wider bg-white/5 hover:bg-white/10 transition-all block text-center"
               >
-                Liên Hệ Đăng Ký
+                {t.landing.pricingFreeRegister}
               </a>
             </div>
           </div>
-
+ 
           {/* Premium Package */}
           <div className="bg-gray-900/20 border-2 border-orange-500 rounded-[2rem] p-8 backdrop-blur-xl flex flex-col justify-between relative overflow-hidden shadow-2xl shadow-orange-950/20 group">
             {/* Pop tag */}
             <div className="absolute top-0 right-0 px-4 py-1.5 bg-primary text-white text-[9px] font-black uppercase tracking-widest rounded-bl-xl shadow-lg">
-              Phổ Biến Nhất
+              {t.landing.pricingPopular}
             </div>
-
+ 
             <div>
               <span className="text-xs font-black text-orange-500 uppercase tracking-widest">
-                GÓI CHUYÊN NGHIỆP
+                {t.landing.pricingProPackageName}
               </span>
               <h3 className="text-2xl font-black text-white mt-2">
                 Premium Partner
               </h3>
               <p className="text-gray-400 text-xs font-bold mt-2">
-                Dành cho quán vừa và lớn, phục vụ đông khách, cần hệ thống chuyên nghiệp
+                {t.landing.pricingProDesc}
               </p>
               <div className="flex items-baseline gap-1 mt-6 border-b border-orange-500/20 pb-6">
                 <span className="text-4xl font-black text-white">
-                  {monthlyPrice.toLocaleString("vi-VN")}đ
+                  {monthlyPrice.toLocaleString(language === "vi" ? "vi-VN" : "en-US")}{language === "vi" ? "đ" : " VND"}
                 </span>
-                <span className="text-gray-500 text-sm font-bold">/ tháng</span>
+                <span className="text-gray-500 text-sm font-bold">{t.landing.pricingProUnit}</span>
               </div>
 
               <ul className="space-y-4 mt-6 text-left">
@@ -1342,28 +1313,28 @@ export default function LandingPage() {
                     size={16}
                     className="text-orange-500 shrink-0"
                   />
-                  Không giới hạn số bàn ăn
+                  {t.landing.pricingProFeature1}
                 </li>
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-200 font-bold">
                   <CheckCircle2
                     size={16}
                     className="text-orange-500 shrink-0"
                   />
-                  Băng thông truyền tin ưu tiên (Siêu tốc)
+                  {t.landing.pricingProFeature2}
                 </li>
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-200 font-bold">
                   <CheckCircle2
                     size={16}
                     className="text-orange-500 shrink-0"
                   />
-                  Tùy chỉnh subdomain theo ý muốn
+                  {t.landing.pricingProFeature3}
                 </li>
                 <li className="flex items-center gap-3 text-xs md:text-sm text-gray-200 font-bold">
                   <CheckCircle2
                     size={16}
                     className="text-orange-500 shrink-0"
                   />
-                  Báo cáo doanh số & phân tích nâng cao
+                  {t.landing.pricingProFeature4}
                 </li>
               </ul>
             </div>
@@ -1373,7 +1344,7 @@ export default function LandingPage() {
                 href="#contact"
                 className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-orange-950/30 hover:scale-102 transition-all block text-center"
               >
-                Liên Hệ Tư Vấn
+                {t.landing.pricingProContact}
               </a>
             </div>
           </div>
@@ -1387,14 +1358,13 @@ export default function LandingPage() {
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
 
           <span className="text-xs font-black text-white/80 tracking-[0.25em] uppercase relative z-10">
-            Sẵn Sàng Số Hóa?
+            {t.landing.readyTitle}
           </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3 max-w-2xl relative z-10">
-            Bắt đầu trải nghiệm menu điện tử ngay hôm nay!
+            {t.landing.readySubtitle}
           </h2>
           <p className="text-white/80 text-xs md:text-sm font-bold mt-4 max-w-lg relative z-10">
-            Chỉ mất chưa đầy 5 phút để tạo thực đơn và in mã QR cho quán ăn của
-            bạn. Hãy thử nghiệm miễn phí hoàn toàn.
+            {t.landing.readyDesc}
           </p>
 
           <div className="mt-8 relative z-10 w-full sm:w-auto">
@@ -1402,7 +1372,7 @@ export default function LandingPage() {
               href="#contact"
               className="w-full sm:w-auto px-8 py-4 bg-white text-primary hover:bg-gray-100 rounded-2xl text-base font-black shadow-xl hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
             >
-              Đăng Ký Ngay
+              {t.landing.readyRegister}
               <ArrowRight size={18} />
             </a>
           </div>
@@ -1416,13 +1386,13 @@ export default function LandingPage() {
       >
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-xs font-black text-orange-500 tracking-[0.25em] uppercase animate-pulse">
-            Đăng Ký Mở Quán
+            {t.landing.regSectionTitleShort}
           </span>
           <h2 className="text-3xl md:text-5xl font-black tracking-tight text-white mt-3 bg-clip-text bg-gradient-to-r from-white to-orange-500 text-transparent">
-            Bắt Đầu Số Hóa Cửa Hàng
+            {t.landing.regSectionHeading}
           </h2>
           <p className="text-gray-400 text-sm md:text-base font-medium mt-4">
-            Điền thông tin của bạn vào biểu mẫu bên dưới. Đội ngũ kỹ thuật của chúng tôi sẽ liên hệ hỗ trợ bạn tạo tài khoản trong vòng 24 giờ.
+            {t.landing.regSectionSubtitle}
           </p>
         </div>
 
@@ -1445,7 +1415,7 @@ export default function LandingPage() {
                 id="name"
                 name="name"
                 type="text"
-                placeholder="Nhập tên của bạn hoặc tên cửa hàng..."
+                placeholder={t.landing.formNamePlaceholder}
                 value={formData.name}
                 onChange={handleInputChange}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all font-medium text-sm md:text-base"
@@ -1461,7 +1431,7 @@ export default function LandingPage() {
                 name="phone"
                 type="tel"
                 required
-                placeholder="Ví dụ: 0901234567..."
+                placeholder={t.landing.formPhonePlaceholder}
                 value={formData.phone}
                 onChange={handleInputChange}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all font-medium text-sm md:text-base"
@@ -1476,7 +1446,7 @@ export default function LandingPage() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="Ví dụ: lienhe@quananviet.com..."
+                placeholder={t.landing.formEmailPlaceholder}
                 value={formData.email}
                 onChange={handleInputChange}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all font-medium text-sm md:text-base"
@@ -1491,7 +1461,7 @@ export default function LandingPage() {
                 id="note"
                 name="note"
                 rows={4}
-                placeholder="Hãy cho chúng tôi biết về mô hình kinh doanh của bạn (ví dụ: bún bò, quán nhậu, cafe)..."
+                placeholder={t.landing.formNotePlaceholder}
                 value={formData.note}
                 onChange={handleInputChange}
                 className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3.5 text-white placeholder-gray-500 focus:outline-none focus:border-orange-500 focus:bg-white/10 transition-all font-medium text-sm md:text-base resize-none"
@@ -1551,14 +1521,13 @@ export default function LandingPage() {
               </span>
             </div>
             <p className="text-gray-500 text-xs font-medium leading-relaxed">
-              Giải pháp menu QR điện tử toàn diện cho các đơn vị kinh doanh F&B
-              tại Việt Nam. Vận hành tinh gọn, phục vụ nhanh chóng.
+              {t.landing.footerDesc}
             </p>
           </div>
 
           <div className="space-y-3">
             <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest">
-              Sản Phẩm
+              {t.landing.footerProduct}
             </h5>
             <ul className="space-y-2 text-xs font-bold text-gray-500">
               <li>
@@ -1566,7 +1535,7 @@ export default function LandingPage() {
                   href="#features"
                   className="hover:text-white transition-colors"
                 >
-                  Tính năng
+                  {t.landing.footerFeatures}
                 </a>
               </li>
               <li>
@@ -1574,7 +1543,7 @@ export default function LandingPage() {
                   href="#workflow"
                   className="hover:text-white transition-colors"
                 >
-                  Quy trình
+                  {t.landing.footerWorkflow}
                 </a>
               </li>
               <li>
@@ -1582,7 +1551,7 @@ export default function LandingPage() {
                   href="#pricing"
                   className="hover:text-white transition-colors"
                 >
-                  Bảng giá
+                  {t.landing.footerPricing}
                 </a>
               </li>
             </ul>
@@ -1590,7 +1559,7 @@ export default function LandingPage() {
 
           <div className="space-y-3">
             <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest">
-              Liên Hệ Hỗ Trợ
+              {t.landing.footerSupport}
             </h5>
             <ul className="space-y-2 text-xs font-bold text-gray-500">
               <li>Hotline: 0707.898.849</li>
@@ -1602,7 +1571,7 @@ export default function LandingPage() {
                   rel="noopener noreferrer"
                   className="hover:text-white transition-colors flex items-center gap-1.5 mt-2 text-[#0068FF] font-bold"
                 >
-                  💬 Chat Hỗ Trợ Zalo
+                  {t.landing.footerZalo}
                 </a>
               </li>
             </ul>
@@ -1610,15 +1579,15 @@ export default function LandingPage() {
  
           <div className="space-y-3">
             <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest">
-              Bảo Mật & Tin Cậy
+              {t.landing.footerSecurity}
             </h5>
             <div className="flex items-center gap-2 text-gray-500">
               <ShieldCheck size={18} className="text-orange-500/80" />
-              <span className="text-xs font-bold">Bảo mật dữ liệu 100%</span>
+              <span className="text-xs font-bold">{t.landing.footerSecurityDesc}</span>
             </div>
             <div className="flex items-center gap-2 text-gray-500 mt-2">
               <Zap size={18} className="text-orange-500/80" />
-              <span className="text-xs font-bold">Thời gian uptime 99.9%</span>
+              <span className="text-xs font-bold">{t.landing.footerUptime}</span>
             </div>
           </div>
         </div>
@@ -1634,7 +1603,7 @@ export default function LandingPage() {
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-[999] bg-[#0068FF] hover:bg-[#0056d2] w-14 h-14 rounded-full shadow-[0_8px_30px_rgb(0,104,255,0.4)] flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group"
-        title="Liên hệ hỗ trợ qua Zalo"
+        title={t.landing.footerZaloTitle}
       >
         {/* Ripple Ping effect */}
         <span className="absolute inset-0 rounded-full bg-[#0068FF] opacity-60 animate-ping group-hover:animate-none"></span>
