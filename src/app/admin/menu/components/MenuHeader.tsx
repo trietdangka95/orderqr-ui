@@ -51,7 +51,7 @@ export default function MenuHeader({
 
         <button
           onClick={onAddNew}
-          className="bg-primary text-white p-4 sm:px-8 sm:py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-primary shadow-2xl shadow-primary/20 transition-all active:scale-95 text-sm uppercase tracking-widest cursor-pointer"
+          className="bg-primary text-white h-[46px] w-[46px] sm:h-auto sm:w-auto sm:px-8 sm:py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:bg-primary shadow-2xl shadow-primary/20 transition-all active:scale-95 text-sm uppercase tracking-widest cursor-pointer shrink-0"
         >
           <Plus size={20} />
           <span className="hidden sm:inline">{t.menuAdmin.addDish}</span>

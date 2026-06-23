@@ -596,11 +596,11 @@ export default function AdminBillingPage() {
       {/* Checkout Modal */}
       {isModalOpen && selectedPkg && (
         <div className="fixed inset-0 bg-black/60 z-[100] backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2rem] w-full max-w-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-6 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+          <div className="bg-white rounded-[2rem] w-full max-w-xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[calc(100dvh-2rem)] sm:max-h-[90vh]">
+            <div className="p-4 sm:p-6 border-b border-gray-100 bg-gray-50 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <CreditCard className="text-primary" />
-                <h3 className="font-bold text-lg text-gray-900">
+                <h3 className="font-bold text-base sm:text-lg text-gray-900">
                   {t.billing.checkoutTitle.replace("{months}", String(selectedPkg.months)).replace("{unit}", unitLabel)}
                 </h3>
               </div>
@@ -612,7 +612,7 @@ export default function AdminBillingPage() {
               </button>
             </div>
 
-            <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto flex-1">
               <div className="bg-primary-soft border border-primary rounded-2xl p-4 flex flex-col items-center gap-3">
                 <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t.billing.checkoutInstruction}</p>
                 <div className="w-44 h-44 bg-white border border-gray-200/60 rounded-xl flex items-center justify-center p-2 relative shadow-md">
@@ -632,7 +632,7 @@ export default function AdminBillingPage() {
                 <div className="flex justify-between border-b border-gray-200/50 pb-1.5 items-center">
                   <span className="text-gray-400 font-bold">{t.billing.accountNumber}</span>
                   <div className="flex items-center gap-1.5">
-                    <span className="font-bold text-gray-800">{superAdminBankAcc}</span>
+                     <span className="font-bold text-gray-800">{superAdminBankAcc}</span>
                     <button
                       onClick={() => handleCopy(superAdminBankAcc, t.billing.accountNumber)}
                       className="text-primary hover:text-primary transition-colors cursor-pointer"
@@ -674,7 +674,7 @@ export default function AdminBillingPage() {
               </div>
             </div>
 
-            <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
+            <div className="p-4 sm:p-6 border-t border-gray-100 bg-gray-50 flex gap-3 shrink-0">
               <Button
                 onClick={handleCloseModal}
                 variant="secondary"

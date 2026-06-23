@@ -48,17 +48,20 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between outline-none cursor-pointer"
+        className="w-full flex items-center justify-between outline-none cursor-pointer gap-2"
       >
-        <div className="flex items-center gap-3">
-          <div className="w-1.5 h-6 bg-primary rounded-full"></div>
-          <h2 className="text-sm font-black text-gray-900 uppercase tracking-wider flex items-center gap-2">
-            {t.menuAdmin.manageCategories} <span className="text-xs font-bold text-gray-400 normal-case bg-gray-50 px-2 py-0.5 rounded-lg whitespace-nowrap">{t.menuAdmin.categoriesCount.replace("{count}", String(categories.length))}</span>
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 text-left">
+          <div className="w-1.5 h-6 bg-primary rounded-full shrink-0"></div>
+          <h2 className="text-xs sm:text-sm font-black text-gray-900 uppercase tracking-wider flex flex-wrap items-center gap-x-2 gap-y-1 min-w-0">
+            <span>{t.menuAdmin.manageCategories}</span>
+            <span className="text-[10px] sm:text-xs font-bold text-gray-400 normal-case bg-gray-50 px-2 py-0.5 rounded-lg whitespace-nowrap shrink-0">
+              {t.menuAdmin.categoriesCount.replace("{count}", String(categories.length))}
+            </span>
           </h2>
         </div>
-        <div className="flex items-center gap-1.5 text-xs font-black text-primary uppercase tracking-widest hover:text-orange-600 transition-colors">
+        <div className="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-black text-primary uppercase tracking-wider sm:tracking-widest hover:text-orange-600 transition-colors shrink-0">
           <span>{isOpen ? t.menuAdmin.collapse : t.menuAdmin.edit}</span>
-          {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          {isOpen ? <ChevronUp size={14} className="sm:w-4 sm:h-4" /> : <ChevronDown size={14} className="sm:w-4 sm:h-4" />}
         </div>
       </button>
 
@@ -94,18 +97,18 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
               </AnimatePresence>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex gap-3 items-center">
+            <form onSubmit={handleSubmit} className="flex gap-2 sm:gap-3 items-center">
               <input
                 type="text"
                 placeholder={t.menuAdmin.newCategoryPlaceholder}
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
-                className="flex-1 px-4 py-4 bg-gray-50 border-2 border-transparent rounded-xl focus:border-orange-500 outline-none transition-all font-bold text-xs text-gray-700"
+                className="flex-1 px-3.5 py-3 sm:px-4 sm:py-4 bg-gray-50 border-2 border-transparent rounded-xl focus:border-orange-500 outline-none transition-all font-bold text-xs text-gray-700"
               />
               <button
                 type="submit"
                 disabled={createCategoryMutation.isPending || !newCategoryName.trim()}
-                className="px-5 py-4 bg-primary text-white rounded-xl font-black uppercase tracking-widest text-[10px] hover:bg-primary shadow-md shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1.5 shrink-0 cursor-pointer"
+                className="px-4 py-3 sm:px-5 sm:py-4 bg-primary text-white rounded-xl font-black uppercase tracking-wider sm:tracking-widest text-[10px] hover:bg-primary shadow-md shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1.5 shrink-0 cursor-pointer"
               >
                 {createCategoryMutation.isPending ? (
                   <Loader2 size={12} className="animate-spin" />
