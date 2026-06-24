@@ -10,8 +10,10 @@ import { useCartStore } from "@/store/cartStore";
 export default function LogsPage() {
   const t = useTranslation();
   const { language } = useCartStore();
-  const { data: logs = [], isLoading } = useAuditLogs();
+  const { data: rawLogs = [], isLoading } = useAuditLogs();
   const [searchTerm, setSearchTerm] = useState("");
+
+  const logs = rawLogs.filter(log => log.user?.role !== "SUPER_ADMIN");
 
   const filteredLogs = logs.filter(log => 
     log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||

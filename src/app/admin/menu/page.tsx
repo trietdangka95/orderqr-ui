@@ -28,10 +28,15 @@ export default function AdminMenuPage() {
     description: p.description || '',
   }));
 
-  const filteredMenu = menuItems.filter((item) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredMenu = menuItems
+    .filter((item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (a.isAvailable === b.isAvailable) return 0;
+      return a.isAvailable ? -1 : 1;
+    });
 
   const handleEdit = (item: MenuItem) => {
     setEditingItem(item);

@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo, useRef } from "react";
 import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
+import StaffNameModal from "@/components/admin/StaffNameModal";
 import { useCartStore } from "@/store/cartStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { LayoutDashboard, LogOut, Soup, Sparkles, Store, AlertTriangle } from "lucide-react";
@@ -62,12 +63,22 @@ function HomeContent() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isTableSelectorOpen, setIsTableSelectorOpen] = useState(false);
+  const [isStaffNameModalOpen, setIsStaffNameModalOpen] = useState(false);
+  const [canCloseModal, setCanCloseModal] = useState(true);
 
   const {
     getTotalItems, toggleCart, toggleOrders, logout,
     userRole, selectedTable, setSelectedTable, tables, storeConfig,
-    toastMessage, setToastMessage, storeError
+    toastMessage, setToastMessage, storeError, activeStaffName
   } = useCartStore();
+
+  useEffect(() => {
+    const isManageRole = ["admin", "staff", "kitchen"].includes(userRole);
+    if (isManageRole && !activeStaffName) {
+      setCanCloseModal(false);
+      setIsStaffNameModalOpen(true);
+    }
+  }, [userRole, activeStaffName]);
 
   const isGuest = userRole === "guest";
   const urlTable = searchParams.get("table") || searchParams.get("tables");
@@ -438,7 +449,12 @@ function HomeContent() {
         {/* Product List grouped by Category */}
         <div className="space-y-16">
           {storeCategories.map((cat) => {
-            const catProducts = filteredProducts.filter(p => p.category === cat);
+            const catProducts = filteredProducts
+              .filter(p => p.category === cat)
+              .sort((a, b) => {
+                if (a.isAvailable === b.isAvailable) return 0;
+                return a.isAvailable ? -1 : 1;
+              });
             if (catProducts.length === 0) return null;
 
             return (
@@ -500,6 +516,12 @@ function HomeContent() {
         product={selectedProduct}
         isOpen={!!selectedProduct}
         onClose={() => setSelectedProduct(null)}
+      />
+
+      <StaffNameModal
+        isOpen={isStaffNameModalOpen}
+        onClose={() => setIsStaffNameModalOpen(false)}
+        canClose={canCloseModal}
       />
 
       {/* Global Glassmorphic Toast Notification */}

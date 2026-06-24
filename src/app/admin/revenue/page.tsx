@@ -296,8 +296,9 @@ function exportCSV(records: InvoiceRecord[], from: string, to: string, t: any, l
 
   const rows = groupRows.map((it) => {
     const total = it.originalPrice * it.quantity;
+    const shortCode = it.productId ? it.productId.slice(-6).toUpperCase() : "";
     return [
-      formatCSVField(it.productId),
+      formatCSVField(shortCode),
       formatCSVField(it.name),
       formatCSVField(it.description),
       it.originalPrice,
