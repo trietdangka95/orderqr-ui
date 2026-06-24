@@ -96,7 +96,7 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="relative w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
+          className="relative w-full md:max-w-3xl lg:max-w-4xl bg-white rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
         >
           {/* Close Button */}
           <button
@@ -108,13 +108,13 @@ export default function ProductDetailModal({ product, isOpen, onClose }: Product
 
           <div className="flex flex-col md:flex-row min-h-0">
             {/* Image Section */}
-            <div className="relative w-full md:w-1/2 aspect-square md:aspect-auto h-[220px] md:h-auto bg-gray-50">
+            <div className="relative w-full md:w-1/2 aspect-square md:aspect-auto h-[260px] md:h-auto bg-gray-50">
               <Image
                 src={getImageUrl(product.image)}
                 alt={product.name}
                 fill
                 unoptimized
-                className="object-cover"
+                className="object-contain p-4 md:p-6"
               />
             </div>
 
