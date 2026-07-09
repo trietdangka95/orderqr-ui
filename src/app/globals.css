@@ -38,6 +38,10 @@ body {
   scrollbar-width: none;  /* Firefox */
 }
 
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
 /* Interactive Cursor Polish */
 button:not(:disabled),
 a:not([disabled]),

@@ -81,13 +81,14 @@ export default function OrdersDrawer() {
 
   // Auto-switch default tab for staff when drawer is opened
   useEffect(() => {
-    if (isOrdersOpen && isStaff) {
-      if (!selectedTable) {
-        setActiveTab("all");
-      } else {
-        setActiveTab("current");
-      }
+    if (!isOrdersOpen || !isStaff) {
+      return;
     }
+
+    const nextTab = selectedTable ? "current" : "all";
+    const timer = window.setTimeout(() => setActiveTab(nextTab), 0);
+
+    return () => window.clearTimeout(timer);
   }, [isOrdersOpen, isStaff, selectedTable]);
 
   // Real-time updates
@@ -203,8 +204,8 @@ export default function OrdersDrawer() {
         <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{t.ordersDrawer.vietQrTransfer}</p>
         
         {/* QR Code Image Container */}
-        <div 
-          className="w-48 h-48 bg-white border border-gray-200/60 rounded-[1.5rem] flex items-center justify-center p-3 relative shadow-md"
+        <div
+          className="w-36 h-36 sm:w-48 sm:h-48 bg-white border border-gray-200/60 rounded-[1.5rem] flex items-center justify-center p-3 relative shadow-md"
         >
           <img
             src={`https://img.vietqr.io/image/${sanitizeBankId(storeConfig.bankId)}-${storeConfig.bankAccountNo}-compact2.png?amount=${amount}&addInfo=Ban%20${selectedTable}%20Thanh%20Toan&accountName=${encodeURIComponent(storeConfig.bankAccountName || "")}`}
@@ -215,14 +216,14 @@ export default function OrdersDrawer() {
 
         {/* Account Details Table */}
         <div className="w-full text-left bg-white border border-gray-100 rounded-xl p-3 text-xs space-y-2 font-medium shadow-sm mt-1">
-          <div className="flex justify-between border-b border-gray-50 pb-1.5">
-            <span className="text-gray-400">{t.ordersDrawer.bankLabel}</span>
-            <span className="font-bold text-gray-800">{storeConfig.bankId}</span>
+          <div className="flex justify-between gap-3 border-b border-gray-50 pb-1.5">
+            <span className="text-gray-400 shrink-0">{t.ordersDrawer.bankLabel}</span>
+            <span className="font-bold text-gray-800 text-right break-words min-w-0">{storeConfig.bankId}</span>
           </div>
-          <div className="flex justify-between border-b border-gray-50 pb-1.5 items-center">
-            <span className="text-gray-400">{t.ordersDrawer.accountNumberLabel}</span>
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-gray-800">{storeConfig.bankAccountNo}</span>
+          <div className="flex justify-between gap-3 border-b border-gray-50 pb-1.5 items-center">
+            <span className="text-gray-400 shrink-0">{t.ordersDrawer.accountNumberLabel}</span>
+            <div className="flex items-center justify-end gap-1.5 min-w-0">
+              <span className="font-bold text-gray-800 text-right break-all">{storeConfig.bankAccountNo}</span>
               <button
                 onClick={(e) => {
                   e.preventDefault();
@@ -236,14 +237,14 @@ export default function OrdersDrawer() {
               </button>
             </div>
           </div>
-          <div className="flex justify-between border-b border-gray-50 pb-1.5">
-            <span className="text-gray-400">{t.ordersDrawer.beneficiaryLabel}</span>
-            <span className="font-bold text-gray-800">{storeConfig.bankAccountName || "N/A"}</span>
+          <div className="flex justify-between gap-3 border-b border-gray-50 pb-1.5">
+            <span className="text-gray-400 shrink-0">{t.ordersDrawer.beneficiaryLabel}</span>
+            <span className="font-bold text-gray-800 text-right break-words min-w-0">{storeConfig.bankAccountName || "N/A"}</span>
           </div>
-          <div className="flex justify-between border-b border-gray-50 pb-1.5 items-center">
-            <span className="text-gray-400">{t.ordersDrawer.transferContentLabel}</span>
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-primary">Ban {selectedTable} Thanh Toan</span>
+          <div className="flex justify-between gap-3 border-b border-gray-50 pb-1.5 items-center">
+            <span className="text-gray-400 shrink-0">{t.ordersDrawer.transferContentLabel}</span>
+            <div className="flex items-center justify-end gap-1.5 min-w-0">
+              <span className="font-bold text-primary text-right break-words">Ban {selectedTable} Thanh Toan</span>
               <button
                 onClick={(e) => {
                   e.preventDefault();
@@ -257,8 +258,8 @@ export default function OrdersDrawer() {
               </button>
             </div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-gray-400">{t.orders.totalAmount}</span>
+          <div className="flex justify-between gap-3">
+            <span className="text-gray-400 shrink-0">{t.orders.totalAmount}</span>
             <span className="font-black text-primary text-sm">{amount.toLocaleString("vi-VN")} ₫</span>
           </div>
         </div>
@@ -286,8 +287,8 @@ export default function OrdersDrawer() {
         onClick={toggleOrders}
       />
 
-      <div className="fixed top-0 right-0 h-full w-full sm:w-[500px] bg-gray-50 z-[101] shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-        <div className="p-4 border-b border-gray-100 bg-white shadow-sm">
+      <div className="fixed top-0 right-0 h-[100dvh] w-full sm:w-[500px] bg-gray-50 z-[101] shadow-2xl flex min-h-0 flex-col animate-in slide-in-from-right duration-300">
+        <div className="p-4 border-b border-gray-100 bg-white shadow-sm shrink-0">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <ClipboardList className="w-6 h-6 text-primary" />
@@ -334,7 +335,7 @@ export default function OrdersDrawer() {
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-6">
           {/* Cumulative Subtotal Banner */}
           {activeTab === "current" && selectedTable && tableOrders.length > 0 && (
             <div className="bg-primary-soft border border-primary rounded-2xl p-4 flex justify-between items-center mb-2 shadow-sm">
@@ -636,7 +637,11 @@ export default function OrdersDrawer() {
 
         {/* Guest checkout section */}
         {userRole !== "staff" && tableOrders.length > 0 && (
-          <div className="bg-white border-t border-gray-100 p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] pb-safe relative z-20">
+          <div
+            className={`bg-white border-t border-gray-100 p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] pb-safe relative z-20 shrink-0 ${
+              isCheckoutMode || pendingInvoice ? "max-h-[76dvh] overflow-y-auto overscroll-contain" : ""
+            }`}
+          >
             {pendingInvoice ? (
               // Status screen for pending payment
               <div className="space-y-4">
@@ -748,12 +753,12 @@ export default function OrdersDrawer() {
                         setIsCheckoutMode(false);
                         setSelectedPayment(null);
                       },
-                      onError: (err: any) => {
+                      onError: (err: unknown) => {
                         showAlert(translateApiError(err, t, t.ordersDrawer.submitPaymentError));
                       }
                     });
                   }}
-                  className="w-full bg-primary disabled:opacity-50 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-primary hover:bg-primary active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
+                  className="sticky bottom-0 w-full bg-primary disabled:opacity-50 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-primary hover:bg-primary active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
                 >
                   {requestCheckoutMutation.isPending ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

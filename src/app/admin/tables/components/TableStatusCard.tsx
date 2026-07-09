@@ -2,13 +2,36 @@
  
 import { motion } from "framer-motion";
 import { CheckCircle2 as CheckIcon, X as XIcon, AlertCircle, Banknote, QrCode, Printer } from "lucide-react";
-import { Order, useCartStore } from "@/store/cartStore";
+import { useCartStore } from "@/store/cartStore";
 import { showConfirm } from "@/store/dialogStore";
 import { useTranslation } from "@/hooks/useTranslation";
 
+interface TableOrderItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+interface PendingInvoice {
+  id: string;
+  paymentMethod?: string;
+  paymentStatus?: string;
+}
+
+interface TableOrder {
+  id: string;
+  totalPrice: number;
+  status: string;
+  isConfirmed?: boolean;
+  invoiceId?: string | null;
+  invoice?: PendingInvoice | null;
+  items: TableOrderItem[];
+}
+
 interface TableStatusCardProps {
   tableNumber: string;
-  tableOrders: any[];
+  tableOrders: TableOrder[];
   formatPrice: (price: number) => string;
   onCheckout: (tableNumber: string) => void;
   onConfirmOrder: (orderId: string) => void;
@@ -38,7 +61,7 @@ export default function TableStatusCard({
       layout
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className={`bg-white rounded-[2rem] shadow-xl shadow-slate-100/30 border-2 overflow-hidden flex flex-col transition-all duration-300 ${
+      className={`bg-white rounded-[2rem] shadow-xl shadow-slate-100/30 border-2 overflow-hidden flex h-fit flex-col transition-all duration-300 ${
         pendingInvoice
           ? "border-amber-400 bg-amber-50/5"
           : hasUnconfirmed
@@ -113,9 +136,9 @@ export default function TableStatusCard({
         </div>
       )}
  
-      <div className="flex-1 p-4 space-y-4 max-h-[400px] overflow-y-auto">
+      <div className="p-4 space-y-3 sm:space-y-4 max-h-[320px] sm:max-h-[400px] overflow-y-auto">
         {tableOrders.map((order) => (
-          <div key={order.id} className="pb-4 border-b border-gray-50 last:border-0 last:pb-0">
+          <div key={order.id} className="pb-3 sm:pb-4 border-b border-gray-50 last:border-0 last:pb-0">
             <div className="flex items-center justify-between mb-2 gap-1">
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="text-[9px] font-black text-gray-400 uppercase tracking-wider truncate">
@@ -159,12 +182,12 @@ export default function TableStatusCard({
               )}
             </div>
             <ul className="space-y-2">
-              {order.items.map((item: any) => (
-                <li key={item.id} className="flex justify-between text-sm">
-                  <span className="text-gray-700">
+              {order.items.map((item) => (
+                <li key={item.id} className="flex justify-between gap-3 text-sm">
+                  <span className="text-gray-700 min-w-0 break-words">
                     <span className="font-bold text-orange-500">{item.quantity}x</span> {item.name}
                   </span>
-                  <span className="text-gray-500">{formatPrice(item.price * item.quantity)}</span>
+                  <span className="text-gray-500 shrink-0">{formatPrice(item.price * item.quantity)}</span>
                 </li>
               ))}
             </ul>
@@ -172,7 +195,7 @@ export default function TableStatusCard({
         ))}
       </div>
  
-      <div className="p-4 bg-gray-50 border-t mt-auto">
+      <div className="p-3.5 sm:p-4 bg-gray-50 border-t">
         {pendingInvoice ? (
           <button
             onClick={() => onConfirmInvoicePayment(pendingInvoice.id, tableNumber, totalAmount, pendingInvoice.paymentMethod || "CASH")}

@@ -22,6 +22,7 @@ import { StoreConfig, useCartStore } from "@/store/cartStore";
 import { FILTER_PRESETS, FilterType } from "@/constants/filters";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatPrice as utilsFormatPrice } from "@/utils/currency";
+import { buildRevenueCSV } from "@/utils/revenueCsv";
 import { TranslationSchema } from "@/locales/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -211,7 +212,7 @@ function buildTop(invoices: InvoiceRecord[], t: TranslationSchema) {
     inv.orders.forEach((ord) =>
       ord.orderItems.forEach((it) => {
         const name = it.product?.name || t.revenue.unknownItem;
-        const cat = (it.product as any)?.category?.name || "—";
+        const cat = it.product?.category?.name || "—";
         if (!map[name]) map[name] = { name, cat, qty: 0, rev: 0 };
         map[name].qty += it.quantity;
         map[name].rev += it.quantity * Number(it.priceAtTime);
@@ -223,136 +224,8 @@ function buildTop(invoices: InvoiceRecord[], t: TranslationSchema) {
 
 // ─── CSV Export ────────────────────────────────────────────────────────────────
 function exportCSV(records: InvoiceRecord[], from: string, to: string, t: TranslationSchema) {
-  const sep = ",";
   const bom = "\uFEFF";
-
-  const groupMap: Record<string, {
-    productId: string;
-    name: string;
-    description: string;
-    originalPrice: number;
-    quantity: number;
-    discountPercent: number;
-    totalDiscount: number;
-    actualRevenue: number;
-  }> = {};
-
-  records.forEach((inv) => {
-    inv.orders.forEach((ord) => {
-      ord.orderItems.forEach((it) => {
-        const productId = it.productId || it.product?.id || "";
-        const name = it.product?.name || t.revenue.unknownItem;
-        const description = it.product?.description || "";
-        
-        // Calculate prices
-        const priceAtTime = Number(it.priceAtTime !== undefined ? it.priceAtTime : (it.product?.price || 0));
-        const originalPrice = Number(it.originalPriceAtTime !== null && it.originalPriceAtTime !== undefined
-          ? it.originalPriceAtTime
-          : (it.product?.price || 0));
-        const discountPercent = Number(it.discountPercentAtTime !== null && it.discountPercentAtTime !== undefined
-          ? it.discountPercentAtTime
-          : (it.product?.discountPercent || 0));
-        
-        const qty = it.quantity;
-        const totalDiscount = Math.max(0, originalPrice - priceAtTime) * qty;
-        const actualRev = priceAtTime * qty;
-
-        const key = `${productId}_${originalPrice}_${discountPercent}`;
-
-        if (!groupMap[key]) {
-          groupMap[key] = {
-            productId,
-            name,
-            description,
-            originalPrice,
-            quantity: 0,
-            discountPercent,
-            totalDiscount: 0,
-            actualRevenue: 0
-          };
-        }
-
-        const group = groupMap[key];
-        group.quantity += qty;
-        group.totalDiscount += totalDiscount;
-        group.actualRevenue += actualRev;
-      });
-    });
-  });
-
-  const groupRows = Object.values(groupMap);
-
-  const headers = [
-    t.revenue.csvProductCode,
-    t.revenue.csvProductName,
-    t.revenue.csvProductDescription,
-    t.revenue.csvPrice,
-    t.revenue.csvQuantity,
-    t.revenue.csvTotal,
-    t.revenue.csvDiscount,
-    t.revenue.csvTotalDiscount,
-    t.revenue.csvActualRevenue,
-  ];
-
-  const formatCSVField = (field: string | number) => {
-    const stringVal = String(field);
-    if (stringVal.includes(",") || stringVal.includes('"') || stringVal.includes("\n")) {
-      return `"${stringVal.replace(/"/g, '""')}"`;
-    }
-    return stringVal;
-  };
-
-  const rows = groupRows.map((it) => {
-    const total = it.originalPrice * it.quantity;
-    const shortCode = it.productId ? it.productId.slice(-6).toUpperCase() : "";
-    return [
-      formatCSVField(shortCode),
-      formatCSVField(it.name),
-      formatCSVField(it.description),
-      it.originalPrice,
-      it.quantity,
-      total,
-      formatCSVField(`${it.discountPercent}%`),
-      it.totalDiscount,
-      it.actualRevenue
-    ].join(sep);
-  });
-
-  // Calculate totals for the bottom row
-  const totalQty = groupRows.reduce((sum, r) => sum + r.quantity, 0);
-  const totalSum = groupRows.reduce((sum, r) => sum + (r.originalPrice * r.quantity), 0);
-  const totalDiscountSum = groupRows.reduce((sum, r) => sum + r.totalDiscount, 0);
-  const totalActualSum = groupRows.reduce((sum, r) => sum + r.actualRevenue, 0);
-
-  const totalRow = [
-    "",
-    formatCSVField(t.revenue.receiptTotal.replace(":", "")),
-    "",
-    "",
-    totalQty,
-    totalSum,
-    "",
-    totalDiscountSum,
-    totalActualSum
-  ].join(sep);
-
-  const period = from && to 
-    ? `${from} - ${to}`
-    : from 
-      ? `${t.revenue.fromDate} ${from}` 
-      : to 
-        ? `${t.revenue.toDate} ${to}` 
-        : t.revenue.reportAllPeriod;
-
-  const titleText = t.revenue.reportTitle.replace("{period}", period);
-
-  const content = [
-    formatCSVField(titleText),
-    "",
-    headers.map(formatCSVField).join(sep),
-    ...rows,
-    totalRow
-  ].join("\n");
+  const content = buildRevenueCSV(records, from, to, t);
 
   const blob = new Blob([bom + content], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
@@ -455,9 +328,9 @@ function InvoiceModal({ inv, onClose, t, language }: { inv: InvoiceRecord; onClo
                       {it.product?.name || t.revenue.unknownItem}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      {(it.product as any)?.category?.name && (
+                      {it.product?.category?.name && (
                         <span className="text-[10px] text-gray-400 font-medium">
-                          {(it.product as any).category.name}
+                          {it.product.category.name}
                         </span>
                       )}
                       {it.note && (
@@ -577,6 +450,7 @@ export default function RevenuePage() {
   const [customTo, setCustomTo] = useState("");
   const [selectedInv, setSelectedInv] = useState<InvoiceRecord | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [todayKey] = useState(() => toYMD(Date.now()));
 
   const formatPrice = (price: number) => {
     return utilsFormatPrice(price, storeConfig, language);
@@ -609,7 +483,7 @@ export default function RevenuePage() {
   // normalise API data
   const revenue: InvoiceRecord[] = useMemo(
     () =>
-      (apiInvoices as any[]).map((inv) => ({
+      (apiInvoices as unknown as InvoiceRecord[]).map((inv) => ({
         ...inv,
         totalAmount: Number(inv.totalAmount),
         timestamp: new Date(inv.createdAt).getTime(),
@@ -678,9 +552,9 @@ export default function RevenuePage() {
   const todayRev = useMemo(
     () =>
       revenue
-        .filter((r) => toYMD(r.timestamp) === toYMD(Date.now()))
+        .filter((r) => toYMD(r.timestamp) === todayKey)
         .reduce((s, r) => s + r.totalAmount, 0),
-    [revenue]
+    [revenue, todayKey]
   );
   const avgOrder = filtered.length ? Math.round(totalRev / filtered.length) : 0;
 
@@ -696,7 +570,11 @@ export default function RevenuePage() {
   const toggleRow = (id: string) =>
     setExpandedRows((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
 
@@ -988,9 +866,9 @@ export default function RevenuePage() {
                                             <span className="font-bold text-gray-900">
                                               {it.quantity}× {it.product?.name || t.revenue.unknownItem}
                                             </span>
-                                            {(it.product as any)?.category?.name && (
+                                            {it.product?.category?.name && (
                                               <span className="text-[10px] text-gray-400 ml-2">
-                                                {(it.product as any).category.name}
+                                                {it.product.category.name}
                                               </span>
                                             )}
                                             {it.note && (

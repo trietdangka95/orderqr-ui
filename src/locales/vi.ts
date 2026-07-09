@@ -866,6 +866,7 @@ export const vi: TranslationSchema = {
     csvProductName: "Tên sản phẩm",
     csvProductDescription: "Mô tả sản phẩm",
     csvPrice: "Giá",
+    csvSalePrice: "Giá bán",
     csvQuantity: "Số lượng",
     csvTotal: "Tổng",
     csvDiscount: "Giảm giá",

@@ -866,6 +866,7 @@ export const en: TranslationSchema = {
     csvProductName: "Product Name",
     csvProductDescription: "Product Description",
     csvPrice: "Price",
+    csvSalePrice: "Sale Price",
     csvQuantity: "Quantity",
     csvTotal: "Total",
     csvDiscount: "Discount (%)",

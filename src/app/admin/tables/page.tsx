@@ -7,7 +7,7 @@ import {
   QrCode as QrCodeIcon,
   Printer as PrinterIcon
 } from "lucide-react";
-import { useCartStore, Order, OrderStatus } from "@/store/cartStore";
+import { useCartStore, OrderStatus } from "@/store/cartStore";
 import TableStatusCard from "./components/TableStatusCard";
 import QRCodeCard from "./components/QRCodeCard";
 import { useOrders, useClearTable, useConfirmOrder, useConfirmInvoicePayment } from "@/hooks/useOrders";
@@ -16,6 +16,16 @@ import { useSocket } from "@/providers/SocketProvider";
 import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatPrice as utilsFormatPrice } from "@/utils/currency";
+
+interface ReceiptOrderItem {
+  id: string;
+  productId?: string;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  discountPercent?: number;
+  quantity: number;
+}
 
 export default function AdminTablesPage() {
   const { tables, addTable, addMultipleTables, removeTable, storeConfig } = useCartStore();
@@ -120,7 +130,27 @@ export default function AdminTablesPage() {
     }
     acc[tNum].push(order);
     return acc;
-  }, {} as Record<string, Order[]>);
+  }, {} as Record<string, typeof activeOrders>);
+
+  const tableEntries = useMemo(() => {
+    const priorityOf = (tableOrders: typeof activeOrders) => {
+      if (tableOrders.some((o) => o.invoiceId && o.invoice?.paymentStatus === "PENDING")) return 0;
+      if (tableOrders.some((o) => !o.isConfirmed)) return 1;
+      if (tableOrders.some((o) => o.status !== "completed")) return 2;
+      return 3;
+    };
+
+    const tableRank = (tableNumber: string) => {
+      const numeric = Number(tableNumber);
+      return Number.isNaN(numeric) ? Number.MAX_SAFE_INTEGER : numeric;
+    };
+
+    return Object.entries(tableStatus).sort(([tableA, ordersA], [tableB, ordersB]) => {
+      const priorityDiff = priorityOf(ordersA) - priorityOf(ordersB);
+      if (priorityDiff !== 0) return priorityDiff;
+      return tableRank(tableA) - tableRank(tableB) || tableA.localeCompare(tableB);
+    });
+  }, [tableStatus]);
 
   const formatPrice = (price: number) => {
     return utilsFormatPrice(price, storeConfig, language);
@@ -130,12 +160,15 @@ export default function AdminTablesPage() {
     setCheckoutConfirmTable(tableNumber);
   };
 
-  const receiptOrders = printingTable ? (tableStatus[printingTable] || []) : [];
+  const receiptOrders = useMemo(
+    () => (printingTable ? (tableStatus[printingTable] || []) : []),
+    [printingTable, tableStatus]
+  );
   const receiptTotal = receiptOrders.reduce((sum, order) => sum + order.totalPrice, 0);
 
   const receiptOriginalTotal = useMemo(() => {
     return receiptOrders.reduce((sum, order) => {
-      return sum + order.items.reduce((itemSum: number, item: any) => {
+      return sum + order.items.reduce((itemSum: number, item: ReceiptOrderItem) => {
         const origPrice = Number(item.originalPrice || item.price);
         return itemSum + origPrice * item.quantity;
       }, 0);
@@ -149,9 +182,10 @@ export default function AdminTablesPage() {
   const receiptItems = useMemo(() => {
     const itemMap: Record<string, { name: string; quantity: number; price: number; originalPrice: number; discountPercent: number }> = {};
     receiptOrders.forEach((order) => {
-      order.items.forEach((item: any) => {
-        if (!itemMap[item.productId]) {
-          itemMap[item.productId] = {
+      order.items.forEach((item: ReceiptOrderItem) => {
+        const itemKey = item.productId || item.id;
+        if (!itemMap[itemKey]) {
+          itemMap[itemKey] = {
             name: item.name,
             quantity: 0,
             price: Number(item.price),
@@ -159,7 +193,7 @@ export default function AdminTablesPage() {
             discountPercent: Number(item.discountPercent || 0)
           };
         }
-        itemMap[item.productId].quantity += item.quantity;
+        itemMap[itemKey].quantity += item.quantity;
       });
     });
     return Object.values(itemMap);
@@ -180,8 +214,6 @@ export default function AdminTablesPage() {
 
     const doc = iframe.contentWindow?.document;
     if (!doc) return;
-
-    const locale = language === "vi" ? "vi-VN" : "en-US";
 
     doc.write(`
       <html>
@@ -313,8 +345,8 @@ export default function AdminTablesPage() {
               <p className="text-lg italic">{t.tables.emptyTables}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Object.entries(tableStatus).map(([tableNumber, tableOrders]) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start gap-6">
+              {tableEntries.map(([tableNumber, tableOrders]) => (
                 <TableStatusCard
                   key={tableNumber}
                   tableNumber={tableNumber}
@@ -417,7 +449,7 @@ export default function AdminTablesPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {receiptItems.map((item: any, i: number) => (
+                    {receiptItems.map((item, i) => (
                       <tr key={i} className="border-b border-dotted border-gray-200">
                         <td className="py-1 max-w-[120px] truncate font-bold text-gray-800">
                           {item.name}

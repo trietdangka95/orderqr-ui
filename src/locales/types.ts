@@ -822,6 +822,7 @@ export interface TranslationSchema {
     csvProductName: string;
     csvProductDescription: string;
     csvPrice: string;
+    csvSalePrice: string;
     csvQuantity: string;
     csvTotal: string;
     csvDiscount: string;
