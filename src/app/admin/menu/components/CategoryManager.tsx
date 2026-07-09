@@ -7,6 +7,7 @@ import { useCreateCategory, useDeleteCategory } from "@/hooks/useProducts";
 import { Category } from "@/types/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/hooks/useTranslation";
+import { translateApiError } from "@/utils/apiError";
 
 interface CategoryManagerProps {
   categories: Category[];
@@ -27,7 +28,7 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
           setNewCategoryName("");
         },
         onError: (err: any) => {
-          showAlert(t.menuAdmin.errorAddCategory.replace("{error}", err.message || "Unknown error"));
+          showAlert(t.menuAdmin.errorAddCategory.replace("{error}", translateApiError(err, t, t.apiErrors.default)));
         }
       });
     }
@@ -37,7 +38,7 @@ export default function CategoryManager({ categories }: CategoryManagerProps) {
     if (await showConfirm(t.menuAdmin.deleteCategoryConfirm)) {
       deleteCategoryMutation.mutate(id, {
         onError: (err: any) => {
-          showAlert(t.menuAdmin.errorDeleteCategory.replace("{error}", err.message || "Unknown error"));
+          showAlert(t.menuAdmin.errorDeleteCategory.replace("{error}", translateApiError(err, t, t.apiErrors.default)));
         }
       });
     }

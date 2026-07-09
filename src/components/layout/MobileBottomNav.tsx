@@ -72,7 +72,7 @@ export default function MobileBottomNav() {
   };
 
   const tabs = [
-    { id: "menu", label: "Menu", icon: Utensils, active: !isOpen && !isOrdersOpen, onClick: handleMenuClick },
+    { id: "menu", label: t.common.menu, icon: Utensils, active: !isOpen && !isOrdersOpen, onClick: handleMenuClick },
     { id: "cart", label: t.common.cart, icon: ShoppingBag, active: isOpen, onClick: handleCartClick, badge: totalItems },
     { id: "orders", label: t.common.orders, icon: ClipboardList, active: isOrdersOpen, onClick: handleOrdersClick, badge: activeOrdersCount },
   ];

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type Category = {
   id: string;
@@ -9,6 +10,7 @@ type Category = {
 };
 
 export default function DesktopSidebar() {
+  const t = useTranslation();
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
@@ -19,7 +21,7 @@ export default function DesktopSidebar() {
 
   return (
     <aside className="hidden md:block w-64 flex-shrink-0 mr-8 sticky top-6 h-fit">
-      <h3 className="text-gray-400 text-sm mb-4">Tìm kiếm món...</h3>
+      <h3 className="text-gray-400 text-sm mb-4">{t.common.searchPlaceholder}</h3>
       <div className="flex flex-col space-y-1">
         {categories.map((cat, index) => (
           <button

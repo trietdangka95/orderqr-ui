@@ -9,8 +9,11 @@ import { Store as StoreData } from "@/api/superadmin";
 import { StoreFilters } from "@/components/superadmin/StoreFilters";
 import { StoreCard } from "@/components/superadmin/StoreCard";
 import { StoreFormModal } from "@/components/superadmin/StoreFormModal";
+import { useTranslation } from "@/hooks/useTranslation";
+import { translateApiError } from "@/utils/apiError";
 
 export default function StoreManagementPage() {
+  const t = useTranslation();
   const { data: stores = [], isLoading, isError, error } = useStores();
   const createStoreMutation = useCreateStore();
   const updateStoreMutation = useUpdateStore();
@@ -80,7 +83,7 @@ export default function StoreManagementPage() {
           resetForm();
         },
         onError: (err: any) => {
-          showAlert("Error updating store: " + (err.message || "Unknown error"));
+          showAlert(t.superadmin.errorUpdatingStore.replace("{error}", translateApiError(err, t, t.apiErrors.default)));
         }
       });
     } else {
@@ -96,7 +99,7 @@ export default function StoreManagementPage() {
           resetForm();
         },
         onError: (err: any) => {
-          showAlert("Error creating store: " + (err.message || "Unknown error"));
+          showAlert(t.superadmin.errorCreatingStore.replace("{error}", translateApiError(err, t, t.apiErrors.default)));
         }
       });
     }
@@ -145,7 +148,7 @@ export default function StoreManagementPage() {
   const toggleStoreStatus = (id: string, currentStatus: boolean) => {
     updateStoreMutation.mutate({ id, data: { isActive: !currentStatus } }, {
       onError: (err: any) => {
-        showAlert("Error toggling store status: " + (err.message || "Unknown error"));
+        showAlert(t.superadmin.errorToggleStore.replace("{error}", translateApiError(err, t, t.apiErrors.default)));
       }
     });
   };
@@ -153,7 +156,7 @@ export default function StoreManagementPage() {
   const handleDelete = (id: string) => {
     deleteStoreMutation.mutate(id, {
       onError: (err: any) => {
-        showAlert("Error deleting store: " + (err.message || "Unknown error"));
+        showAlert(t.superadmin.errorDeletingStore.replace("{error}", translateApiError(err, t, t.apiErrors.default)));
       }
     });
   };
@@ -162,15 +165,15 @@ export default function StoreManagementPage() {
     <div className="max-w-6xl mx-auto">
       <header className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Store Management</h1>
-          <p className="text-gray-500 font-medium italic">Create and manage independent restaurant stores</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.superadmin.storesTitle}</h1>
+          <p className="text-gray-500 font-medium italic">{t.superadmin.storesSubtitle}</p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
           className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 w-fit self-start md:self-auto"
         >
           <Plus size={20} />
-          <span>Add New Store</span>
+          <span>{t.superadmin.addStore}</span>
         </button>
       </header>
 
@@ -190,13 +193,13 @@ export default function StoreManagementPage() {
           </div>
         ) : isError ? (
           <div className="bg-red-50 p-12 rounded-[3rem] text-center border-2 border-dashed border-red-200">
-            <p className="text-xl font-bold text-red-600 mb-2">Unable to load store list</p>
-            <p className="text-sm text-red-500">{(error as any)?.message || "Please check SSL certificate or server connection."}</p>
+            <p className="text-xl font-bold text-red-600 mb-2">{t.superadmin.storesLoadErrorTitle}</p>
+            <p className="text-sm text-red-500">{(error as any)?.message || t.superadmin.storesLoadErrorDesc}</p>
           </div>
         ) : filteredStores.length === 0 ? (
           <div className="bg-white p-20 rounded-[3rem] text-center border-2 border-dashed border-gray-200">
             <Store size={64} className="mx-auto text-gray-200 mb-6" />
-            <p className="text-xl font-bold text-gray-400">No stores found matching your criteria.</p>
+            <p className="text-xl font-bold text-gray-400">{t.superadmin.storesEmpty}</p>
           </div>
         ) : (
           filteredStores.map((store) => (

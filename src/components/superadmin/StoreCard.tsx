@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Store as StoreData } from "@/api/superadmin";
 import { showConfirm } from "@/store/dialogStore";
 import { getImageUrl } from "@/utils/image";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useCartStore } from "@/store/cartStore";
  
 interface StoreCardProps {
   store: StoreData;
@@ -18,6 +20,9 @@ export function StoreCard({
   onEdit,
   onDelete,
 }: StoreCardProps) {
+  const t = useTranslation();
+  const { language } = useCartStore();
+  const locale = language === "vi" ? "vi-VN" : "en-US";
   const mainDomain = process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn";
   const cleanMainDomain = mainDomain.split(":")[0];
   const port = mainDomain.split(":")[1] ? `:${mainDomain.split(":")[1]}` : "";
@@ -51,12 +56,12 @@ export function StoreCard({
               <div className="flex items-center gap-3 mb-1">
                 <h2 className="text-2xl font-black text-gray-900">{store.name}</h2>
                 {store.isActive ? (
-                  <span className="px-3 py-1 bg-green-100 text-green-600 text-[10px] font-black rounded-full uppercase">Active</span>
+                  <span className="px-3 py-1 bg-green-100 text-green-600 text-[10px] font-black rounded-full uppercase">{t.common.active}</span>
                 ) : (
-                  <span className="px-3 py-1 bg-red-100 text-red-600 text-[10px] font-black rounded-full uppercase">Inactive</span>
+                  <span className="px-3 py-1 bg-red-100 text-red-600 text-[10px] font-black rounded-full uppercase">{t.common.inactive}</span>
                 )}
                 {isExpired || store.subscriptionStatus === 'EXPIRED' ? (
-                  <span className="px-3 py-1 bg-red-500 text-white text-[10px] font-black rounded-full uppercase animate-pulse">Expired</span>
+                  <span className="px-3 py-1 bg-red-500 text-white text-[10px] font-black rounded-full uppercase animate-pulse">{t.common.expired}</span>
                 ) : null}
               </div>
               <div className="flex flex-wrap gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest items-center">
@@ -67,13 +72,13 @@ export function StoreCard({
                 <div className="flex items-center gap-1.5">
                   <Layout size={14} className="text-purple-500" />
                   <span className="flex items-center gap-1">
-                    Theme:
+                    {t.superadmin.theme}:
                     <span className="w-3 h-3 rounded-full border border-gray-100" style={{ backgroundColor: store.themeColor }}></span>
                   </span>
                 </div>
                 {store.users && store.users.length > 0 && (
                   <div className="flex items-center gap-1 px-2.5 py-0.5 bg-purple-50 text-purple-600 border border-purple-100 rounded-lg text-[10px] font-black uppercase tracking-wider">
-                    Admin: {store.users[0].username}
+                    {t.superadmin.adminLabel}: {store.users[0].username}
                   </div>
                 )}
                 
@@ -82,7 +87,7 @@ export function StoreCard({
                     ? 'bg-purple-50 text-purple-600 border-purple-100'
                     : 'bg-blue-50 text-blue-600 border-blue-100'
                 }`}>
-                  Gói: {store.subscriptionPlan || 'FREE'}
+                  {t.superadmin.planLabel}: {store.subscriptionPlan || 'FREE'}
                 </div>
  
                 {store.subscriptionEnd && (
@@ -94,16 +99,16 @@ export function StoreCard({
                       : 'bg-green-50 text-green-600 border-green-100'
                   }`}>
                     {isExpired || store.subscriptionStatus === 'EXPIRED'
-                      ? 'Hết hạn sử dụng'
+                      ? t.superadmin.expiryUseExpired
                       : daysLeft !== null && daysLeft < 0
-                      ? 'Hết hạn'
-                      : `Hạn: ${daysLeft} ngày`}
+                      ? t.superadmin.expiryExpired
+                      : t.superadmin.expiryDays.replace("{days}", String(daysLeft))}
                   </div>
                 )}
  
                 {store.subscriptionPrice !== undefined && Number(store.subscriptionPrice) > 0 && (
                   <div className="flex items-center gap-1 px-2.5 py-0.5 bg-gray-50 text-gray-600 border border-gray-100 rounded-lg text-[10px] font-black uppercase tracking-wider">
-                    Giá: {Number(store.subscriptionPrice).toLocaleString('vi-VN')}₫
+                    {t.superadmin.priceLabel}: {Number(store.subscriptionPrice).toLocaleString(locale)}₫
                   </div>
                 )}
               </div>
@@ -120,14 +125,14 @@ export function StoreCard({
           }`}
         >
           {store.isActive ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
-          <span className="lg:hidden xl:inline">{store.isActive ? "Deactivate" : "Activate"}</span>
+          <span className="lg:hidden xl:inline">{store.isActive ? t.superadmin.deactivate : t.superadmin.activate}</span>
         </button>
         <button
           onClick={() => onEdit(store)}
           className="flex-1 lg:flex-none flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 text-gray-600 hover:bg-gray-100 rounded-xl font-bold transition-all"
         >
           <Edit size={20} />
-          <span className="lg:hidden xl:inline">Edit</span>
+          <span className="lg:hidden xl:inline">{t.common.edit}</span>
         </button>
         <Link
           href={storeUrl}
@@ -138,7 +143,7 @@ export function StoreCard({
         </Link>
         <button
           onClick={async () => {
-            if (await showConfirm("Delete this store?")) {
+            if (await showConfirm(t.superadmin.deleteStoreConfirm)) {
               onDelete(store.id);
             }
           }}

@@ -26,6 +26,7 @@ import Textarea from "@/components/ui/Textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import { BANK_OPTIONS } from "@/constants/banks";
 import { useTranslation } from "@/hooks/useTranslation";
+import { translateApiError } from "@/utils/apiError";
 
 const sanitizeBankId = (bankId: string | undefined | null): string => {
   if (!bankId) return "";
@@ -106,13 +107,13 @@ export default function AdminBillingPage() {
 
   // Base packages definitions, switching dynamic labels and prices for testing
   const packages = isTestMode ? [
-    { months: 3, price: 3000, label: language === "vi" ? "3 phút (Test)" : "3 mins (Test)", originalPrice: 3000, desc: language === "vi" ? "Gói Phút 1" : "Minute Plan 1", popular: false },
-    { months: 6, price: 6000, label: language === "vi" ? "6 phút (Test)" : "6 mins (Test)", originalPrice: 6000, desc: language === "vi" ? "Gói Phút 2" : "Minute Plan 2", popular: true },
-    { months: 12, price: 12000, label: language === "vi" ? "12 phút (Test)" : "12 mins (Test)", originalPrice: 12000, desc: language === "vi" ? "Gói Phút 3" : "Minute Plan 3", popular: false },
+    { months: 3, price: 3000, label: t.billing.testMinutesLabel.replace("{count}", "3"), originalPrice: 3000, desc: t.billing.minutePlan1, popular: false },
+    { months: 6, price: 6000, label: t.billing.testMinutesLabel.replace("{count}", "6"), originalPrice: 6000, desc: t.billing.minutePlan2, popular: true },
+    { months: 12, price: 12000, label: t.billing.testMinutesLabel.replace("{count}", "12"), originalPrice: 12000, desc: t.billing.minutePlan3, popular: false },
   ] : [
-    { months: 3, price: 3 * MONTHLY_PRICE, label: language === "vi" ? "3 tháng" : "3 months", originalPrice: 3 * MONTHLY_PRICE, desc: language === "vi" ? "Gói Cơ Bản" : "Basic Plan", popular: false },
-    { months: 6, price: Math.round(6 * MONTHLY_PRICE * 0.9), label: language === "vi" ? "6 tháng (Giảm 10%)" : "6 months (10% Off)", originalPrice: 6 * MONTHLY_PRICE, desc: language === "vi" ? "Gói Phổ Biến" : "Popular Plan", popular: true },
-    { months: 12, price: Math.round(12 * MONTHLY_PRICE * 0.8), label: language === "vi" ? "12 tháng (Giảm 20%)" : "12 months (20% Off)", originalPrice: 12 * MONTHLY_PRICE, desc: language === "vi" ? "Gói Tiết Kiệm" : "Saver Plan", popular: false },
+    { months: 3, price: 3 * MONTHLY_PRICE, label: t.billing.monthsLabel.replace("{count}", "3"), originalPrice: 3 * MONTHLY_PRICE, desc: t.billing.basicPlan, popular: false },
+    { months: 6, price: Math.round(6 * MONTHLY_PRICE * 0.9), label: t.billing.monthsDiscountLabel.replace("{count}", "6").replace("{percent}", "10"), originalPrice: 6 * MONTHLY_PRICE, desc: t.billing.popularPlan, popular: true },
+    { months: 12, price: Math.round(12 * MONTHLY_PRICE * 0.8), label: t.billing.monthsDiscountLabel.replace("{count}", "12").replace("{percent}", "20"), originalPrice: 12 * MONTHLY_PRICE, desc: t.billing.saverPlan, popular: false },
   ];
 
   const superAdminBankId = bankConfig?.bankId || process.env.NEXT_PUBLIC_SUPERADMIN_BANK_ID || "MB";
@@ -160,7 +161,7 @@ export default function AdminBillingPage() {
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
-        showToast(err.message || t.billing.submitError, "error");
+        showToast(translateApiError(err, t, t.billing.submitError), "error");
       }
     });
   };
@@ -187,7 +188,7 @@ export default function AdminBillingPage() {
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
-        showToast(err.message || t.billing.bankSaveError, "error");
+        showToast(translateApiError(err, t, t.billing.bankSaveError), "error");
       }
     });
   };

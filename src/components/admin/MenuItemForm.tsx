@@ -53,7 +53,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
       setFormData({ ...formData, image: result.url });
       setPreviewError(false);
     } catch {
-      showAlert(language === "vi" ? "Lỗi khi tải ảnh lên!" : "Error uploading image!");
+      showAlert(t.menuAdmin.uploadImageError);
     }
   };
 
@@ -67,7 +67,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
       const result = await uploadImage.mutateAsync(compressedFile);
       setFormData((prev) => ({ ...prev, bannerUrl: result.url }));
     } catch {
-      showAlert(language === "vi" ? "Lỗi khi tải ảnh banner lên!" : "Error uploading banner image!");
+      showAlert(t.menuAdmin.uploadBannerError);
     } finally {
       setIsBannerUploading(false);
     }
@@ -152,7 +152,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
               {item ? t.menuAdmin.editDish : t.menuAdmin.addDish}
             </h2>
             <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">
-              {language === "vi" ? "Thông tin chi tiết món ăn" : "Detailed dish information"}
+              {t.menuAdmin.formSubtitle}
             </p>
           </div>
           <button
@@ -169,7 +169,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
             <div className="flex items-center gap-2 mb-2">
               <div className="w-1 h-4 bg-primary rounded-full"></div>
               <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">
-                {language === "vi" ? "Thông tin cơ bản" : "Basic Information"}
+                {t.menuAdmin.basicInfo}
               </h3>
             </div>
             
@@ -183,14 +183,14 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-bold text-gray-700"
-                placeholder={language === "vi" ? "VD: Phở Bò Tái Lăn" : "E.g. Pho Beef"}
+                placeholder={t.menuAdmin.dishNamePlaceholder}
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">
-                  {t.menuAdmin.dishPrice} ({language === "vi" ? "VNĐ" : "VND"})
+                  {t.menuAdmin.dishPrice} ({t.menuAdmin.priceCurrency})
                 </label>
                 <div className="relative">
                   <input
@@ -199,7 +199,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                     value={formatPrice(priceInput)}
                     onChange={handlePriceChange}
                     className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-bold text-gray-900"
-                    placeholder={language === "vi" ? "Ví dụ: 100.000" : "E.g. 100,000"}
+                    placeholder={t.menuAdmin.pricePlaceholder}
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">₫</span>
                 </div>
@@ -210,9 +210,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 </label>
                 {categories.length === 0 ? (
                   <div className="text-xs font-bold text-red-500 bg-red-50 p-3.5 rounded-2xl border border-red-100 leading-relaxed">
-                    {language === "vi" 
-                      ? "⚠️ Chưa có danh mục nào! Vui lòng đóng hộp thoại này và thêm ít nhất 1 danh mục ở phần \"Quản lý Danh mục\" phía sau trước khi thêm món ăn." 
-                      : "⚠️ No categories found! Please close this dialog and add at least 1 category in 'Category Management' first."}
+                    {t.menuAdmin.noCategoriesWarning}
                   </div>
                 ) : (
                   <select
@@ -244,7 +242,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                       setPreviewError(false);
                     }}
                     className="flex-1 h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all font-medium text-gray-600 text-sm"
-                    placeholder={language === "vi" ? "Dán link ảnh (URL)..." : "Paste image link (URL)..."}
+                    placeholder={t.menuAdmin.imageUrlPlaceholder}
                   />
                   <label className="shrink-0 flex items-center justify-center w-12 h-12 bg-gray-100 rounded-2xl cursor-pointer hover:bg-gray-200 transition-colors">
                     <input
@@ -268,12 +266,10 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                       <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-orange-50/60 flex flex-col items-center justify-center p-4 text-center">
                         <span className="text-2xl mb-1">⚠️</span>
                         <p className="text-xs font-black text-red-500 uppercase tracking-wider mb-1">
-                          {language === "vi" ? "Lỗi hiển thị ảnh" : "Image display error"}
+                          {t.menuAdmin.imagePreviewErrorTitle}
                         </p>
                         <p className="text-[10px] text-gray-400 font-bold leading-normal max-w-[80%]">
-                          {language === "vi" 
-                            ? "Không thể hiển thị bản xem trước. Hãy đảm bảo đường dẫn ảnh hoặc kết nối đến máy chủ hoạt động tốt." 
-                            : "Unable to display preview. Make sure the image path or server connection is working."}
+                          {t.menuAdmin.imagePreviewErrorDesc}
                         </p>
                       </div>
                     ) : (
@@ -309,7 +305,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-4 py-3 rounded-2xl border-2 border-gray-100 focus:border-orange-500 outline-none transition-all h-24 resize-none font-medium text-gray-600"
-                placeholder={language === "vi" ? "Nhập mô tả món ăn..." : "Enter dish description..."}
+                placeholder={t.menuAdmin.descriptionPlaceholder}
               />
             </div>
 
@@ -318,7 +314,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
               <div>
                 <label className="block text-xs font-bold text-gray-700">{t.menuAdmin.dishAvailable}</label>
                 <p className="text-[10px] font-medium text-gray-400 mt-0.5">
-                  {language === "vi" ? "Cho phép khách hàng chọn và gọi món này" : "Allow customers to select and order this dish"}
+                  {t.menuAdmin.availableHelp}
                 </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer select-none">
@@ -330,7 +326,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                 <span className="ml-3 text-sm font-bold text-gray-800 w-16">
-                  {formData.isAvailable ? (language === "vi" ? "Còn món" : "Available") : t.common.soldOut}
+                  {formData.isAvailable ? t.menuAdmin.availableStatus : t.common.soldOut}
                 </span>
               </label>
             </div>
@@ -342,11 +338,11 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
               <div className="flex items-center gap-2">
                 <div className="w-1 h-4 bg-red-500 rounded-full"></div>
                 <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">
-                  {language === "vi" ? "Khuyến mãi & Banner" : "Promotion & Banner"}
+                  {t.menuAdmin.promotionSection}
                 </h3>
               </div>
               <span className="text-[10px] font-bold text-gray-400 bg-gray-50 px-2 py-0.5 rounded-lg uppercase">
-                {language === "vi" ? "Tùy chọn" : "Optional"}
+                {t.menuAdmin.optionalBadge}
               </span>
             </div>
 
@@ -359,13 +355,13 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                 value={discountInput}
                 onChange={handleDiscountChange}
                 className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-bold text-red-600"
-                placeholder={language === "vi" ? "VD: 20 (giảm 20%)" : "E.g. 20 (20% off)"}
+                placeholder={t.menuAdmin.discountPlaceholder}
               />
             </div>
 
             <div>
               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">
-                {language === "vi" ? "Ảnh Banner quảng cáo" : "Promo Banner Image"}
+                {t.menuAdmin.promoBannerImage}
               </label>
               <div className="space-y-3">
                 <div className="flex gap-2">
@@ -374,7 +370,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                     value={formData.bannerUrl}
                     onChange={(e) => setFormData({ ...formData, bannerUrl: e.target.value })}
                     className="flex-1 h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-medium text-gray-600 text-sm"
-                    placeholder={language === "vi" ? "Dán link ảnh banner (URL) hoặc tải lên..." : "Paste banner image link (URL) or upload..."}
+                    placeholder={t.menuAdmin.promoBannerUrlPlaceholder}
                   />
                   <label className="shrink-0 flex items-center justify-center w-12 h-12 bg-gray-100 rounded-2xl cursor-pointer hover:bg-gray-200 transition-colors">
                     <input
@@ -397,26 +393,26 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">
-                  {language === "vi" ? "Tiêu đề Banner" : "Banner Title"}
+                  {t.menuAdmin.bannerTitle}
                 </label>
                 <input
                   type="text"
                   value={formData.promoTitle}
                   onChange={(e) => setFormData({ ...formData, promoTitle: e.target.value })}
                   className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-bold text-gray-700"
-                  placeholder={language === "vi" ? "Để trống để lấy tự động..." : "Leave empty to auto-fill..."}
+                  placeholder={t.menuAdmin.autoFillPlaceholder}
                 />
               </div>
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">
-                  {language === "vi" ? "Mô tả Banner" : "Banner Description"}
+                  {t.menuAdmin.bannerDescription}
                 </label>
                 <input
                   type="text"
                   value={formData.promoDescription}
                   onChange={(e) => setFormData({ ...formData, promoDescription: e.target.value })}
                   className="w-full h-12 px-4 rounded-2xl border-2 border-gray-100 focus:border-red-500 outline-none transition-all font-medium text-gray-600"
-                  placeholder={language === "vi" ? "Để trống để lấy tự động..." : "Leave empty to auto-fill..."}
+                  placeholder={t.menuAdmin.autoFillPlaceholder}
                 />
               </div>
             </div>
@@ -425,7 +421,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
             {formData.discountPercent > 0 && (
               <div className="space-y-2 pt-2">
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                  {language === "vi" ? "Xem trước Banner ngoài trang chủ" : "Banner Live Preview on Homepage"}
+                  {t.menuAdmin.bannerPreviewLabel}
                 </label>
                 <div className="relative h-36 rounded-2xl overflow-hidden shadow-lg bg-gray-950 border border-white/5 flex items-center p-4 select-none">
                   {/* Ambient background blur using active image */}
@@ -444,13 +440,13 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
                     {/* Left text */}
                     <div className="flex-1 flex flex-col justify-center text-left space-y-1 pr-2">
                       <div className="inline-flex items-center gap-1 bg-red-500/15 text-red-400 text-[8px] font-black px-2 py-0.5 rounded-full w-fit uppercase tracking-wider">
-                        {language === "vi" ? "Khuyến mãi" : "Promo"} -{formData.discountPercent}%
+                        {t.menuAdmin.promoBadge} -{formData.discountPercent}%
                       </div>
                       <h4 className="text-white text-sm font-black line-clamp-1">
-                        {formData.promoTitle || (language === "vi" ? `Thực đơn Ưu đãi: ${formData.name || "Tên món ăn"}` : `Promo Menu: ${formData.name || "Dish name"}`)}
+                        {formData.promoTitle || t.menuAdmin.promoTitleFallback.replace("{name}", formData.name || t.menuAdmin.dishNameFallback)}
                       </h4>
                       <p className="text-gray-400 text-[10px] font-medium line-clamp-1">
-                        {formData.promoDescription || (language === "vi" ? "Thưởng thức hương vị tuyệt vời với giá ưu đãi đặc biệt hôm nay!" : "Enjoy great taste at a special promo price today!")}
+                        {formData.promoDescription || t.menuAdmin.promoDescFallback}
                       </p>
                       <div className="flex items-center gap-2 pt-0.5">
                         <span className="text-primary text-xs font-black">
@@ -478,9 +474,7 @@ export default function MenuItemForm({ item, onClose }: MenuItemFormProps) {
             )}
 
             <p className="text-[10px] text-gray-400 italic font-medium px-2">
-              {language === "vi" 
-                ? "* Banner sẽ tự động hiển thị ở trang chủ nếu món ăn này được giảm giá (lớn hơn 0%). Ảnh banner và tiêu đề/mô tả sẽ tự động lấy mặc định từ thông tin món ăn nếu để trống." 
-                : "* Banner will automatically display on the home page if this dish is discounted (greater than 0%). Banner image and title/description will automatically default from dish information if left empty."}
+              {t.menuAdmin.bannerHelpText}
             </p>
           </div>
 

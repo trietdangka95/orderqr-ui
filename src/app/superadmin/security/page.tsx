@@ -5,8 +5,11 @@ import { useSuperAdminInfo, useSetup2FA, useEnable2FA, useDisable2FA } from "@/h
 import { ShieldCheck, ShieldAlert, KeyRound, Copy, Check, QrCode } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
+import { translateApiError } from "@/utils/apiError";
 
 export default function SecuritySettingsPage() {
+  const t = useTranslation();
   const { data: info, isLoading: infoLoading, refetch } = useSuperAdminInfo();
   const setupMutation = useSetup2FA();
   const enableMutation = useEnable2FA();
@@ -30,8 +33,7 @@ export default function SecuritySettingsPage() {
       setSetupData(data);
       setIsSettingUp(true);
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error?.response?.data?.message || "Failed to initialize 2FA configuration");
+      setError(translateApiError(err, t, t.superadmin.setupFailed));
     }
   };
 
@@ -60,14 +62,13 @@ export default function SecuritySettingsPage() {
         code: verificationCode,
         secret: setupData.secret
       });
-      setSuccess("Two-factor authentication (2FA) enabled successfully!");
+      setSuccess(t.superadmin.enableSuccess);
       setIsSettingUp(false);
       setSetupData(null);
       setVerificationCode("");
       refetch();
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error?.response?.data?.message || "Verification code is incorrect. Please try again.");
+      setError(translateApiError(err, t, t.superadmin.verifyFailed));
     }
   };
 
@@ -79,13 +80,12 @@ export default function SecuritySettingsPage() {
 
     try {
       await disableMutation.mutateAsync(confirmPassword);
-      setSuccess("Two-factor authentication (2FA) disabled successfully!");
+      setSuccess(t.superadmin.disableSuccess);
       setIsDisabling(false);
       setConfirmPassword("");
       refetch();
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      setError(error?.response?.data?.message || "Confirmation password is incorrect.");
+      setError(translateApiError(err, t, t.superadmin.passwordIncorrect));
     }
   };
 
@@ -104,9 +104,9 @@ export default function SecuritySettingsPage() {
       <header className="mb-10">
         <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2 flex items-center gap-3">
           <KeyRound className="text-blue-600" size={32} />
-          Account Security
+          {t.superadmin.securityTitle}
         </h1>
-        <p className="text-gray-500 font-medium italic">Manage security layers protecting your Super Admin account</p>
+        <p className="text-gray-500 font-medium italic">{t.superadmin.securitySubtitle}</p>
       </header>
 
       {/* Notifications */}
@@ -144,12 +144,12 @@ export default function SecuritySettingsPage() {
           </div>
           <div>
             <h3 className="text-lg font-black text-gray-900 leading-tight">
-              Two-Factor Authentication (2FA / TOTP)
+              {t.superadmin.twoFactorTitle}
             </h3>
             <p className="text-xs text-gray-500 font-semibold mt-1">
-              Status:{" "}
+              {t.superadmin.statusLabel}:{" "}
               <span className={`font-bold ${isEnabled ? "text-green-600" : "text-amber-500"}`}>
-                {isEnabled ? "Enabled" : "Disabled"}
+                {isEnabled ? t.superadmin.enabled : t.superadmin.disabled}
               </span>
             </p>
           </div>
@@ -160,7 +160,7 @@ export default function SecuritySettingsPage() {
           {!isSettingUp && !isDisabling && (
             <div>
               <p className="text-gray-600 text-sm leading-relaxed mb-6 font-medium">
-                Two-factor authentication (2FA) adds an important security layer to your Super Admin account by requiring a 6-digit security code from Google Authenticator or Authy when logging in.
+                {t.superadmin.twoFactorDesc}
               </p>
 
               {isEnabled ? (
@@ -172,7 +172,7 @@ export default function SecuritySettingsPage() {
                   }}
                   className="px-6 py-3.5 bg-red-50 text-red-600 font-black rounded-2xl hover:bg-red-100 hover:text-red-700 active:scale-95 transition-all text-xs tracking-wider uppercase border border-red-200/50"
                 >
-                  Disable Two-Factor Auth
+                  {t.superadmin.disable2FA}
                 </button>
               ) : (
                 <button
@@ -185,7 +185,7 @@ export default function SecuritySettingsPage() {
                   ) : (
                     <>
                       <QrCode size={16} />
-                      <span>Enable Two-Factor Auth</span>
+                      <span>{t.superadmin.enable2FA}</span>
                     </>
                   )}
                 </button>
@@ -211,21 +211,21 @@ export default function SecuritySettingsPage() {
                       includeMargin={false}
                     />
                   </div>
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-4">Scan QR code with Authenticator app</span>
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-4">{t.superadmin.scanQr}</span>
                 </div>
 
                 {/* Setup Instructions */}
                 <div className="space-y-4 flex flex-col justify-center">
-                  <h4 className="font-black text-gray-900 uppercase tracking-widest text-xs">Setup Steps:</h4>
+                  <h4 className="font-black text-gray-900 uppercase tracking-widest text-xs">{t.superadmin.setupStepsTitle}</h4>
                   <ol className="text-sm text-gray-600 space-y-3 font-medium list-decimal pl-4">
-                    <li>Open Google Authenticator or Authy on your phone.</li>
-                    <li>Choose to scan QR code and point the camera at the image on the left.</li>
-                    <li>If you cannot scan, copy the secret key below to configure manually.</li>
+                    <li>{t.superadmin.setupStep1}</li>
+                    <li>{t.superadmin.setupStep2}</li>
+                    <li>{t.superadmin.setupStep3}</li>
                   </ol>
 
                   {/* Secret Copy Key */}
                   <div className="mt-4">
-                    <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider block mb-1.5">Secret Key</span>
+                    <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider block mb-1.5">{t.superadmin.secretKey}</span>
                     <div className="flex items-center gap-2 bg-gray-900 text-gray-100 p-3 rounded-xl font-mono text-sm break-all select-all justify-between border border-gray-800">
                       <span className="tracking-wider text-xs">{setupData.secret}</span>
                       <button
@@ -244,7 +244,7 @@ export default function SecuritySettingsPage() {
               <form onSubmit={handleVerifyAndEnable} className="pt-6 border-t border-gray-100 space-y-4">
                 <div>
                   <label htmlFor="verify-code" className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
-                    Enter 6-digit verification code to activate
+                    {t.superadmin.verifyCodeLabel}
                   </label>
                   <input
                     id="verify-code"
@@ -267,7 +267,7 @@ export default function SecuritySettingsPage() {
                     {enableMutation.isPending ? (
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     ) : (
-                      "Confirm Activation"
+                      t.superadmin.confirmActivation
                     )}
                   </button>
                   <button
@@ -275,7 +275,7 @@ export default function SecuritySettingsPage() {
                     onClick={handleCancelSetup}
                     className="px-6 py-3.5 bg-gray-100 text-gray-600 font-black rounded-2xl hover:bg-gray-200 active:scale-95 transition-all text-xs tracking-wider uppercase"
                   >
-                    Cancel
+                    {t.common.cancel}
                   </button>
                 </div>
               </form>
@@ -290,19 +290,19 @@ export default function SecuritySettingsPage() {
               className="space-y-6"
             >
               <div className="p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl text-xs font-semibold leading-relaxed">
-                Warning: Disabling two-factor authentication will reduce the security of your Super Admin account. Please confirm your current password to continue.
+                {t.superadmin.disableWarning}
               </div>
 
               <form onSubmit={handleDisable2FA} className="space-y-4">
                 <div>
                   <label htmlFor="confirm-pass" className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">
-                    Enter current password
+                    {t.superadmin.currentPasswordLabel}
                   </label>
                   <input
                     id="confirm-pass"
                     autoFocus
                     type="password"
-                    placeholder="Your password..."
+                    placeholder={t.superadmin.currentPasswordPlaceholder}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="max-w-md w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-2xl outline-none focus:border-red-500 focus:bg-white transition-all text-sm font-semibold"
@@ -318,7 +318,7 @@ export default function SecuritySettingsPage() {
                     {disableMutation.isPending ? (
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                     ) : (
-                      "Confirm Disable 2FA"
+                      t.superadmin.confirmDisable
                     )}
                   </button>
                   <button
@@ -330,7 +330,7 @@ export default function SecuritySettingsPage() {
                     }}
                     className="px-6 py-3.5 bg-gray-100 text-gray-600 font-black rounded-2xl hover:bg-gray-200 active:scale-95 transition-all text-xs tracking-wider uppercase"
                   >
-                    Cancel
+                    {t.common.cancel}
                   </button>
                 </div>
               </form>

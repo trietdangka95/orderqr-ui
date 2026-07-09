@@ -10,13 +10,18 @@ import {
 } from "lucide-react";
 import { useStores, usePlatformStats } from "@/hooks/useSuperAdmin";
 import Link from "next/link";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useCartStore } from "@/store/cartStore";
 
 export default function SuperAdminDashboard() {
+  const t = useTranslation();
+  const { language } = useCartStore();
   const { data: statsData, isLoading: statsLoading } = usePlatformStats();
   const { data: stores = [], isLoading: storesLoading } = useStores();
+  const locale = language === "vi" ? "vi-VN" : "en-US";
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("vi-VN", {
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: "VND",
       maximumFractionDigits: 0
@@ -25,28 +30,28 @@ export default function SuperAdminDashboard() {
 
   const stats = [
     { 
-      label: "Total Stores", 
+      label: t.superadmin.statTotalStores, 
       value: statsLoading ? "..." : statsData?.totalStores.toString() || "0", 
       icon: Store, 
       color: "text-blue-600", 
       bg: "bg-blue-50" 
     },
     { 
-      label: "Active Stores", 
+      label: t.superadmin.statActiveStores, 
       value: statsLoading ? "..." : statsData?.activeStores.toString() || "0", 
       icon: Activity, 
       color: "text-green-600", 
       bg: "bg-green-50" 
     },
     { 
-      label: "Total Products", 
+      label: t.superadmin.statTotalProducts, 
       value: statsLoading ? "..." : statsData?.totalProducts.toLocaleString() || "0", 
       icon: Package, 
       color: "text-purple-600", 
       bg: "bg-purple-50" 
     },
     { 
-      label: "Total Revenue", 
+      label: t.superadmin.statTotalRevenue, 
       value: statsLoading ? "..." : formatCurrency(statsData?.totalRevenue || 0), 
       icon: TrendingUp, 
       color: "text-primary", 
@@ -60,15 +65,15 @@ export default function SuperAdminDashboard() {
     <div className="max-w-6xl mx-auto">
       <header className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Platform Overview</h1>
-          <p className="text-gray-500 font-medium italic">Monitoring your SaaS restaurant network</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.superadmin.dashboardTitle}</h1>
+          <p className="text-gray-500 font-medium italic">{t.superadmin.dashboardSubtitle}</p>
         </div>
         <Link 
           href="/superadmin/stores?new=true"
           className="flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-black rounded-2xl shadow-2xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-95 text-sm uppercase tracking-widest w-fit self-start md:self-auto"
         >
           <PlusCircle size={20} />
-          <span>Create New Store</span>
+          <span>{t.superadmin.createStore}</span>
         </Link>
       </header>
 
@@ -102,9 +107,9 @@ export default function SuperAdminDashboard() {
         <div className="flex items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div>
-            <h2 className="text-lg font-black text-gray-900 uppercase tracking-widest">Recent Activity</h2>
+            <h2 className="text-lg font-black text-gray-900 uppercase tracking-widest">{t.superadmin.recentActivity}</h2>
           </div>
-          <Link href="/superadmin/stores" className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">View All Stores</Link>
+          <Link href="/superadmin/stores" className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">{t.superadmin.viewAllStores}</Link>
         </div>
         
         <div className="bg-white rounded-[3rem] shadow-xl shadow-gray-200/50 border border-gray-100 divide-y divide-gray-50 overflow-hidden">
@@ -113,7 +118,7 @@ export default function SuperAdminDashboard() {
               <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : recentStores.length === 0 ? (
-            <div className="p-20 text-center text-gray-400 font-bold">No stores found</div>
+            <div className="p-20 text-center text-gray-400 font-bold">{t.superadmin.noStoresFound}</div>
           ) : (
             recentStores.map((store) => (
               <div key={store.id} className="p-8 flex items-center justify-between hover:bg-gray-50 transition-colors">
@@ -131,13 +136,13 @@ export default function SuperAdminDashboard() {
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="text-right hidden md:block">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Created At</p>
-                    <p className="text-sm font-bold text-gray-900">{new Date(store.createdAt).toLocaleDateString('vi-VN')}</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t.superadmin.createdAt}</p>
+                    <p className="text-sm font-bold text-gray-900">{new Date(store.createdAt).toLocaleDateString(locale)}</p>
                   </div>
                   {store.isActive ? (
-                    <span className="px-4 py-1.5 bg-green-100 text-green-600 text-[10px] font-black rounded-full uppercase tracking-widest">Active</span>
+                    <span className="px-4 py-1.5 bg-green-100 text-green-600 text-[10px] font-black rounded-full uppercase tracking-widest">{t.common.active}</span>
                   ) : (
-                    <span className="px-4 py-1.5 bg-red-100 text-red-600 text-[10px] font-black rounded-full uppercase tracking-widest">Inactive</span>
+                    <span className="px-4 py-1.5 bg-red-100 text-red-600 text-[10px] font-black rounded-full uppercase tracking-widest">{t.common.inactive}</span>
                   )}
                 </div>
               </div>

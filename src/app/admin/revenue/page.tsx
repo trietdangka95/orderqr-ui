@@ -18,10 +18,11 @@ import {
 } from "lucide-react";
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCartStore } from "@/store/cartStore";
+import { StoreConfig, useCartStore } from "@/store/cartStore";
 import { FILTER_PRESETS, FilterType } from "@/constants/filters";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatPrice as utilsFormatPrice } from "@/utils/currency";
+import { TranslationSchema } from "@/locales/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface OrderItemDetail {
@@ -66,7 +67,7 @@ const toYMD = (ts: number) => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
-const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any, t: any, language: string) => {
+const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: StoreConfig | null, t: TranslationSchema, language: string) => {
   const iframe = document.createElement("iframe");
   iframe.style.position = "fixed";
   iframe.style.right = "0";
@@ -83,7 +84,7 @@ const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any, t: any, langua
   const itemMap: Record<string, { name: string; quantity: number; price: number }> = {};
   inv.orders.forEach((order) => {
     order.orderItems.forEach((item) => {
-      const name = item.product?.name || (language === "vi" ? "Món ăn" : "Dish");
+      const name = item.product?.name || t.revenue.unknownItem;
       const price = Number(item.priceAtTime);
       if (!itemMap[name]) {
         itemMap[name] = {
@@ -204,12 +205,12 @@ const handlePrintReceipt = (inv: InvoiceRecord, storeConfig: any, t: any, langua
 };
 
 // ─── Build top-selling items ───────────────────────────────────────────────────
-function buildTop(invoices: InvoiceRecord[], language: string) {
+function buildTop(invoices: InvoiceRecord[], t: TranslationSchema) {
   const map: Record<string, { name: string; cat: string; qty: number; rev: number }> = {};
   invoices.forEach((inv) =>
     inv.orders.forEach((ord) =>
       ord.orderItems.forEach((it) => {
-        const name = it.product?.name || (language === "vi" ? "Không rõ" : "Unknown");
+        const name = it.product?.name || t.revenue.unknownItem;
         const cat = (it.product as any)?.category?.name || "—";
         if (!map[name]) map[name] = { name, cat, qty: 0, rev: 0 };
         map[name].qty += it.quantity;
@@ -221,7 +222,7 @@ function buildTop(invoices: InvoiceRecord[], language: string) {
 }
 
 // ─── CSV Export ────────────────────────────────────────────────────────────────
-function exportCSV(records: InvoiceRecord[], from: string, to: string, t: any, language: string) {
+function exportCSV(records: InvoiceRecord[], from: string, to: string, t: TranslationSchema) {
   const sep = ",";
   const bom = "\uFEFF";
 
@@ -240,7 +241,7 @@ function exportCSV(records: InvoiceRecord[], from: string, to: string, t: any, l
     inv.orders.forEach((ord) => {
       ord.orderItems.forEach((it) => {
         const productId = it.productId || it.product?.id || "";
-        const name = it.product?.name || (language === "vi" ? "Món ăn" : "Dish");
+        const name = it.product?.name || t.revenue.unknownItem;
         const description = it.product?.description || "";
         
         // Calculate prices
@@ -281,10 +282,17 @@ function exportCSV(records: InvoiceRecord[], from: string, to: string, t: any, l
 
   const groupRows = Object.values(groupMap);
 
-  // Headers: Mã hàng | Tên sản phẩm | Mô tả sản phẩm | Giá | Số lượng | Tổng | Giảm giá | Tổng giảm | Thực thu
-  const headers = language === "vi" 
-    ? ["Mã hàng", "Tên sản phẩm", "Mô tả sản phẩm", "Giá", "Số lượng", "Tổng", "Giảm giá", "Tổng giảm", "Thực thu"]
-    : ["Product Code", "Product Name", "Product Description", "Price", "Quantity", "Total", "Discount (%)", "Total Discount", "Actual Revenue"];
+  const headers = [
+    t.revenue.csvProductCode,
+    t.revenue.csvProductName,
+    t.revenue.csvProductDescription,
+    t.revenue.csvPrice,
+    t.revenue.csvQuantity,
+    t.revenue.csvTotal,
+    t.revenue.csvDiscount,
+    t.revenue.csvTotalDiscount,
+    t.revenue.csvActualRevenue,
+  ];
 
   const formatCSVField = (field: string | number) => {
     const stringVal = String(field);
@@ -318,7 +326,7 @@ function exportCSV(records: InvoiceRecord[], from: string, to: string, t: any, l
 
   const totalRow = [
     "",
-    formatCSVField(language === "vi" ? "Tổng cộng" : "Total"),
+    formatCSVField(t.revenue.receiptTotal.replace(":", "")),
     "",
     "",
     totalQty,
@@ -334,11 +342,9 @@ function exportCSV(records: InvoiceRecord[], from: string, to: string, t: any, l
       ? `${t.revenue.fromDate} ${from}` 
       : to 
         ? `${t.revenue.toDate} ${to}` 
-        : (language === "vi" ? "Toàn bộ" : "All");
+        : t.revenue.reportAllPeriod;
 
-  const titleText = language === "vi" 
-    ? `BÁO CÁO DOANH THU CHI TIẾT (${period})` 
-    : `DETAILED REVENUE REPORT (${period})`;
+  const titleText = t.revenue.reportTitle.replace("{period}", period);
 
   const content = [
     formatCSVField(titleText),
@@ -353,7 +359,7 @@ function exportCSV(records: InvoiceRecord[], from: string, to: string, t: any, l
   const a = document.createElement("a");
   a.href = url;
   const suffix = from || to ? `_${from || "start"}_${to || "end"}` : "_all";
-  a.download = `${language === "vi" ? "bao_cao_doanh_thu" : "revenue_report"}${suffix}_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.download = `${t.revenue.exportFileName}${suffix}_${new Date().toISOString().slice(0, 10)}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -361,7 +367,7 @@ function exportCSV(records: InvoiceRecord[], from: string, to: string, t: any, l
 }
 
 // ─── Invoice Detail Modal ─────────────────────────────────────────────────────
-function InvoiceModal({ inv, onClose, t, language }: { inv: InvoiceRecord; onClose: () => void; t: any; language: string }) {
+function InvoiceModal({ inv, onClose, t, language }: { inv: InvoiceRecord; onClose: () => void; t: TranslationSchema; language: string }) {
   const allItems = inv.orders.flatMap((o) => o.orderItems);
   const storeConfig = useCartStore((state) => state.storeConfig);
   const locale = language === "vi" ? "vi-VN" : "en-US";
@@ -446,7 +452,7 @@ function InvoiceModal({ inv, onClose, t, language }: { inv: InvoiceRecord; onClo
                 >
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-gray-900 text-sm truncate">
-                      {it.product?.name || (language === "vi" ? "Món ăn" : "Dish")}
+                      {it.product?.name || t.revenue.unknownItem}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                       {(it.product as any)?.category?.name && (
@@ -488,10 +494,9 @@ function InvoiceModal({ inv, onClose, t, language }: { inv: InvoiceRecord; onClo
 }
 
 // ─── Top Items Sidebar ────────────────────────────────────────────────────────
-function TopItems({ invoices, t, language }: { invoices: InvoiceRecord[]; t: any; language: string }) {
-  const items = useMemo(() => buildTop(invoices, language).slice(0, 10), [invoices, language]);
+function TopItems({ invoices, t, language }: { invoices: InvoiceRecord[]; t: TranslationSchema; language: string }) {
+  const items = useMemo(() => buildTop(invoices, t).slice(0, 10), [invoices, t]);
   const maxQty = items[0]?.qty || 1;
-  const locale = language === "vi" ? "vi-VN" : "en-US";
 
   const storeConfig = useCartStore((state) => state.storeConfig);
   const formatPrice = (price: number) => {
@@ -534,7 +539,7 @@ function TopItems({ invoices, t, language }: { invoices: InvoiceRecord[]; t: any
               <div className="flex items-center justify-between mb-1.5">
                 <span className="font-bold text-gray-900 text-sm truncate pr-2">{item.name}</span>
                 <span className="text-xs font-black text-gray-600 shrink-0 bg-gray-100 px-2 py-0.5 rounded-lg">
-                  {item.qty} {language === "vi" ? "phần" : "units"}
+                  {item.qty} {t.revenue.topSellingUnit}
                 </span>
               </div>
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -696,11 +701,11 @@ export default function RevenuePage() {
     });
 
   const getExportPeriod = () => {
-    if (filterType === "ALL_TIME") return { from: language === "vi" ? "Tất cả" : "All", to: "" };
-    if (filterType === "TODAY") return { from: language === "vi" ? "Hôm nay" : "Today", to: "" };
-    if (filterType === "THIS_WEEK") return { from: language === "vi" ? "Tuần này" : "This week", to: "" };
-    if (filterType === "THIS_MONTH") return { from: language === "vi" ? "Tháng này" : "This month", to: "" };
-    if (filterType === "THIS_YEAR") return { from: language === "vi" ? "Năm nay" : "This year", to: "" };
+    if (filterType === "ALL_TIME") return { from: t.admin.filterAllTime, to: "" };
+    if (filterType === "TODAY") return { from: t.admin.filterToday, to: "" };
+    if (filterType === "THIS_WEEK") return { from: t.admin.filterThisWeek, to: "" };
+    if (filterType === "THIS_MONTH") return { from: t.admin.filterThisMonth, to: "" };
+    if (filterType === "THIS_YEAR") return { from: t.admin.filterThisYear, to: "" };
     return { from: customFrom, to: customTo };
   };
 
@@ -835,7 +840,7 @@ export default function RevenuePage() {
             <button
               onClick={() => {
                 const { from, to } = getExportPeriod();
-                exportCSV(filtered, from, to, t, language);
+                exportCSV(filtered, from, to, t);
               }}
               className="ml-auto flex items-center gap-2 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white font-black rounded-xl transition-all shadow-md shadow-green-100/50 hover:scale-[1.02] active:scale-95 text-xs shrink-0 cursor-pointer"
             >
@@ -886,7 +891,7 @@ export default function RevenuePage() {
               <ShoppingBag size={18} className="text-primary" />
               <h3 className="font-black text-gray-900">{t.revenue.invoiceListTitle}</h3>
               <span className="ml-auto text-xs font-black text-gray-400 bg-gray-100 px-2.5 py-1 rounded-lg">
-                {language === "vi" ? `${filtered.length} đơn` : `${filtered.length} orders`}
+                {t.revenue.ordersCount.replace("{count}", String(filtered.length))}
               </span>
             </div>
 
@@ -981,7 +986,7 @@ export default function RevenuePage() {
                                         <div key={it.id} className="flex items-start justify-between gap-3 text-sm">
                                           <div className="min-w-0">
                                             <span className="font-bold text-gray-900">
-                                              {it.quantity}× {it.product?.name || (language === "vi" ? "Món ăn" : "Dish")}
+                                              {it.quantity}× {it.product?.name || t.revenue.unknownItem}
                                             </span>
                                             {(it.product as any)?.category?.name && (
                                               <span className="text-[10px] text-gray-400 ml-2">

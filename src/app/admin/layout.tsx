@@ -77,7 +77,7 @@ export default function AdminLayout({
         { href: "/admin/billing", label: t.admin.billingTab, icon: CreditCard }
       ]
     : [
-        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/admin", label: t.admin.dashboardTab, icon: LayoutDashboard },
         { href: "/admin/tables", label: t.admin.tablesTab, icon: Store },
         { href: "/admin/kitchen", label: t.admin.kitchenTab, icon: Soup },
         { href: "/admin/revenue", label: t.admin.revenueTab, icon: TrendingUp },

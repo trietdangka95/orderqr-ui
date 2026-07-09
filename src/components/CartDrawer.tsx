@@ -9,6 +9,7 @@ import { getImageUrl } from "@/utils/image";
 import { showAlert } from "@/store/dialogStore";
 import { useTranslation } from "@/hooks/useTranslation";
 import { formatPrice } from "@/utils/currency";
+import { translateApiError } from "@/utils/apiError";
 
 export default function CartDrawer() {
   const t = useTranslation();
@@ -38,7 +39,7 @@ export default function CartDrawer() {
         toggleOrders();
       },
       onError: (error: Error) => {
-        showAlert(error.message || t.cart.checkoutError);
+        showAlert(translateApiError(error, t, t.cart.checkoutError));
       }
     });
   };
@@ -113,7 +114,7 @@ export default function CartDrawer() {
                             setEditingNoteId(null);
                           }}
                           className="p-1 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-red-500 shrink-0"
-                          title="Xóa ghi chú"
+                          title={t.cart.clearNoteTitle}
                         >
                           <X className="w-3 h-3" />
                         </button>

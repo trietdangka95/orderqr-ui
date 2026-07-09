@@ -15,15 +15,21 @@ import {
   AlertCircle
 } from "lucide-react";
 import useIsMounted from "@/hooks/useIsMounted";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useCartStore } from "@/store/cartStore";
+import { translateApiError } from "@/utils/apiError";
  
 const RENEWAL_STATUS_TABS = [
-  { id: "PENDING", label: "Pending" },
-  { id: "APPROVED", label: "Approved" },
-  { id: "REJECTED", label: "Rejected" },
-  { id: "ALL", label: "All" },
+  { id: "PENDING" },
+  { id: "APPROVED" },
+  { id: "REJECTED" },
+  { id: "ALL" },
 ] as const;
 
 export default function SuperAdminRenewalsPage() {
+  const t = useTranslation();
+  const { language } = useCartStore();
+  const locale = language === "vi" ? "vi-VN" : "en-US";
   const isMounted = useIsMounted();
   const { data: requests = [], isLoading } = useRenewalRequests();
   const approveMutation = useApproveRenewalRequest();
@@ -41,6 +47,13 @@ export default function SuperAdminRenewalsPage() {
   const [premiumPrice, setPremiumPrice] = useState<number>(599000);
  
   if (!isMounted) return null;
+
+  const getStatusLabel = (status: "ALL" | "PENDING" | "APPROVED" | "REJECTED") => {
+    if (status === "ALL") return t.logs.actionAll;
+    if (status === "APPROVED") return t.billing.historyStatusApproved;
+    if (status === "REJECTED") return t.billing.historyStatusRejected;
+    return t.superadmin.statusPending;
+  };
  
   const filteredRequests = requests.filter(req => {
     if (activeTab === "ALL") return true;
@@ -48,13 +61,13 @@ export default function SuperAdminRenewalsPage() {
   });
  
   const handleApprove = async (id: string, storeName: string, months: number) => {
-    if (await showConfirm(`Are you sure you want to APPROVE the ${months}-month renewal request for store "${storeName}"?`)) {
+    if (await showConfirm(t.superadmin.approveRenewalConfirm.replace("{months}", String(months)).replace("{store}", storeName))) {
       approveMutation.mutate(id, {
         onSuccess: () => {
-          showAlert("Renewal request approved successfully!");
+          showAlert(t.superadmin.renewalApproved);
         },
         onError: (err: any) => {
-          showAlert(err.message || "Approval failed!");
+          showAlert(translateApiError(err, t, t.superadmin.approvalFailed));
         }
       });
     }
@@ -68,7 +81,7 @@ export default function SuperAdminRenewalsPage() {
   const submitReject = async () => {
     if (!rejectingId) return;
     if (!rejectReason.trim()) {
-      showAlert("Please enter a reason for rejection!");
+      showAlert(t.superadmin.rejectReasonRequired);
       return;
     }
  
@@ -79,10 +92,10 @@ export default function SuperAdminRenewalsPage() {
       onSuccess: () => {
         setRejectingId(null);
         setRejectReason("");
-        showAlert("Renewal request rejected!");
+        showAlert(t.superadmin.renewalRejected);
       },
       onError: (err: any) => {
-        showAlert(err.message || "Rejection failed!");
+        showAlert(translateApiError(err, t, t.superadmin.rejectionFailed));
       }
     });
   };
@@ -99,15 +112,15 @@ export default function SuperAdminRenewalsPage() {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Renewal Requests</h1>
-          <p className="text-gray-500 font-medium italic">Verify incoming payments and approve service plans for stores</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.superadmin.renewalsTitle}</h1>
+          <p className="text-gray-500 font-medium italic">{t.superadmin.renewalsSubtitle}</p>
         </div>
         <button
           onClick={handleOpenBankModal}
           className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-2xl text-sm transition-all active:scale-95 shadow-lg shadow-blue-100 flex items-center gap-2"
         >
           <CreditCard size={18} />
-          Configure Receiving Account
+          {t.superadmin.configureReceivingAccount}
         </button>
       </div>
  
@@ -127,7 +140,7 @@ export default function SuperAdminRenewalsPage() {
                   : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/40"
               }`}
             >
-              {tab.label}
+              {getStatusLabel(tab.id)}
               <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black transition-colors ${
                 activeTab === tab.id 
                   ? "bg-blue-50 text-blue-600" 
@@ -142,11 +155,11 @@ export default function SuperAdminRenewalsPage() {
  
       {isLoading ? (
         <div className="text-center font-bold text-gray-400 py-20 animate-pulse">
-          Loading renewal requests...
+          {t.superadmin.loadingRenewals}
         </div>
       ) : filteredRequests.length === 0 ? (
         <div className="bg-white rounded-3xl border border-gray-100 p-20 text-center text-gray-400 italic">
-          No renewal requests found in this section.
+          {t.superadmin.renewalsEmpty}
         </div>
       ) : (
         <>
@@ -161,10 +174,10 @@ export default function SuperAdminRenewalsPage() {
                     </div>
                     <div className="text-left">
                       <h4 className="font-bold text-gray-900 leading-tight">
-                        {req.store?.name || "Hidden Store"}
+                        {req.store?.name || t.superadmin.hiddenStore}
                       </h4>
                       <p className="text-[10px] text-gray-400 font-mono mt-0.5">
-                        slug: {req.store?.slug || "N/A"}
+                        {t.superadmin.slugLabel}: {req.store?.slug || t.common.notAvailable}
                       </p>
                     </div>
                   </div>
@@ -176,29 +189,31 @@ export default function SuperAdminRenewalsPage() {
                       ? "bg-red-100 text-red-700" 
                       : "bg-amber-100 text-amber-700 animate-pulse"
                   }`}>
-                    {req.status === "APPROVED" ? "Approved" : req.status === "REJECTED" ? "Rejected" : "Pending"}
+                    {getStatusLabel(req.status)}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 pt-3 border-t border-gray-50 text-left text-xs font-semibold">
                   <div>
-                    <span className="text-gray-400 block mb-0.5">Plan</span>
-                    <span className="text-gray-800 font-bold">Premium (+{req.months} {req.notes?.includes('[TEST_MINUTES]') ? 'mins' : 'months'})</span>
+                    <span className="text-gray-400 block mb-0.5">{t.superadmin.plan}</span>
+                    <span className="text-gray-800 font-bold">
+                      {t.superadmin.premiumPlanName} (+{req.months} {req.notes?.includes('[TEST_MINUTES]') ? t.superadmin.minsUnit : t.superadmin.monthsUnit})
+                    </span>
                   </div>
                   <div>
-                    <span className="text-gray-400 block mb-0.5">Amount Transferred</span>
-                    <span className="text-primary font-black">{Number(req.price).toLocaleString("vi-VN")} ₫</span>
+                    <span className="text-gray-400 block mb-0.5">{t.superadmin.amountTransferred}</span>
+                    <span className="text-primary font-black">{Number(req.price).toLocaleString(locale)} ₫</span>
                   </div>
                   <div className="col-span-2">
-                    <span className="text-gray-400 block mb-0.5">Date Sent</span>
+                    <span className="text-gray-400 block mb-0.5">{t.billing.historyHeaderDate}</span>
                     <span className="text-gray-600 flex items-center gap-1">
                       <Calendar size={12} className="text-gray-400 shrink-0" />
-                      {new Date(req.createdAt).toLocaleDateString("vi-VN")} {new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(req.createdAt).toLocaleDateString(locale)} {new Date(req.createdAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                   {req.notes && (
                     <div className="col-span-2">
-                      <span className="text-gray-400 block mb-0.5">Request Notes</span>
+                      <span className="text-gray-400 block mb-0.5">{t.superadmin.requestNotes}</span>
                       <span className="text-gray-500 italic block bg-gray-50 p-2.5 rounded-xl border border-gray-100/60 leading-normal">{req.notes}</span>
                     </div>
                   )}
@@ -208,11 +223,11 @@ export default function SuperAdminRenewalsPage() {
                   <div className="flex gap-2 pt-2 border-t border-gray-50">
                     <button
                       disabled={approveMutation.isPending || rejectMutation.isPending}
-                      onClick={() => handleApprove(req.id, req.store?.name || "Store", req.months)}
+                      onClick={() => handleApprove(req.id, req.store?.name || t.superadmin.storeName, req.months)}
                       className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 text-xs shadow-md shadow-green-100"
                     >
                       <Check size={16} />
-                      Approve
+                      {t.billing.historyStatusApproved}
                     </button>
                     <button
                       disabled={approveMutation.isPending || rejectMutation.isPending}
@@ -220,12 +235,12 @@ export default function SuperAdminRenewalsPage() {
                       className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 text-xs shadow-md shadow-red-100"
                     >
                       <X size={16} />
-                      Reject
+                      {t.billing.historyStatusRejected}
                     </button>
                   </div>
                 ) : (
                   <div className="text-center pt-2 border-t border-gray-50 text-xs text-gray-400 italic">
-                    Processed
+                    {t.superadmin.processed}
                   </div>
                 )}
               </div>
@@ -238,13 +253,13 @@ export default function SuperAdminRenewalsPage() {
               <table className="w-full text-left text-sm font-medium">
                 <thead className="bg-gray-50 text-[10px] font-black uppercase text-gray-400 border-b border-gray-100">
                   <tr>
-                    <th className="px-6 py-4">Store</th>
-                    <th className="px-6 py-4">Plan & Duration</th>
-                    <th className="px-6 py-4">Amount</th>
-                    <th className="px-6 py-4">Date Sent</th>
-                    <th className="px-6 py-4">Request Notes</th>
-                    <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th className="px-6 py-4">{t.superadmin.storeName}</th>
+                    <th className="px-6 py-4">{t.superadmin.plan}</th>
+                    <th className="px-6 py-4">{t.billing.historyHeaderAmount}</th>
+                    <th className="px-6 py-4">{t.billing.historyHeaderDate}</th>
+                    <th className="px-6 py-4">{t.superadmin.requestNotes}</th>
+                    <th className="px-6 py-4">{t.superadmin.statusLabel}</th>
+                    <th className="px-6 py-4 text-right">{t.common.actions}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50 text-gray-700">
@@ -257,38 +272,40 @@ export default function SuperAdminRenewalsPage() {
                           </div>
                           <div>
                             <p className="font-bold text-gray-900 leading-tight">
-                              {req.store?.name || "Hidden Store"}
+                              {req.store?.name || t.superadmin.hiddenStore}
                             </p>
                             <p className="text-[10px] text-gray-400 font-mono mt-0.5">
-                              slug: {req.store?.slug || "N/A"}
+                              {t.superadmin.slugLabel}: {req.store?.slug || t.common.notAvailable}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div>
-                          <span className="font-bold text-gray-800">Premium</span>
-                          <span className="text-xs text-gray-400 block font-bold mt-0.5">+{req.months} {req.notes?.includes('[TEST_MINUTES]') ? 'mins' : 'months'} of usage</span>
+                          <span className="font-bold text-gray-800">{t.superadmin.premiumPlanName}</span>
+                          <span className="text-xs text-gray-400 block font-bold mt-0.5">
+                            +{req.months} {req.notes?.includes('[TEST_MINUTES]') ? t.superadmin.minsUnit : t.superadmin.monthsUnit} {t.superadmin.usageSuffix}
+                          </span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <span className="font-black text-primary">
-                          {Number(req.price).toLocaleString("vi-VN")} ₫
+                          {Number(req.price).toLocaleString(locale)} ₫
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1 text-xs text-gray-500 font-semibold">
                           <Calendar size={12} className="text-gray-400 shrink-0" />
-                          <span>{new Date(req.createdAt).toLocaleDateString("vi-VN")}</span>
+                          <span>{new Date(req.createdAt).toLocaleDateString(locale)}</span>
                           <span className="text-[10px] text-gray-300">|</span>
                           <Clock size={12} className="text-gray-400 shrink-0" />
-                          <span>{new Date(req.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          <span>{new Date(req.createdAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-start gap-1.5 max-w-xs text-xs italic text-gray-500">
                           <MessageSquare size={13} className="text-gray-400 shrink-0 mt-0.5" />
-                          <span className="line-clamp-2">{req.notes || "No notes"}</span>
+                          <span className="line-clamp-2">{req.notes || t.common.noNotes}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -299,7 +316,7 @@ export default function SuperAdminRenewalsPage() {
                             ? "bg-red-100 text-red-700" 
                             : "bg-amber-100 text-amber-700 animate-pulse"
                         }`}>
-                          {req.status === "APPROVED" ? "Approved" : req.status === "REJECTED" ? "Rejected" : "Pending"}
+                          {getStatusLabel(req.status)}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -307,25 +324,25 @@ export default function SuperAdminRenewalsPage() {
                           <div className="flex items-center justify-end gap-2">
                             <button
                               disabled={approveMutation.isPending || rejectMutation.isPending}
-                              onClick={() => handleApprove(req.id, req.store?.name || "Store", req.months)}
+                              onClick={() => handleApprove(req.id, req.store?.name || t.superadmin.storeName, req.months)}
                               className="bg-green-500 hover:bg-green-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-green-100"
-                              title="Approve renewal"
+                              title={t.superadmin.approveRenewal}
                             >
                               <Check size={16} />
-                              Approve
+                              {t.billing.historyStatusApproved}
                             </button>
                             <button
                               disabled={approveMutation.isPending || rejectMutation.isPending}
                               onClick={() => handleReject(req.id)}
                               className="bg-red-500 hover:bg-red-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-red-100"
-                              title="Reject request"
+                              title={t.superadmin.rejectRequest}
                             >
                               <X size={16} />
-                              Reject
+                              {t.billing.historyStatusRejected}
                             </button>
                           </div>
                         ) : (
-                          <span className="text-xs text-gray-400 italic">Processed</span>
+                          <span className="text-xs text-gray-400 italic">{t.superadmin.processed}</span>
                         )}
                       </td>
                     </tr>
@@ -344,7 +361,7 @@ export default function SuperAdminRenewalsPage() {
             <div className="p-6 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AlertCircle className="text-red-500" />
-                <h3 className="font-bold text-lg text-gray-900">Reject Renewal Request</h3>
+                <h3 className="font-bold text-lg text-gray-900">{t.superadmin.rejectModalTitle}</h3>
               </div>
               <button 
                 onClick={() => setRejectingId(null)} 
@@ -355,9 +372,9 @@ export default function SuperAdminRenewalsPage() {
             </div>
  
             <div className="p-6 space-y-4">
-              <label className="text-xs font-black text-gray-500 uppercase block">Enter reason for rejection</label>
+              <label className="text-xs font-black text-gray-500 uppercase block">{t.superadmin.rejectReasonLabel}</label>
               <textarea
-                placeholder="E.g. Payment not received, incorrect transfer content..."
+                placeholder={t.superadmin.rejectReasonPlaceholder}
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-red-500 focus:outline-none transition-colors"
@@ -370,7 +387,7 @@ export default function SuperAdminRenewalsPage() {
                 onClick={() => setRejectingId(null)}
                 className="flex-1 py-3 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-100 transition-all active:scale-[0.98]"
               >
-                Cancel
+                {t.common.cancel}
               </button>
               <button
                 disabled={rejectMutation.isPending}
@@ -382,7 +399,7 @@ export default function SuperAdminRenewalsPage() {
                 ) : (
                   <>
                     <X size={16} />
-                    Confirm Rejection
+                    {t.superadmin.confirmRejection}
                   </>
                 )}
               </button>
@@ -398,7 +415,7 @@ export default function SuperAdminRenewalsPage() {
             <div className="p-6 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <CreditCard className="text-blue-500" />
-                <h3 className="font-bold text-lg text-gray-900">Configure Receiving Account</h3>
+                <h3 className="font-bold text-lg text-gray-900">{t.superadmin.bankConfigTitle}</h3>
               </div>
               <button 
                 onClick={() => setIsBankModalOpen(false)} 
@@ -410,10 +427,10 @@ export default function SuperAdminRenewalsPage() {
  
             <div className="p-6 space-y-4 text-left">
               <div className="space-y-1">
-                <label className="text-xs font-black text-gray-500 uppercase block">Bank ID (VietQR ID)</label>
+                <label className="text-xs font-black text-gray-500 uppercase block">{t.superadmin.bankIdLabel}</label>
                 <input
                   type="text"
-                  placeholder="E.g. MB, VCB, BIDV..."
+                  placeholder={t.superadmin.bankIdPlaceholder}
                   value={bankId}
                   onChange={(e) => setBankId(e.target.value.toUpperCase())}
                   className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
@@ -421,10 +438,10 @@ export default function SuperAdminRenewalsPage() {
               </div>
  
               <div className="space-y-1">
-                <label className="text-xs font-black text-gray-500 uppercase block">Account Number</label>
+                <label className="text-xs font-black text-gray-500 uppercase block">{t.superadmin.accountNumberLabel}</label>
                 <input
                   type="text"
-                  placeholder="Enter bank account number..."
+                  placeholder={t.superadmin.bankAccountNumberPlaceholder}
                   value={bankAccountNo}
                   onChange={(e) => setBankAccountNo(e.target.value)}
                   className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
@@ -432,10 +449,10 @@ export default function SuperAdminRenewalsPage() {
               </div>
  
               <div className="space-y-1">
-                <label className="text-xs font-black text-gray-500 uppercase block">Account Holder Name</label>
+                <label className="text-xs font-black text-gray-500 uppercase block">{t.superadmin.accountHolderLabel}</label>
                 <input
                   type="text"
-                  placeholder="Enter name (no accents)..."
+                  placeholder={t.superadmin.accountHolderPlaceholder}
                   value={bankAccountName}
                   onChange={(e) => setBankAccountName(e.target.value)}
                   className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
@@ -443,10 +460,10 @@ export default function SuperAdminRenewalsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-black text-gray-500 uppercase block">Premium Plan Price / Month (₫)</label>
+                <label className="text-xs font-black text-gray-500 uppercase block">{t.superadmin.premiumPriceLabel}</label>
                 <input
                   type="number"
-                  placeholder="Enter price (e.g. 599000)..."
+                  placeholder={t.superadmin.premiumPricePlaceholder}
                   value={premiumPrice}
                   onChange={(e) => setPremiumPrice(Math.max(0, parseInt(e.target.value) || 0))}
                   className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm focus:border-blue-500 focus:outline-none transition-colors"
@@ -459,13 +476,13 @@ export default function SuperAdminRenewalsPage() {
                 onClick={() => setIsBankModalOpen(false)}
                 className="flex-1 py-3 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-100 transition-all active:scale-[0.98]"
               >
-                Cancel
+                {t.common.cancel}
               </button>
               <button
                 disabled={saveBankConfigMutation.isPending}
                 onClick={async () => {
                   if (!bankId.trim() || !bankAccountNo.trim() || !bankAccountName.trim()) {
-                    showAlert("Please fill in all account details!");
+                    showAlert(t.superadmin.accountDetailsRequired);
                     return;
                   }
                   saveBankConfigMutation.mutate({
@@ -476,10 +493,10 @@ export default function SuperAdminRenewalsPage() {
                   }, {
                     onSuccess: () => {
                       setIsBankModalOpen(false);
-                      showAlert("System configuration updated successfully!");
+                      showAlert(t.superadmin.configUpdated);
                     },
                     onError: (err: any) => {
-                      showAlert(err.message || "Update failed!");
+                      showAlert(translateApiError(err, t, t.superadmin.updateFailed));
                     }
                   });
                 }}
@@ -490,7 +507,7 @@ export default function SuperAdminRenewalsPage() {
                 ) : (
                   <>
                     <Check size={16} />
-                    Save Configuration
+                    {t.billing.saveBankConfig}
                   </>
                 )}
               </button>

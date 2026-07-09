@@ -25,7 +25,6 @@ interface ActionButtonsProps {
 
 const ActionButtons = ({ item, isGrid, onEdit, onToggleAvailability, onDelete }: ActionButtonsProps) => {
   const t = useTranslation();
-  const { language } = useCartStore();
 
   return (
     <div className={`flex items-center gap-2 mt-4 flex-wrap ${isGrid ? "justify-start" : "justify-end"}`}>
@@ -37,7 +36,7 @@ const ActionButtons = ({ item, isGrid, onEdit, onToggleAvailability, onDelete }:
           }`}
       >
         <span className={`w-2 h-2 rounded-full ${item.isAvailable ? "bg-green-500" : "bg-gray-400"}`}></span>
-        {item.isAvailable ? (language === "vi" ? "Còn món" : "Available") : t.common.soldOut}
+        {item.isAvailable ? t.menuAdmin.availableStatus : t.common.soldOut}
       </button>
 
       <button
@@ -48,14 +47,14 @@ const ActionButtons = ({ item, isGrid, onEdit, onToggleAvailability, onDelete }:
         className="flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all active:scale-95 cursor-pointer"
       >
         <Edit2 size={14} />
-        {language === "vi" ? "Sửa" : "Edit"}
+        {t.common.edit}
       </button>
       <button
         onClick={onDelete}
         className="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white transition-all active:scale-95 cursor-pointer"
       >
         <Trash2 size={14} />
-        {language === "vi" ? "Xóa" : "Delete"}
+        {t.common.delete}
       </button>
     </div>
   );

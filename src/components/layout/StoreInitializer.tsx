@@ -5,6 +5,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useSearchParams } from "next/navigation";
 import { useSocket } from "@/providers/SocketProvider";
 import { KeyRound, Phone, AlertTriangle } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 // Helper function to extract store slug from host or search params
 function getSlug(searchParams: URLSearchParams): string | null {
@@ -56,6 +57,7 @@ function getSlug(searchParams: URLSearchParams): string | null {
 }
 
 export default function StoreInitializer() {
+  const t = useTranslation();
   const { fetchStoreConfig, storeConfig, storeError } = useCartStore();
   const searchParams = useSearchParams();
   const { socket } = useSocket();
@@ -155,6 +157,8 @@ export default function StoreInitializer() {
   const isExpired = storeConfig?.subscriptionEnd != null && new Date() > new Date(storeConfig.subscriptionEnd);
   const isSuspended = storeConfig?.subscriptionStatus === 'EXPIRED' || isExpired;
   const isAdminOrSuperAdminPath = pathname.startsWith("/admin") || pathname.startsWith("/superadmin") || pathname.startsWith("/super-login");
+  const suspendedStoreName = storeConfig?.name || t.page.subscriptionSuspendedStoreFallback;
+  const [suspendedDescPrefix, suspendedDescSuffix = ""] = t.page.subscriptionSuspendedDesc.split("{name}");
 
   if (isSuspended && !isAdminOrSuperAdminPath) {
     return (
@@ -167,9 +171,11 @@ export default function StoreInitializer() {
           <div className="w-20 h-20 bg-red-500/10 border border-red-500/20 text-red-500 rounded-[2rem] flex items-center justify-center mb-6">
             <AlertTriangle size={36} className="animate-pulse" />
           </div>
-          <h2 className="text-white text-2xl font-black mb-3 tracking-tight">Cửa hàng tạm ngưng dịch vụ</h2>
+          <h2 className="text-white text-2xl font-black mb-3 tracking-tight">{t.page.subscriptionSuspendedTitle}</h2>
           <p className="text-gray-400 text-sm leading-relaxed mb-6 font-semibold">
-            Dịch vụ của cửa hàng <span className="text-white font-bold">{storeConfig?.name || "này"}</span> hiện đang tạm thời bị gián đoạn do hết hạn gói thuê.
+            {suspendedDescPrefix}
+            <span className="text-white font-bold">{suspendedStoreName}</span>
+            {suspendedDescSuffix}
           </p>
 
           <div className="flex flex-col w-full gap-3 mt-4">
@@ -178,7 +184,7 @@ export default function StoreInitializer() {
               className="w-full py-3.5 px-4 bg-primary hover:bg-[#E06C00] text-white font-black rounded-xl shadow-lg shadow-orange-500/10 transition-all active:scale-[0.98] text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
             >
               <KeyRound size={15} />
-              Quản trị & Gia hạn
+              {t.page.manageRenewal}
             </a>
             
             <a
@@ -186,12 +192,12 @@ export default function StoreInitializer() {
               className="w-full py-3.5 px-4 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 font-bold rounded-xl transition-all active:scale-[0.98] text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer"
             >
               <Phone size={15} className="text-orange-500" />
-              Gọi Hotline: 0707.898.849
+              {t.page.callHotline}
             </a>
           </div>
 
           <div className="text-[10px] font-bold text-gray-500 mt-6 uppercase tracking-wider">
-            Vui lòng gia hạn hoặc liên hệ hỗ trợ để tiếp tục dịch vụ
+            {t.page.subscriptionSuspendedHint}
           </div>
         </div>
       </div>
@@ -200,7 +206,7 @@ export default function StoreInitializer() {
 
   return (
     <>
-      <title>{storeConfig?.name ? `${storeConfig.name} - Đặt Món Online` : "Order QR - Đặt Món Online"}</title>
+      <title>{storeConfig?.name ? t.page.documentTitle.replace("{name}", storeConfig.name) : t.landing.title}</title>
       <link rel="icon" href="/orderqr-logo.svg" type="image/svg+xml" />
     </>
   );

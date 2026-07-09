@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Store as StoreData, superAdminApi } from "@/api/superadmin";
 import { showAlert } from "@/store/dialogStore";
 import { getImageUrl, compressImage } from "@/utils/image";
+import { useTranslation } from "@/hooks/useTranslation";
+import { translateApiError } from "@/utils/apiError";
 
 export const THEME_PALETTES = [
   { name: "Fire - Standard Orange", color: "#f97316", bgClass: "bg-primary", element: "Fire" },
@@ -52,6 +54,7 @@ export function StoreFormModal({
   initialData,
   isPending,
 }: StoreFormModalProps) {
+  const t = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState(initialData);
   const [isUploading, setIsUploading] = useState(false);
@@ -74,7 +77,7 @@ export function StoreFormModal({
       const res = await superAdminApi.uploadLogo(compressedFile);
       setFormData((prev) => ({ ...prev, logo: res.url }));
     } catch (err: any) {
-      showAlert("Error uploading logo: " + (err.message || "Unknown error"));
+      showAlert(t.superadmin.errorUploadingLogo.replace("{error}", translateApiError(err, t, t.apiErrors.default)));
     } finally {
       setIsUploading(false);
     }
@@ -105,9 +108,9 @@ export function StoreFormModal({
             {/* Modal Header */}
             <div className="flex items-center gap-3.5 mb-5">
               <div>
-                <h2 className="text-xl font-black text-gray-900">{editingStoreId ? "Update Store" : "Add New Store"}</h2>
+                <h2 className="text-xl font-black text-gray-900">{editingStoreId ? t.superadmin.updateStore : t.superadmin.addNewStore}</h2>
                 <p className="text-gray-400 text-[9px] font-black uppercase tracking-wider mt-0.5">
-                  {editingStoreId ? "Edit information & admin account" : "Initialize store information & account"}
+                  {editingStoreId ? t.superadmin.updateStoreSubtitle : t.superadmin.addNewStoreSubtitle}
                 </p>
               </div>
             </div>
@@ -129,7 +132,7 @@ export function StoreFormModal({
                     )}
                   </div>
                   <div className="flex-1">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Store Logo</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.storeLogo}</label>
                     <input
                       type="file"
                       accept="image/*"
@@ -141,27 +144,27 @@ export function StoreFormModal({
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Store Name</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.storeName}</label>
                   <input
                     required
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
-                    placeholder="e.g. Quán Ăn Việt"
+                    placeholder={t.superadmin.storeNamePlaceholder}
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Store Description</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.storeDescription}</label>
                   <textarea
                     value={formData.description || ""}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none h-20 resize-none"
-                    placeholder="E.g. Welcome to our store!"
+                    placeholder={t.superadmin.storeDescriptionPlaceholder}
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Subdomain Slug</label>
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.subdomainSlug}</label>
                   <div className="flex items-center gap-2">
                     <input
                       required
@@ -170,19 +173,19 @@ export function StoreFormModal({
                       value={formData.slug}
                       onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/ /g, '-') })}
                       className="flex-1 h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 font-mono text-sm disabled:opacity-50 outline-none"
-                      placeholder="e.g. quan-an-viet"
+                      placeholder={t.superadmin.subdomainPlaceholder}
                     />
                     <span className="text-gray-400 font-bold text-xs">.{process.env.NEXT_PUBLIC_MAIN_DOMAIN || "orderqr.id.vn"}</span>
                   </div>
                   {editingStoreId && (
                     <div className="mt-2.5">
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Admin Username (Read Only)</label>
+                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.adminUsernameReadonly}</label>
                       <input
                         type="text"
                         readOnly
                         value={currentEditingStore?.users?.[0]?.username || "admin"}
                         className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl font-mono text-sm uppercase text-gray-500 cursor-not-allowed outline-none opacity-75"
-                        title="Store admin login username"
+                        title={t.superadmin.adminUsernameReadonly}
                       />
                     </div>
                   )}
@@ -191,28 +194,28 @@ export function StoreFormModal({
                 {editingStoreId ? (
                   <>
                     <div className="h-px bg-gray-100 my-1"></div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-purple-600">Change Admin Account (Optional)</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-purple-600">{t.superadmin.changeAdminAccountOptional}</p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                       <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">New Admin Username</label>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.newAdminUsername}</label>
                         <input
                           type="text"
                           value={formData.adminUsername}
                           onChange={(e) => setFormData({ ...formData, adminUsername: e.target.value })}
                           className="w-full h-12 px-5 bg-gray-50 border-2 border-purple-50 focus:border-purple-500 rounded-xl outline-none focus:ring-2 focus:ring-purple-500/20 text-sm"
-                          placeholder="Leave empty to keep unchanged"
+                          placeholder={t.superadmin.leaveEmptyUnchanged}
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">New Admin Password</label>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.newAdminPassword}</label>
                         <div className="relative">
                           <input
                             type={showPassword ? "text" : "password"}
                             value={formData.adminPassword}
                             onChange={(e) => setFormData({ ...formData, adminPassword: e.target.value })}
                             className="w-full h-12 pl-5 pr-11 bg-gray-50 border-2 border-purple-50 focus:border-purple-500 rounded-xl outline-none focus:ring-2 focus:ring-purple-500/20 text-sm"
-                            placeholder="Leave empty to keep unchanged"
+                            placeholder={t.superadmin.leaveEmptyUnchanged}
                           />
                           <button
                             type="button"
@@ -228,22 +231,22 @@ export function StoreFormModal({
                 ) : (
                   <>
                     <div className="h-px bg-gray-100 my-1"></div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Store Admin Account</p>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t.superadmin.storeAdminAccount}</p>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                       <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Admin Username</label>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.adminUsername}</label>
                         <input
                           required
                           type="text"
                           value={formData.adminUsername}
                           onChange={(e) => setFormData({ ...formData, adminUsername: e.target.value })}
                           className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
-                          placeholder="admin-username"
+                          placeholder={t.superadmin.adminUsernamePlaceholder}
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Admin Password</label>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.adminPassword}</label>
                         <div className="relative">
                           <input
                             required
@@ -251,7 +254,7 @@ export function StoreFormModal({
                             value={formData.adminPassword}
                             onChange={(e) => setFormData({ ...formData, adminPassword: e.target.value })}
                             className="w-full h-12 pl-5 pr-11 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
-                            placeholder="••••••••"
+                            placeholder={t.superadmin.adminPasswordPlaceholder}
                           />
                           <button
                             type="button"
@@ -270,7 +273,7 @@ export function StoreFormModal({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Theme Color</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">{t.superadmin.themeColor}</label>
                     <div className="grid grid-cols-5 gap-2 bg-gray-50 p-3 rounded-2xl border border-gray-100">
                       {THEME_PALETTES.map((palette) => (
                         <button
@@ -288,49 +291,49 @@ export function StoreFormModal({
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Currency</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.currency}</label>
                     <input
                       type="text"
                       value={formData.currency}
                       onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
                       className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
-                      placeholder="VND"
+                      placeholder={t.superadmin.currencyPlaceholder}
                     />
                   </div>
                 </div>
 
                 <div className="h-px bg-gray-100 my-1"></div>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-blue-600">Subscription Plan Management</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest text-blue-600">{t.superadmin.subscriptionPlanManagement}</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Plan</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.plan}</label>
                     <select
                       value={formData.subscriptionPlan}
                       onChange={(e) => setFormData({ ...formData, subscriptionPlan: e.target.value as "FREE" | "PREMIUM" })}
                       className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none cursor-pointer"
                     >
-                      <option value="FREE">FREE Plan (Short duration)</option>
-                      <option value="PREMIUM">PREMIUM Plan (Unlimited)</option>
+                      <option value="FREE">{t.superadmin.freePlanOption}</option>
+                      <option value="PREMIUM">{t.superadmin.premiumPlanOption}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Subscription Status</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.subscriptionStatus}</label>
                     <select
                       value={formData.subscriptionStatus}
                       onChange={(e) => setFormData({ ...formData, subscriptionStatus: e.target.value })}
                       className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none cursor-pointer"
                     >
-                      <option value="ACTIVE">Active</option>
-                      <option value="EXPIRED">Expired</option>
-                      <option value="PENDING_PAYMENT">Pending Payment</option>
+                      <option value="ACTIVE">{t.superadmin.statusActive}</option>
+                      <option value="EXPIRED">{t.superadmin.statusExpired}</option>
+                      <option value="PENDING_PAYMENT">{t.superadmin.statusPendingPayment}</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Start Date</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.startDate}</label>
                     <input
                       type="date"
                       value={formData.subscriptionStart}
@@ -339,35 +342,35 @@ export function StoreFormModal({
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Expiry Date</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.expiryDate}</label>
                     <input
                       type="date"
                       value={formData.subscriptionEnd}
                       onChange={(e) => setFormData({ ...formData, subscriptionEnd: e.target.value })}
                       className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none"
-                      placeholder="Unlimited"
+                      placeholder={t.superadmin.unlimited}
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-3.5">
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Payment Amount (VND)</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.paymentAmount}</label>
                     <input
                       type="number"
                       value={formData.subscriptionPrice}
                       onChange={(e) => setFormData({ ...formData, subscriptionPrice: Number(e.target.value) })}
                       className="w-full h-12 px-5 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none font-mono"
-                      placeholder="E.g. 199000"
+                      placeholder={t.superadmin.paymentAmountPlaceholder}
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">Subscription Notes</label>
+                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 ml-1">{t.superadmin.subscriptionNotes}</label>
                     <textarea
                       value={formData.subscriptionNotes}
                       onChange={(e) => setFormData({ ...formData, subscriptionNotes: e.target.value })}
                       className="w-full px-5 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500/20 text-sm outline-none h-20 resize-none"
-                      placeholder="Additional notes about payment, renewals..."
+                      placeholder={t.superadmin.subscriptionNotesPlaceholder}
                     />
                   </div>
                 </div>
@@ -379,14 +382,14 @@ export function StoreFormModal({
                   onClick={onClose}
                   className="flex-1 px-5 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all text-sm"
                 >
-                  Cancel
+                  {t.common.cancel}
                 </button>
                 <button
                   type="submit"
                   disabled={isPending || isUploading}
                   className="flex-[2] px-5 py-3 bg-blue-600 text-white font-black rounded-xl hover:bg-blue-700 shadow-md shadow-blue-100 transition-all active:scale-95 disabled:opacity-50 text-sm"
                 >
-                  {isPending ? "Processing..." : editingStoreId ? "Save Changes" : "Confirm & Create Store"}
+                  {isPending ? t.common.processing : editingStoreId ? t.superadmin.saveChanges : t.superadmin.confirmCreateStore}
                 </button>
               </div>
             </form>

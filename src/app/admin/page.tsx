@@ -447,7 +447,7 @@ export default function AdminDashboard() {
               if (id === "THIS_MONTH") return t.admin.filterThisMonth;
               if (id === "THIS_YEAR") return t.admin.filterThisYear;
               if (id === "CUSTOM") return t.admin.filterCustom;
-              return btn.label;
+              return id;
             };
             return (
               <button

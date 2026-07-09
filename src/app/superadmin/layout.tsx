@@ -67,7 +67,7 @@ export default function SuperAdminLayout({
             <ShieldAlert size={18} />
           </div>
           <div>
-            <h1 className="font-black text-sm tracking-tight text-white leading-none">Super Admin</h1>
+            <h1 className="font-black text-sm tracking-tight text-white leading-none">{t.superadmin.title}</h1>
             <p className="text-[8px] font-bold text-blue-400 uppercase tracking-widest mt-0.5">{t.superadmin.platformLabel}</p>
           </div>
         </div>
@@ -94,7 +94,7 @@ export default function SuperAdminLayout({
             <ShieldAlert size={24} />
           </div>
           <div>
-            <h1 className="font-black text-xl tracking-tight leading-none text-white">Super Admin</h1>
+            <h1 className="font-black text-xl tracking-tight leading-none text-white">{t.superadmin.title}</h1>
             <p className="text-[10px] font-bold text-blue-400 uppercase tracking-widest mt-1">{t.superadmin.platformLabel}</p>
           </div>
         </div>
@@ -122,7 +122,7 @@ export default function SuperAdminLayout({
  
         <div className="mt-8 pt-6 border-t border-gray-800 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-black text-gray-500 uppercase tracking-wider">Language</span>
+            <span className="text-[10px] font-black text-gray-500 uppercase tracking-wider">{t.common.language}</span>
             <LanguageSelector light={false} />
           </div>
 

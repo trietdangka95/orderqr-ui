@@ -15,15 +15,21 @@ import {
   Mail
 } from "lucide-react";
 import useIsMounted from "@/hooks/useIsMounted";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useCartStore } from "@/store/cartStore";
+import { translateApiError } from "@/utils/apiError";
 
 const CONTACT_STATUS_TABS = [
-  { id: "PENDING", label: "Pending" },
-  { id: "CONTACTED", label: "Contacted" },
-  { id: "COMPLETED", label: "Completed" },
-  { id: "ALL", label: "All" },
+  { id: "PENDING" },
+  { id: "CONTACTED" },
+  { id: "COMPLETED" },
+  { id: "ALL" },
 ] as const;
 
 export default function SuperAdminContactsPage() {
+  const t = useTranslation();
+  const { language } = useCartStore();
+  const locale = language === "vi" ? "vi-VN" : "en-US";
   const isMounted = useIsMounted();
   const { data: contacts = [], isLoading } = useContactRequests();
   const updateStatusMutation = useUpdateContactStatus();
@@ -33,6 +39,13 @@ export default function SuperAdminContactsPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   if (!isMounted) return null;
+
+  const getStatusLabel = (status: "ALL" | "PENDING" | "CONTACTED" | "COMPLETED") => {
+    if (status === "ALL") return t.logs.actionAll;
+    if (status === "CONTACTED") return t.superadmin.statusContacted;
+    if (status === "COMPLETED") return t.superadmin.statusCompleted;
+    return t.superadmin.statusPending;
+  };
 
   const filteredContacts = contacts.filter((contact) => {
     // 1. Filter by tab status
@@ -49,23 +62,17 @@ export default function SuperAdminContactsPage() {
   });
 
   const handleUpdateStatus = async (id: string, name: string, status: "PENDING" | "CONTACTED" | "COMPLETED") => {
-    const statusText =
-      status === "PENDING"
-        ? "Pending"
-        : status === "CONTACTED"
-        ? "Contacted"
-        : "Completed";
+    const statusText = getStatusLabel(status);
 
-    if (await showConfirm(`Are you sure you want to change the status of "${name}"'s request to "${statusText}"?`)) {
+    if (await showConfirm(t.superadmin.updateContactConfirm.replace("{name}", name).replace("{status}", statusText))) {
       updateStatusMutation.mutate(
         { id, status },
         {
           onSuccess: () => {
-            showAlert("Status updated successfully!");
+            showAlert(t.superadmin.statusUpdated);
           },
           onError: (err: unknown) => {
-            const error = err as { message?: string };
-            showAlert(error.message || "Failed to update status!");
+            showAlert(translateApiError(err, t, t.superadmin.updateStatusFailed));
           }
         }
       );
@@ -73,14 +80,13 @@ export default function SuperAdminContactsPage() {
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (await showConfirm(`WARNING: Are you sure you want to DELETE the registration request from "${name}"? This action cannot be undone.`)) {
+    if (await showConfirm(t.superadmin.deleteContactConfirm.replace("{name}", name))) {
       deleteMutation.mutate(id, {
         onSuccess: () => {
-          showAlert("Request deleted successfully!");
+          showAlert(t.superadmin.contactDeleted);
         },
         onError: (err: unknown) => {
-          const error = err as { message?: string };
-          showAlert(error.message || "Failed to delete request!");
+          showAlert(translateApiError(err, t, t.superadmin.deleteContactFailed));
         }
       });
     }
@@ -89,8 +95,8 @@ export default function SuperAdminContactsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">Registration Requests</h1>
-        <p className="text-gray-500 font-medium italic">Manage the list of restaurants that registered for the service from the landing page</p>
+        <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">{t.superadmin.contactsTitle}</h1>
+        <p className="text-gray-500 font-medium italic">{t.superadmin.contactsSubtitle}</p>
       </div>
 
       {/* Controls: Tab and Search */}
@@ -112,7 +118,7 @@ export default function SuperAdminContactsPage() {
                     : "text-gray-500 hover:text-gray-800 hover:bg-gray-200/40"
                 }`}
               >
-                {tab.label}
+                {getStatusLabel(tab.id)}
                 <span
                   className={`px-1.5 py-0.5 rounded-full text-[9px] font-black transition-colors ${
                     activeTab === tab.id ? "bg-blue-50 text-blue-600" : "bg-gray-200 text-gray-500"
@@ -130,7 +136,7 @@ export default function SuperAdminContactsPage() {
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
-            placeholder="Search by name, phone, notes..."
+            placeholder={t.superadmin.searchContactsPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white border border-gray-200 rounded-2xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:border-blue-600 transition-colors font-medium text-gray-800 placeholder-gray-400"
@@ -140,11 +146,11 @@ export default function SuperAdminContactsPage() {
 
       {isLoading ? (
         <div className="text-center font-bold text-gray-400 py-20 animate-pulse">
-          Loading registration list...
+          {t.superadmin.loadingContacts}
         </div>
       ) : filteredContacts.length === 0 ? (
         <div className="bg-white rounded-3xl border border-gray-100 p-20 text-center text-gray-400 italic">
-          No registration requests found in this section.
+          {t.superadmin.contactsEmpty}
         </div>
       ) : (
         <>
@@ -159,7 +165,7 @@ export default function SuperAdminContactsPage() {
                     </div>
                     <div className="text-left">
                       <h4 className="font-bold text-gray-900 leading-tight">
-                        {contact.name || "N/A"}
+                        {contact.name || t.common.notAvailable}
                       </h4>
                       <p className="text-[10px] text-gray-400 font-mono mt-0.5 flex items-center gap-1 flex-wrap">
                         <PhoneCall size={10} /> {contact.phone}
@@ -183,25 +189,25 @@ export default function SuperAdminContactsPage() {
                     }`}
                   >
                     {contact.status === "COMPLETED"
-                      ? "Completed"
+                      ? t.superadmin.statusCompleted
                       : contact.status === "CONTACTED"
-                      ? "Contacted"
-                      : "Pending"}
+                      ? t.superadmin.statusContacted
+                      : t.superadmin.statusPending}
                   </span>
                 </div>
 
                 <div className="pt-3 border-t border-gray-50 text-left text-xs font-semibold space-y-2">
                   <div>
-                    <span className="text-gray-400 block mb-0.5">Registration Time</span>
+                    <span className="text-gray-400 block mb-0.5">{t.superadmin.registrationTime}</span>
                     <span className="text-gray-600 flex items-center gap-1">
                       <Calendar size={12} className="text-gray-400 shrink-0" />
-                      {new Date(contact.createdAt).toLocaleDateString("vi-VN")}{" "}
-                      {new Date(contact.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      {new Date(contact.createdAt).toLocaleDateString(locale)}{" "}
+                      {new Date(contact.createdAt).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </div>
                   {contact.note && (
                     <div>
-                      <span className="text-gray-400 block mb-0.5">Additional Notes</span>
+                      <span className="text-gray-400 block mb-0.5">{t.superadmin.additionalNotes}</span>
                       <span className="text-gray-500 italic block bg-gray-50 p-2.5 rounded-xl border border-gray-100/65 leading-normal">
                         {contact.note}
                       </span>
@@ -217,7 +223,7 @@ export default function SuperAdminContactsPage() {
                       className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1 text-[11px] shadow-sm"
                     >
                       <PhoneCall size={14} />
-                      Contacted
+                      {t.superadmin.statusContacted}
                     </button>
                   )}
                   {contact.status !== "COMPLETED" && (
@@ -227,14 +233,14 @@ export default function SuperAdminContactsPage() {
                       className="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-1 text-[11px] shadow-sm"
                     >
                       <CheckCircle size={14} />
-                      Completed
+                      {t.superadmin.statusCompleted}
                     </button>
                   )}
                   <button
                     disabled={updateStatusMutation.isPending || deleteMutation.isPending}
                     onClick={() => handleDelete(contact.id, contact.name)}
                     className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-all active:scale-[0.98] flex items-center justify-center"
-                    title="Delete request"
+                    title={t.superadmin.deleteRequest}
                   >
                     <Trash2 size={16} />
                   </button>
@@ -249,11 +255,11 @@ export default function SuperAdminContactsPage() {
               <table className="w-full text-left text-sm font-medium">
                 <thead className="bg-gray-50 text-[10px] font-black uppercase text-gray-400 border-b border-gray-100">
                   <tr>
-                    <th className="px-6 py-4">Customer / Contact</th>
-                    <th className="px-6 py-4">Additional Notes</th>
-                    <th className="px-6 py-4">Date Sent</th>
-                    <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th className="px-6 py-4">{t.superadmin.customerContact}</th>
+                    <th className="px-6 py-4">{t.superadmin.additionalNotes}</th>
+                    <th className="px-6 py-4">{t.superadmin.registrationTime}</th>
+                    <th className="px-6 py-4">{t.superadmin.statusLabel}</th>
+                    <th className="px-6 py-4 text-right">{t.common.actions}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50 text-gray-700">
@@ -266,7 +272,7 @@ export default function SuperAdminContactsPage() {
                           </div>
                           <div>
                             <p className="font-bold text-gray-900 leading-tight">
-                              {contact.name || "N/A"}
+                              {contact.name || t.common.notAvailable}
                             </p>
                             <div className="flex flex-col gap-0.5">
                               <p className="text-[11px] text-gray-500 font-mono mt-1 flex items-center gap-1">
@@ -286,17 +292,17 @@ export default function SuperAdminContactsPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-start gap-1.5 max-w-sm text-xs italic text-gray-600">
                           <MessageSquare size={13} className="text-gray-400 shrink-0 mt-0.5" />
-                          <span className="line-clamp-3">{contact.note || "No notes"}</span>
+                          <span className="line-clamp-3">{contact.note || t.common.noNotes}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1 text-xs text-gray-500 font-semibold">
                           <Calendar size={12} className="text-gray-400 shrink-0" />
-                          <span>{new Date(contact.createdAt).toLocaleDateString("vi-VN")}</span>
+                          <span>{new Date(contact.createdAt).toLocaleDateString(locale)}</span>
                           <span className="text-[10px] text-gray-300">|</span>
                           <Clock size={12} className="text-gray-400 shrink-0" />
                           <span>
-                            {new Date(contact.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                            {new Date(contact.createdAt).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}
                           </span>
                         </div>
                       </td>
@@ -311,10 +317,10 @@ export default function SuperAdminContactsPage() {
                           }`}
                         >
                           {contact.status === "COMPLETED"
-                            ? "Completed"
+                            ? t.superadmin.statusCompleted
                             : contact.status === "CONTACTED"
-                            ? "Contacted"
-                            : "Pending"}
+                            ? t.superadmin.statusContacted
+                            : t.superadmin.statusPending}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -324,10 +330,10 @@ export default function SuperAdminContactsPage() {
                               disabled={updateStatusMutation.isPending || deleteMutation.isPending}
                               onClick={() => handleUpdateStatus(contact.id, contact.name, "CONTACTED")}
                               className="bg-blue-500 hover:bg-blue-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-blue-100"
-                              title="Mark as Contacted"
+                              title={t.superadmin.markAsContacted}
                             >
                               <PhoneCall size={15} />
-                              Contact
+                              {t.superadmin.contactAction}
                             </button>
                           )}
                           {contact.status !== "COMPLETED" && (
@@ -335,17 +341,17 @@ export default function SuperAdminContactsPage() {
                               disabled={updateStatusMutation.isPending || deleteMutation.isPending}
                               onClick={() => handleUpdateStatus(contact.id, contact.name, "COMPLETED")}
                               className="bg-green-500 hover:bg-green-600 text-white font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center gap-1 text-xs shadow-md shadow-green-100"
-                              title="Mark as Completed"
+                              title={t.superadmin.markAsCompleted}
                             >
                               <CheckCircle size={15} />
-                              Done
+                              {t.superadmin.doneAction}
                             </button>
                           )}
                           <button
                             disabled={updateStatusMutation.isPending || deleteMutation.isPending}
                             onClick={() => handleDelete(contact.id, contact.name)}
                             className="bg-red-50 hover:bg-red-100 text-red-600 font-bold p-2 rounded-xl transition-all active:scale-[0.9] flex items-center justify-center"
-                            title="Delete request"
+                            title={t.superadmin.deleteRequest}
                           >
                             <Trash2 size={15} />
                           </button>

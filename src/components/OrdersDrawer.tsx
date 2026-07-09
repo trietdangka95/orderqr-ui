@@ -11,6 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useEffect } from "react";
 import { getImageUrl } from "@/utils/image";
+import { translateApiError } from "@/utils/apiError";
 
 const sanitizeBankId = (bankId: string | undefined | null): string => {
   if (!bankId) return "";
@@ -136,7 +137,7 @@ export default function OrdersDrawer() {
 
         return {
           ...i,
-          name: i.product?.name || 'Món ăn',
+          name: i.product?.name || t.revenue.unknownItem,
           image: i.product?.image || '',
           price,
           originalPrice,
@@ -748,7 +749,7 @@ export default function OrdersDrawer() {
                         setSelectedPayment(null);
                       },
                       onError: (err: any) => {
-                        showAlert(err.message || t.ordersDrawer.submitPaymentError);
+                        showAlert(translateApiError(err, t, t.ordersDrawer.submitPaymentError));
                       }
                     });
                   }}

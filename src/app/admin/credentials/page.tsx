@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useChangePassword } from "@/hooks/useAuth";
 import UserPasswordManager from "./components/UserPasswordManager";
 import { useTranslation } from "@/hooks/useTranslation";
+import { translateApiError } from "@/utils/apiError";
 
 export default function CredentialsPage() {
   const t = useTranslation();
@@ -49,7 +50,7 @@ export default function CredentialsPage() {
         setTimeout(() => setShowSuccess(false), 3000);
       },
       onError: (err: Error) => {
-        setError(err.message || t.credentials.oldPasswordIncorrect);
+        setError(translateApiError(err, t, t.credentials.oldPasswordIncorrect));
       }
     });
   };

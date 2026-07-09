@@ -6,7 +6,8 @@
     "dev": "next dev --webpack -p 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "i18n:audit": "node scripts/i18n-audit.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.10",

@@ -4,6 +4,9 @@
 import { Clock, ChefHat, Check } from "lucide-react";
 import { useUpdateOrderItemStatus } from "@/hooks/useOrders";
 import { VirtualTicket, ColumnType } from "@/app/admin/kitchen/page";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useCartStore } from "@/store/cartStore";
+import { formatPrice } from "@/utils/currency";
 
 interface OrderTicketProps {
   ticket: VirtualTicket;
@@ -11,7 +14,10 @@ interface OrderTicketProps {
 }
 
 export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
+  const t = useTranslation();
+  const { language, storeConfig } = useCartStore();
   const updateItemStatusMutation = useUpdateOrderItemStatus();
+  const locale = language === "vi" ? "vi-VN" : "en-US";
 
   const handleItemAction = (orderItemId: string, action: "startCooking" | "doneCooking" | "served") => {
     if (updateItemStatusMutation.isPending) return;
@@ -49,13 +55,15 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
             {ticket.tableNumber}
           </div>
           <div>
-            <span className="font-black text-xs text-gray-900 uppercase tracking-[0.2em]">Bàn {ticket.tableNumber}</span>
+            <span className="font-black text-xs text-gray-900 uppercase tracking-[0.2em]">
+              {t.kitchen.summaryTableLabel.replace("{table}", ticket.tableNumber)}
+            </span>
             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">#{ticket.orderId.slice(-4)}</div>
           </div>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] text-gray-400 font-bold bg-white px-2 py-1 rounded-lg border border-gray-100">
           <Clock size={12} />
-          {new Date(ticket.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          {new Date(ticket.timestamp).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}
         </div>
       </div>
 
@@ -84,7 +92,7 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 hover:bg-red-500 hover:text-white hover:border-red-500 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 shrink-0 disabled:opacity-50"
                     >
                       <ChefHat size={12} />
-                      Nấu
+                      {t.kitchen.ticketActionCook}
                     </button>
                   )}
 
@@ -95,21 +103,21 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 text-white hover:bg-orange-600 rounded-xl font-black text-[10px] uppercase tracking-wider transition-all active:scale-95 shrink-0 shadow-md shadow-orange-200/50 disabled:opacity-50"
                     >
                       <Check size={12} strokeWidth={3} />
-                      Xong
+                      {t.kitchen.ticketActionDone}
                     </button>
                   )}
 
                   {columnType === "serving" && (
                     <span className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-xl font-black text-[10px] uppercase tracking-wider shrink-0">
                       <Clock size={12} />
-                      Chờ phục vụ
+                      {t.kitchen.ticketWaitingService}
                     </span>
                   )}
 
                   {columnType === "completed" && (
                     <span className="flex items-center gap-1 px-2 py-1 bg-green-50 text-green-600 border border-green-100 rounded-xl text-[10px] font-black uppercase tracking-wider shrink-0">
                       <Check size={10} strokeWidth={3} />
-                      Xong
+                      {t.kitchen.ticketActionDone}
                     </span>
                   )}
                 </div>
@@ -128,9 +136,9 @@ export default function OrderTicket({ ticket, columnType }: OrderTicketProps) {
         {/* Footer — total price */}
         <div className="pt-4 border-t border-dashed border-gray-100">
           <div className="flex flex-col">
-            <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Tổng cộng</span>
+            <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">{t.kitchen.ticketTotal}</span>
             <span className="font-black text-gray-900 text-lg">
-              {Number(ticket.orderTotalPrice).toLocaleString("vi-VN")}₫
+              {formatPrice(Number(ticket.orderTotalPrice), storeConfig, language)}
             </span>
           </div>
         </div>

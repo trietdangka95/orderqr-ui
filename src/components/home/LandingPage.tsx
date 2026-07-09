@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useCartStore } from "@/store/cartStore";
 import LanguageSelector from "@/components/ui/LanguageSelector";
+import { translateApiError } from "@/utils/apiError";
 import {
   ChefHat,
   QrCode,
@@ -88,12 +89,7 @@ export default function LandingPage() {
       setTimeout(() => setSubmitSuccess(null), 5000);
     } catch (err: unknown) {
       console.error(err);
-      const error = err as { response?: { data?: { message?: string } }; message?: string };
-      setSubmitError(
-        error.response?.data?.message ||
-        error.message ||
-        t.landing.formError,
-      );
+      setSubmitError(translateApiError(err, t, t.landing.formError));
     } finally {
       setIsSubmitting(false);
     }
